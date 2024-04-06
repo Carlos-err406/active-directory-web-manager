@@ -14,19 +14,20 @@
 	<Form.Control let:attrs>
 		<Form.Label><slot name="label" /></Form.Label>
 		<div class="relative">
-			<div class="absolute left-2 top-1">
+			<div class="addornment absolute left-2 top-2.5">
 				<slot name="addornment-left" />
 			</div>
 			<Input
 				class={clsx(
 					!!$$slots['addornment-left'] && 'pl-10',
-					!!$$slots['addornment-right'] && 'pr-10'
+					!!$$slots['addornment-right'] && 'pr-10',
+					'w-full'
 				)}
 				bind:value
 				{...inputProps}
 				{...attrs}
 			/>
-			<div class="absolute right-2 top-1">
+			<div class="addornment absolute right-2 top-2.5">
 				<slot name="addornment-right" />
 			</div>
 		</div>
