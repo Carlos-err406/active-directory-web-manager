@@ -1,0 +1,11 @@
+version: '3.2'
+services:
+  samba:
+    image: samba4:latest
+    #    privileged: true
+    env_file:
+      - ../.env
+    ports:
+      - 389:389
+      - 636:636
+    restart: unless-stopped
