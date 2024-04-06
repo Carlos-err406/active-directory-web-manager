@@ -5,3 +5,4 @@ export const loginSchema = z.object({
 	password: z.string().min(8)
 });
 export type LoginSchema = typeof loginSchema;
+
