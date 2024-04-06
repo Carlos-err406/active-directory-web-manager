@@ -1,4 +1,4 @@
-import { loginSchema } from '$lib/components/form/schemas/login-schema';
+import { loginSchema } from '$lib/schemas/login-schema';
 import { fail } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';

@@ -2,7 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import Input from '$lib/components/form/input.svelte';
-	import { loginSchema } from '$lib/components/form/schemas/login-schema';
+	import { loginSchema } from '$lib/schemas/login-schema';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import Loader from '$lib/components/ui/loader.svelte';
