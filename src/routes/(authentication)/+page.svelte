@@ -2,10 +2,9 @@
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import Input from '$lib/components/form/input.svelte';
-	import { loginSchema } from '$lib/schemas/login-schema';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
-	import Loader from '$lib/components/ui/loader.svelte';
+	import { loginSchema } from '$lib/schemas/login-schema';
 	import { Eye, LockKeyholeIcon, Mail } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 	import { superForm } from 'sveltekit-superforms';
@@ -24,11 +23,7 @@
 			toast.error('Invalid credentials');
 		}
 	}
-	const {
-		form: formData,
-		submitting,
-		options: {}
-	} = methods;
+	const { form: formData } = methods;
 </script>
 
 <form method="POST" use:enhance>
@@ -71,9 +66,7 @@
 			</Input>
 		</Card.Content>
 		<Card.Footer>
-			<Button type="submit" class="w-full">
-				<Loader condition={$submitting}>Sign in</Loader>
-			</Button>
+			<Button type="submit" class="w-full">Sign in</Button>
 		</Card.Footer>
 	</Card.Root>
 </form>
