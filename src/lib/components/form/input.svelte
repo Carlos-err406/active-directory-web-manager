@@ -1,5 +1,6 @@
 <script lang="ts" context="module">
 	export type InputProps = Partial<Omit<HTMLInputAttributes, 'value' | 'name'>>;
+	type T = Record<string, unknown>;
 </script>
 
 <script lang="ts">
@@ -9,7 +10,7 @@
 	import type { SuperForm } from 'sveltekit-superforms';
 	import { Input } from '../ui/input';
 	export let name: string;
-	export let methods: SuperForm<any>;
+	export let methods: SuperForm<T>;
 	export let value: HTMLInputAttributes['value'] = undefined;
 	export let inputProps: InputProps = {};
 </script>

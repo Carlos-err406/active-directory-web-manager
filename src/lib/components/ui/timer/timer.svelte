@@ -1,7 +1,5 @@
 <script lang="ts">
-	import { flyAndScale } from '$lib/utils';
 	import { createEventDispatcher, onMount } from 'svelte';
-	import { scale } from 'svelte/transition';
 
 	export let timeout: number;
 	let animationFrameId: number;

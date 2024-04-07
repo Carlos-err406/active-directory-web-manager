@@ -1,3 +1,7 @@
+<script lang="ts" context="module">
+	type T = Record<string, unknown>;
+</script>
+
 <script lang="ts">
 	import { Eye, EyeOff, LockKeyholeIcon } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
@@ -5,7 +9,7 @@
 	import type { SuperForm } from 'sveltekit-superforms';
 	import { Button } from '../ui/button';
 	import Input, { type InputProps } from './input.svelte';
-	export let methods: SuperForm<any>;
+	export let methods: SuperForm<T>;
 	export let value: HTMLInputAttributes['value'] = undefined;
 	export let inputProps: Omit<InputProps, 'type'> = {};
 	let show = false;
