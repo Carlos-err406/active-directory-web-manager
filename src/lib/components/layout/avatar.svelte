@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import { DoorOpen, LogOut } from 'lucide-svelte';
 </script>
 
 <DropdownMenu.Root>
@@ -20,10 +21,12 @@
 		<DropdownMenu.Separator />
 		<DropdownMenu.Item>Settings</DropdownMenu.Item>
 		<DropdownMenu.Item>Support</DropdownMenu.Item>
-		<DropdownMenu.Separator />
 		<DropdownMenu.Item class="justify-center p-0">
 			<form method="post" action="/?/signOut" class="w-full">
-				<Button type="submit" class="w-full">Logout</Button>
+				<Button type="submit" variant="destructive" class="w-full space-x-3">
+					<span>Sign Out</span>
+					<LogOut />
+				</Button>
 			</form>
 		</DropdownMenu.Item>
 	</DropdownMenu.Content>
