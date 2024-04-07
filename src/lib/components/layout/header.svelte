@@ -9,12 +9,12 @@
 <header
 	class="sticky top-0 z-30 flex h-14 items-center justify-between gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6"
 >
-	<div class="w-full flex items-center gap-4">
+	<div class="flex w-full items-center gap-4">
 		<NavigationSheet />
 		<SearchForm />
 		<Breadcrumb.Root class="hidden md:flex">
 			<Breadcrumb.List class="!flex-nowrap">
-				{#each $breadcrumbs as item, index}
+				{#each $breadcrumbs as item, index (item.name)}
 					<Breadcrumb.Item>
 						{#if item.link}
 							<Breadcrumb.Link href={item.link}>{item.name}</Breadcrumb.Link>

@@ -15,7 +15,9 @@
 </script>
 
 <script lang="ts">
+	import { page } from '$app/stores';
 	import * as Tooltip from '$lib/components/ui/tooltip';
+	import clsx from 'clsx';
 </script>
 
 <aside class="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
@@ -36,7 +38,10 @@
 					<a
 						{href}
 						data-sveltekit-preload-data="hover"
-						class="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+						class={clsx(
+							'flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8',
+							$page.url.pathname === href && 'border-l-2 border-l-primary bg-accent shadow-lg !text-foreground'
+						)}
 						use:builder.action
 						{...builder}
 					>
@@ -54,7 +59,10 @@
 					<a
 						data-sveltekit-preload-data="hover"
 						href="/settings"
-						class="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+						class={clsx(
+							'flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8',
+							$page.url.pathname === "/settings" && 'border-l-2 border-l-primary bg-accent shadow-lg !text-foreground'
+						)}
 						use:builder.action
 						{...builder}
 					>
