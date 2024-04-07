@@ -1,16 +1,13 @@
 <script>
-	import * as Sheet from '$lib/components/ui/sheet';
 	import { Button } from '$lib/components/ui/button';
+	import * as Sheet from '$lib/components/ui/sheet';
 	import {
-		Home,
-		LineChart,
-		Package,
-		Package2,
+		Code,
 		PanelLeft,
 		PanelRight,
-		ShoppingCart,
-		UsersRound
+		Settings
 	} from 'lucide-svelte';
+	import { items } from './navigation.svelte';
 </script>
 
 <Sheet.Root>
@@ -25,44 +22,30 @@
 		</Button>
 	</Sheet.Trigger>
 	<Sheet.Content side="left" class="sm:max-w-xs">
-		<nav class="grid gap-6 text-lg font-medium">
+		<nav class="flex h-full flex-col gap-6 text-lg font-medium">
+			<div class="flex items-center gap-4 px-2.5 text-foreground">
+				<Code />
+				Console
+			</div>
+			<hr class="w-full bg-muted" />
+			{#each items as { name, icon, href }}
+				<!-- content here -->
+				<a
+					data-sveltekit-preload-data="hover"
+					{href}
+					class="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+				>
+					<svelte:component this={icon} class="h-5 w-5" />
+					{name}
+				</a>
+			{/each}
+			<hr class="mt-auto w-full bg-muted" />
 			<a
-				href="##"
-				class="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
+				data-sveltekit-preload-data="hover"
+				href="/settings"
+				class="flex items-center gap-4 justify-self-end px-2.5 text-muted-foreground hover:text-foreground"
 			>
-				<Package2 class="h-5 w-5 transition-all group-hover:scale-110" />
-				<span class="sr-only">Acme Inc</span>
-			</a>
-			<a
-				href="##"
-				class="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-			>
-				<Home class="h-5 w-5" />
-				Dashboard
-			</a>
-			<a
-				href="##"
-				class="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-			>
-				<ShoppingCart class="h-5 w-5" />
-				Orders
-			</a>
-			<a href="##" class="flex items-center gap-4 px-2.5 text-foreground">
-				<Package class="h-5 w-5" />
-				Products
-			</a>
-			<a
-				href="##"
-				class="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-			>
-				<UsersRound class="h-5 w-5" />
-				Customers
-			</a>
-			<a
-				href="##"
-				class="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-			>
-				<LineChart class="h-5 w-5" />
+				<Settings class="h-5 w-5" />
 				Settings
 			</a>
 		</nav>
