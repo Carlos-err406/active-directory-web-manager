@@ -6,7 +6,7 @@
 	import { Input } from '../ui/input';
 	export let name: string;
 	export let methods: SuperForm<any>;
-	export let value: HTMLInputAttributes['value'];
+	export let value: HTMLInputAttributes['value'] = undefined;
 	export let inputProps: Partial<HTMLInputAttributes> = {};
 </script>
 
@@ -23,6 +23,11 @@
 					!!$$slots['addornment-right'] && 'pr-10',
 					'w-full'
 				)}
+				on:input
+				on:change
+				on:keydown
+				on:keypress
+				on:keyup
 				bind:value
 				{...inputProps}
 				{...attrs}
