@@ -4,6 +4,9 @@
 	import NavigationSheet from './navigation-sheet.svelte';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
 	import { breadcrumbs } from '$lib/stores';
+	import { getContext } from 'svelte';
+	import type { Writable } from 'svelte/store';
+	const showSearch = getContext<Writable<boolean>>('showSearch');
 </script>
 
 <header
@@ -11,7 +14,9 @@
 >
 	<div class="flex w-full items-center gap-4">
 		<NavigationSheet />
-		<SearchForm />
+		{#if $showSearch}
+			<SearchForm />
+		{/if}
 		<Breadcrumb.Root class="hidden md:flex">
 			<Breadcrumb.List class="!flex-nowrap">
 				{#each $breadcrumbs as item, index (item.name)}

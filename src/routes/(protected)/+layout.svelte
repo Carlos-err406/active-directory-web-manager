@@ -5,6 +5,10 @@
 	import Header from '$lib/components/layout/header.svelte';
 	import Navigation from '$lib/components/layout/navigation.svelte';
 	import { breadcrumbs } from '$lib/stores';
+	import { setContext } from 'svelte';
+	import { writable } from 'svelte/store';
+	const showSearch = writable<boolean>(true);
+	setContext('showSearch', showSearch);
 	afterNavigate(() => {
 		switch ($page.url.pathname) {
 			case paths.groups.list:
