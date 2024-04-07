@@ -15,7 +15,7 @@
 <form class="min-w-fit max-w-64" action="?/search" method="post" use:enhance>
 	<Input
 		name="q"
-		form={methods}
+		{methods}
 		value={$formData.q}
 		inputProps={{ type: 'search', placeholder: 'Search' }}
 	>

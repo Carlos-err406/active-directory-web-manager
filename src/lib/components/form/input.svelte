@@ -5,12 +5,12 @@
 	import type { SuperForm } from 'sveltekit-superforms';
 	import { Input } from '../ui/input';
 	export let name: string;
-	export let form: SuperForm<any>;
+	export let methods: SuperForm<any>;
 	export let value: HTMLInputAttributes['value'];
 	export let inputProps: Partial<HTMLInputAttributes> = {};
 </script>
 
-<Form.Field {form} {name}>
+<Form.Field form={methods} {name}>
 	<Form.Control let:attrs>
 		<Form.Label><slot name="label" /></Form.Label>
 		<div class="relative">

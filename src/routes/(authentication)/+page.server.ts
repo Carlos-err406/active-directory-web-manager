@@ -12,8 +12,6 @@ export const actions: Actions = {
 	default: async (event) => {
 		const form = await superValidate(event, zod(loginSchema));
 		if (!form.valid) return fail(400, { form, success: false });
-		// TODO check in ldap
-
-		return { form, success: true };
+		return { form };
 	}
 };
