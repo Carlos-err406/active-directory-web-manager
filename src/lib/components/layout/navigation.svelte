@@ -40,7 +40,8 @@
 						data-sveltekit-preload-data="hover"
 						class={clsx(
 							'flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8',
-							$page.url.pathname === href && 'border-l-2 border-l-primary bg-accent shadow-lg !text-foreground'
+							$page.url.pathname.startsWith(href) &&
+								'border-l-2 border-l-primary bg-accent !text-foreground shadow-lg'
 						)}
 						use:builder.action
 						{...builder}
@@ -61,7 +62,8 @@
 						href="/settings"
 						class={clsx(
 							'flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8',
-							$page.url.pathname === "/settings" && 'border-l-2 border-l-primary bg-accent shadow-lg !text-foreground'
+							$page.url.pathname === '/settings' &&
+								'border-l-2 border-l-primary bg-accent !text-foreground shadow-lg'
 						)}
 						use:builder.action
 						{...builder}

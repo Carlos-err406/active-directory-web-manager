@@ -31,7 +31,7 @@
 					{href}
 					class={clsx(
 						'flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground transition-all py-3',
-						href === $page.url.pathname && 'border-l-4 border-l-primary bg-accent shadow-lg !text-foreground'
+						$page.url.pathname.startsWith(href) && 'border-l-4 border-l-primary bg-accent shadow-lg !text-foreground'
 					)}
 				>
 					<svelte:component this={icon} class="h-5 w-5" />

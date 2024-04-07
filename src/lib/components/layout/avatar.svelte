@@ -19,8 +19,10 @@
 	<DropdownMenu.Content align="end">
 		<DropdownMenu.Label>My Account</DropdownMenu.Label>
 		<DropdownMenu.Separator />
-		<DropdownMenu.Item>Settings</DropdownMenu.Item>
-		<DropdownMenu.Item>Support</DropdownMenu.Item>
+		<DropdownMenu.Item>
+			<a data-sveltekit-preload-data href="/users/me"> See profile </a>
+		</DropdownMenu.Item>
+		<DropdownMenu.Separator class="my-2"/>
 		<DropdownMenu.Item class="justify-center p-0">
 			<form method="post" action="/?/signOut" class="w-full">
 				<Button type="submit" variant="destructive" class="w-full space-x-3">
