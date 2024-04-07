@@ -1,4 +1,4 @@
-version: "3.4"
+version: '3.4'
 
 services:
   samba:
@@ -6,7 +6,7 @@ services:
       context: samba
       dockerfile: Dockerfile
       args:
-        samba_version: "4.20.0" #value selected from https://download.samba.org/pub/samba/stable
+        samba_version: '4.20.0' #value selected from https://download.samba.org/pub/samba/stable
     image: samba4:latest
     container_name: directory
     env_file:

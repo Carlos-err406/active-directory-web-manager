@@ -1,3 +1,3 @@
-<main class="h-screen w-full flex justify-center items-center">
+<main class="flex h-screen w-full items-center justify-center">
 	<slot />
 </main>

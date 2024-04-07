@@ -8,13 +8,16 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import Timer from '../ui/timer/timer.svelte';
 	import Input from './input.svelte';
+
 	let timer: number;
 	let showTimer = false;
 	let formElement: HTMLFormElement;
 	let q = $page.url.searchParams.get('q') || '';
+
 	afterNavigate(() => {
 		q = $page.url.searchParams.get('q') || '';
 	});
+
 	$: methods = superForm(
 		{ q },
 		{

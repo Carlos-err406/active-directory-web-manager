@@ -30,8 +30,9 @@
 					data-sveltekit-preload-data="hover"
 					{href}
 					class={clsx(
-						'flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground transition-all py-3',
-						$page.url.pathname.startsWith(href) && 'border-l-4 border-l-primary bg-accent shadow-lg !text-foreground'
+						'flex items-center gap-4 px-2.5 py-3 text-muted-foreground transition-all hover:text-foreground',
+						$page.url.pathname.startsWith(href) &&
+							'border-l-4 border-l-primary bg-accent !text-foreground shadow-lg'
 					)}
 				>
 					<svelte:component this={icon} class="h-5 w-5" />
