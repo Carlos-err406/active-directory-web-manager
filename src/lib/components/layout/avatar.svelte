@@ -1,7 +1,8 @@
 <script lang="ts">
+	import { paths } from '$lib';
 	import { Button } from '$lib/components/ui/button';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import { DoorOpen, LogOut } from 'lucide-svelte';
+	import { LogOut } from 'lucide-svelte';
 </script>
 
 <DropdownMenu.Root>
@@ -20,11 +21,11 @@
 		<DropdownMenu.Label>My Account</DropdownMenu.Label>
 		<DropdownMenu.Separator />
 		<DropdownMenu.Item>
-			<a data-sveltekit-preload-data href="/users/me"> See profile </a>
+			<a data-sveltekit-preload-data href={paths.users.me}> See profile </a>
 		</DropdownMenu.Item>
-		<DropdownMenu.Separator class="my-2"/>
+		<DropdownMenu.Separator class="my-2" />
 		<DropdownMenu.Item class="justify-center p-0">
-			<form method="post" action="/?/signOut" class="w-full">
+			<form method="post" action="{paths.auth}?/signOut" class="w-full">
 				<Button type="submit" variant="destructive" class="w-full space-x-3">
 					<span>Sign Out</span>
 					<LogOut />

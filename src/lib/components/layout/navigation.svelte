@@ -7,15 +7,20 @@
 	import { Building2, Code, FileTextIcon, Settings, User, Users } from 'lucide-svelte';
 	import type { SvelteComponent } from 'svelte';
 	export const items: NavigationItem[] = [
-		{ href: '/users', name: 'Users', icon: User as typeof SvelteComponent },
-		{ href: '/groups', name: 'Groups', icon: Users as typeof SvelteComponent },
-		{ href: '/ous', name: 'Organizational Units', icon: Building2 as typeof SvelteComponent },
-		{ href: '/logs', name: 'Logs', icon: FileTextIcon as typeof SvelteComponent }
+		{ href: paths.users.list, name: 'Users', icon: User as typeof SvelteComponent },
+		{ href: paths.groups.list, name: 'Groups', icon: Users as typeof SvelteComponent },
+		{
+			href: paths.ous.list,
+			name: 'Organizational Units',
+			icon: Building2 as typeof SvelteComponent
+		},
+		{ href: paths.logs.list, name: 'Logs', icon: FileTextIcon as typeof SvelteComponent }
 	];
 </script>
 
 <script lang="ts">
 	import { page } from '$app/stores';
+	import { paths } from '$lib';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import clsx from 'clsx';
 </script>
@@ -59,7 +64,7 @@
 				<Tooltip.Trigger asChild let:builder>
 					<a
 						data-sveltekit-preload-data="hover"
-						href="/settings"
+						href={paths.settings}
 						class={clsx(
 							'flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8',
 							$page.url.pathname === '/settings' &&
