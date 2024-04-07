@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import Input from '$lib/components/form/input.svelte';
+	import PasswordInput from '$lib/components/form/password-input.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import { loginSchema } from '$lib/schemas/login-schema';
 	import { signIn } from '@auth/sveltekit/client';
-	import { Eye, LockKeyholeIcon, Mail } from 'lucide-svelte';
+	import { Mail } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
@@ -14,6 +15,7 @@
 
 	const methods = superForm(data.form, {
 		validators: zodClient(loginSchema),
+		validationMethod: 'oninput',
 		onResult: async (event) => {
 			if (event.result.type !== 'success') return;
 			const res = await signIn('credentials', {
@@ -39,7 +41,7 @@
 	const { form: formData, enhance } = methods;
 </script>
 
-<form method="POST" action="?/signIn" use:enhance>
+<form method="POST" action="?/signIn" novalidate use:enhance>
 	<Card.Root class="w-full max-w-sm">
 		<Card.Header>
 			<Card.Title class="text-2xl">Login</Card.Title>
@@ -49,7 +51,8 @@
 			<Input
 				inputProps={{
 					placeholder: 'example@mail.com',
-					type: 'email'
+					type: 'email',
+					required: true
 				}}
 				bind:value={$formData.email}
 				{methods}
@@ -60,23 +63,7 @@
 					<Mail />
 				</svelte:fragment>
 			</Input>
-			<Input
-				name="password"
-				inputProps={{
-					placeholder: '*****',
-					type: 'password'
-				}}
-				bind:value={$formData.password}
-				{methods}
-			>
-				<svelte:fragment slot="label">Password</svelte:fragment>
-				<svelte:fragment slot="addornment-left">
-					<LockKeyholeIcon />
-				</svelte:fragment>
-				<svelte:fragment slot="addornment-right">
-					<Eye />
-				</svelte:fragment>
-			</Input>
+			<PasswordInput inputProps={{ required: true }} {methods} bind:value={$formData.password} />
 		</Card.Content>
 		<Card.Footer>
 			<Button type="submit" class="w-full">Sign in</Button>

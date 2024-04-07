@@ -59,3 +59,9 @@
 .addornment .lucide-icon {
 	@apply h-4 w-4;
 }
+
+label.required[for]::after {
+	content: '*';
+	margin-left: 0.2rem;
+	color: red;
+}

@@ -1,3 +1,7 @@
+<script lang="ts" context="module">
+	export type InputProps = Partial<Omit<HTMLInputAttributes, 'value' | 'name'>>;
+</script>
+
 <script lang="ts">
 	import * as Form from '$lib/components/ui/form';
 	import clsx from 'clsx';
@@ -7,12 +11,12 @@
 	export let name: string;
 	export let methods: SuperForm<any>;
 	export let value: HTMLInputAttributes['value'] = undefined;
-	export let inputProps: Partial<HTMLInputAttributes> = {};
+	export let inputProps: InputProps = {};
 </script>
 
 <Form.Field form={methods} {name}>
 	<Form.Control let:attrs>
-		<Form.Label><slot name="label" /></Form.Label>
+		<Form.Label class={clsx(inputProps.required && 'required')}><slot name="label" /></Form.Label>
 		<div class="relative">
 			<div class="addornment absolute left-2 top-2.5">
 				<slot name="addornment-left" />
