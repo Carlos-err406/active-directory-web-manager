@@ -13,7 +13,7 @@ export const { handle, signIn, signOut } = SvelteKitAuth({
 				if (!credentials || !credentials.email || !credentials.password) return null;
 				const { email, password } = credentials as { email: string; password: string };
 
-				if (email === 'admin@mail.com' && password === 'admin12345678') {
+				if (email === 'admin@mail.com' && password === 'ADmanager(2024)') {
 					return { id: '1', name: 'admin' };
 				}
 
