@@ -17,3 +17,5 @@ const getBreadcrumbsStore = () => {
 };
 
 export const breadcrumbs = getBreadcrumbsStore();
+
+export const globalLoader = writable<boolean>(false);
