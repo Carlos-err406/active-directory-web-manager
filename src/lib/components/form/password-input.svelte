@@ -1,17 +1,12 @@
-<script lang="ts" context="module">
-	type T = Record<string, unknown>;
-</script>
-
 <script lang="ts">
 	import { Eye, EyeOff, LockKeyholeIcon } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
-	import type { HTMLInputAttributes } from 'svelte/elements';
-	import type { SuperForm } from 'sveltekit-superforms';
 	import { Button } from '../ui/button';
 	import Input, { type InputProps } from './input.svelte';
-	export let methods: SuperForm<T>;
-	export let value: HTMLInputAttributes['value'] = undefined;
-	export let inputProps: Omit<InputProps, 'type'> = {};
+	import type { Methods } from './form.svelte';
+	export let methods: Methods;
+	export let name = 'password';
+	export let { ...inputProps }: Omit<InputProps, 'type'> = {};
 	let show = false;
 	let timer: number;
 	let countdown = 5;
@@ -31,16 +26,17 @@
 		}
 	};
 	onDestroy(() => clearInterval(timer));
+	const { form } = methods;
+	let value = $form[name];
 </script>
 
 <Input
-	name="password"
+	{name}
 	inputProps={{
 		placeholder: '*****',
 		...inputProps,
 		type: show ? 'text' : 'password'
 	}}
-	bind:value
 	{methods}
 >
 	<svelte:fragment slot="label">

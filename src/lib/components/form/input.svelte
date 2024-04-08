@@ -1,17 +1,17 @@
 <script lang="ts" context="module">
+	import type { HTMLInputAttributes } from 'svelte/elements';
+	import type { Methods } from './form.svelte';
 	export type InputProps = Partial<Omit<HTMLInputAttributes, 'value' | 'name'>>;
-	type T = Record<string, unknown>;
 </script>
 
 <script lang="ts">
 	import * as Form from '$lib/components/ui/form';
 	import clsx from 'clsx';
-	import type { HTMLInputAttributes } from 'svelte/elements';
-	import type { SuperForm } from 'sveltekit-superforms';
 	import { Input } from '../ui/input';
-	export let name: string;
-	export let methods: SuperForm<T>;
-	export let value: HTMLInputAttributes['value'] = undefined;
+	export let methods: Methods;
+	const { form } = methods;
+
+	export let name: keyof typeof $form;
 	export let inputProps: InputProps = {};
 </script>
 
@@ -33,7 +33,7 @@
 				on:keydown
 				on:keypress
 				on:keyup
-				bind:value
+				bind:value={$form[name]}
 				{...inputProps}
 				{...attrs}
 			/>

@@ -1,78 +1,83 @@
 <script lang="ts">
 	import { afterNavigate, goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { searchSchema } from '$lib/schemas/search-schema';
+	import { searchSchema as schema, type SearchSchema } from '$lib/schemas/search-schema';
 	import { Search } from 'lucide-svelte';
 	import { onDestroy } from 'svelte';
-	import { superForm } from 'sveltekit-superforms';
-	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { toast } from 'svelte-sonner';
 	import Timer from '../ui/timer/timer.svelte';
+	import Form, { type Methods, type ResultType } from './form.svelte';
 	import Input from './input.svelte';
 
 	let timer: number;
 	let showTimer = false;
 	let formElement: HTMLFormElement;
-	let q = $page.url.searchParams.get('q') || '';
-
+	let form = {
+		q: $page.url.searchParams.get('q')
+	};
 	afterNavigate(() => {
-		q = $page.url.searchParams.get('q') || '';
+		form.q = $page.url.searchParams.get('q');
 	});
-
-	$: methods = superForm(
-		{ q },
-		{
-			validators: zodClient(searchSchema),
-			clearOnSubmit: 'errors',
-
-			onSubmit: async (event) => {
-				const q = event.formData.get('q') as string;
-				const search = $page.url.searchParams;
-				if (q) search.set('q', q);
-				else search.delete('q');
-				await goto($page.url.pathname + '?' + search.toString());
-			}
+	const onResult = async (event: ResultType<SearchSchema>) => {
+		const { result } = event;
+		if (result.type === 'success') {
+			const { data } = result;
+			if (!data) return;
+			form.q = data.form.data.q || null;
+			const { searchParams } = $page.url;
+			const search = new URLSearchParams(searchParams);
+			if (form.q) search.set('q', form.q);
+			else search.delete('q');
+			await goto(`${$page.url.pathname}?${search.toString()}`);
+		} else {
+			toast.error('Something went wrong', { description: `Status: ${result.status}` });
 		}
-	);
-	$: ({ form: formData, submit, enhance } = methods);
+	};
 
-	const handleInput = () => {
+	const handleInput = (submit: Methods['submit']) => {
 		clearTimeout(timer);
+
 		if (showTimer) {
 			showTimer = false;
 			setTimeout(() => (showTimer = true), 10);
 		} else showTimer = true;
+
 		timer = setTimeout(() => {
 			showTimer = false;
-			submit(formElement);
+			submit();
 		}, 1000);
 	};
-	const handleEnter = (event: KeyboardEvent) => {
-		if (event.key === 'Enter') {
-			clearTimeout(timer);
-			showTimer = false;
-			submit(formElement);
-		}
-	};
+
 	onDestroy(() => {
 		clearTimeout(timer);
 		showTimer = false;
 	});
 </script>
 
-<form
-	bind:this={formElement}
-	class="w-full min-w-fit max-w-96"
-	action="?/search"
-	method="post"
-	use:enhance
+<Form
+	bind:formElement
+	let:methods
+	bind:form
+	{schema}
+	formProps={{ action: '?/search' }}
+	formOptions={{
+		resetForm: false,
+		validationMethod: 'oninput',
+		onResult
+	}}
 >
 	<Input
 		name="q"
 		{methods}
-		bind:value={$formData.q}
-		on:input={handleInput}
-		on:keydown={handleEnter}
-		inputProps={{ type: 'text', placeholder: 'Search' }}
+		inputProps={{ placeholder: 'Search' }}
+		on:input={() => handleInput(methods.submit)}
+		on:keydown={(event) => {
+			if (event.key === 'Enter') {
+				clearTimeout(timer);
+				showTimer = false;
+				methods.submit(formElement);
+			}
+		}}
 	>
 		<svelte:fragment slot="addornment-left">
 			<Search />
@@ -83,4 +88,4 @@
 			{/if}
 		</svelte:fragment>
 	</Input>
-</form>
+</Form>
