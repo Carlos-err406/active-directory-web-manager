@@ -63,6 +63,7 @@
 		"sveltekit-superforms": "^2.12.2",
 		"tailwind-merge": "^2.2.2",
 		"tailwind-variants": "^0.2.1",
+		"tailwindcss-animation-delay": "^1.2.0",
 		"zod": "^3.22.4"
 	},
 	"type": "module"

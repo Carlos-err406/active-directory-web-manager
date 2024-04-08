@@ -1,10 +1,11 @@
 import { fontFamily } from 'tailwindcss/defaultTheme';
+const tailwindcssAnimationDelay = 'tailwindcss-animation-delay';
 
 /** @type {import('tailwindcss').Config} */
 const config = {
 	darkMode: ['class'],
 	content: ['./src/**/*.{html,js,svelte,ts}'],
-	safelist: ['dark', { pattern: /delay-/ }],
+	safelist: ['dark', { pattern: /animation-delay/ }],
 	theme: {
 		container: {
 			center: true,
@@ -49,30 +50,6 @@ const config = {
 					foreground: 'hsl(var(--card-foreground) / <alpha-value>)'
 				}
 			},
-			transitionDelay: {
-				100: '100ms',
-				200: '200ms',
-				300: '300ms',
-				400: '400ms',
-				500: '500ms',
-				600: '600ms',
-				700: '700ms',
-				800: '800ms',
-				900: '900ms',
-				1000: '1000ms'
-			},
-			animationDelay: {
-				100: '100ms',
-				200: '200ms',
-				300: '300ms',
-				400: '400ms',
-				500: '500ms',
-				600: '600ms',
-				700: '700ms',
-				800: '800ms',
-				900: '900ms',
-				1000: '1000ms'
-			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
@@ -82,7 +59,8 @@ const config = {
 				sans: [...fontFamily.sans]
 			}
 		}
-	}
+	},
+	plugins: [require(tailwindcssAnimationDelay)]
 };
 
 export default config;
