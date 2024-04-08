@@ -7,7 +7,7 @@
 	const showSearch = getContext<Writable<boolean>>('showSearch');
 	showSearch.set(false);
 	beforeNavigate((navigation) => {
-		showSearch.set(navigation.to?.url.pathname === $page.url.pathname);
+		showSearch.set(navigation.to?.url.pathname !== $page.url.pathname);
 	});
 </script>
 

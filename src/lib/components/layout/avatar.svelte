@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import { paths } from '$lib';
 	import { Button } from '$lib/components/ui/button';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
@@ -25,7 +26,7 @@
 		</DropdownMenu.Item>
 		<DropdownMenu.Separator class="my-2" />
 		<DropdownMenu.Item class="justify-center p-0">
-			<form method="post" action="{paths.auth}?/signOut" class="w-full">
+			<form method="post" action="{paths.auth}?/signOut" class="w-full" use:enhance>
 				<Button type="submit" variant="destructive" class="w-full space-x-3">
 					<span>Sign Out</span>
 					<LogOut />
