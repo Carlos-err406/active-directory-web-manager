@@ -6,6 +6,7 @@
 		"dev": "vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
+		"start": "node -r dotenv/config build",
 		"test": "npm run test:integration && npm run test:unit",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
@@ -17,9 +18,9 @@
 	},
 	"lint-staged": {
 		"*": [
-			"prettier --write .",
-			"prettier --check .",
-			"eslint ."
+			"prettier --write",
+			"prettier --check",
+			"eslint"
 		]
 	},
 	"devDependencies": {
@@ -56,6 +57,7 @@
 		"bits-ui": "^0.21.2",
 		"clsx": "^2.1.0",
 		"cmdk-sv": "^0.0.17",
+		"dotenv": "^16.4.5",
 		"formsnap": "^1.0.0",
 		"mode-watcher": "^0.3.0",
 		"svelte-radix": "^1.1.0",
