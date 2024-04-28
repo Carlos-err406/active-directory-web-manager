@@ -3,64 +3,69 @@ version: '3.4'
 services:
   samba:
     build:
-      context: samba
-      dockerfile: Dockerfile
+      dockerfile: samba.Dockerfile
       args:
-        samba_version: '4.20.0' #value selected from https://download.samba.org/pub/samba/stable
-    image: samba4:latest
-    container_name: directory
-    env_file:
-      - .env
+        samba_version: '4.16.7' #value selected from https://download.samba.org/pub/samba/stable
+    image: admanager.directory:latest
+    container_name: admanager.directory
+    environment:
+      SAMBA_DC_REALM: ${SAMBA_DC_REALM}
+      SAMBA_DC_DOMAIN: ${SAMBA_DC_DOMAIN}
+      SAMBA_DC_ADMIN_PASSWD: ${SAMBA_DC_ADMIN_PASSWD}
+      SAMBA_DC_DNS_BACKEND: ${SAMBA_DC_DNS_BACKEND}
     restart: unless-stopped
+    ports:
+      - 636:636
+      - 389:389
     networks:
-      adwebmanagerapp.net:
-        ipv4_address: ${SAMBA_AD_SERVER}
+      admanager.net:
+        ipv4_address: 172.16.238.11
 
   db:
     image: postgres:16.2-alpine3.19
-    container_name: adwebmanagerapp.db
+    container_name: admanager.db
     env_file:
       - .env
     ports:
       - 5432:5432
     volumes:
-      - adwebmanagerapp.pgvol:/var/lib/postgresql/data
+      - admanager.pgvol:/var/lib/postgresql/data
     networks:
-      - adwebmanagerapp.net
+      - admanager.net
 
   pgadmin:
-    container_name: adwebmanagerapp.pgadmin
+    container_name: admanager.pgadmin
     image: dpage/pgadmin4:8.5
     env_file:
       - .env
     volumes:
-      - adwebmanagerapp.pgadminvol:/var/lib/pgadmin
+      - admanager.pgadminvol:/var/lib/pgadmin
     ports:
       - 80:80
     networks:
-      - adwebmanagerapp.net
+      - admanager.net
 
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    image: app:latest
-    container_name: app
+    image: admanager.app:latest
+    container_name: admanager.app
     ports:
       - 3000:3000
     depends_on:
       - db
       - samba
     networks:
-      - adwebmanagerapp.net
+      - admanager.net
 
 networks:
-  adwebmanagerapp.net:
+  admanager.net:
     driver: bridge
     ipam:
       config:
         - subnet: 172.16.238.0/24
 
 volumes:
-  adwebmanagerapp.pgvol:
-  adwebmanagerapp.pgadminvol:
+  admanager.pgvol:
+  admanager.pgadminvol:

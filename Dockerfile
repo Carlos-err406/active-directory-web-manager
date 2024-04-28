@@ -10,11 +10,11 @@ COPY . ./
 RUN npm run build
 RUN rm -r src/ static/
 
-RUN apk add --no-cache fontconfig
-ENV FONTCONFIG_PATH=/etc/fonts
-RUN mkdir -p /usr/share/fonts/
-COPY static/fonts/* /usr/share/fonts/
-RUN fc-cache -f -v
+# RUN apk add --no-cache fontconfig
+# ENV FONTCONFIG_PATH=/etc/fonts
+# RUN mkdir -p /usr/share/fonts/
+# COPY static/fonts/* /usr/share/fonts/
+# RUN fc-cache -f -v
 
 EXPOSE 3000
 CMD npm run start

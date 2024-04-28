@@ -1,7 +1,7 @@
 FROM ubuntu:focal
 
 # samba version from https://download.samba.org/pub/samba/stable/
-ARG samba_version=4.20.0
+ARG samba_version=4.16.7
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update
@@ -18,8 +18,8 @@ ENV PATH=/usr/local/samba/bin:/usr/local/samba/sbin:$PATH
 
 VOLUME ["/var/lib/samba", "/etc/samba"]
 
-ADD docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod +x /docker-entrypoint.sh
+ADD samba.docker-entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-ENTRYPOINT ["/docker-entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["samba"]
