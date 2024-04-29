@@ -2,7 +2,7 @@
 	import { afterNavigate, goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { searchSchema as schema, type SearchSchema } from '$lib/schemas/search-schema';
-	import { Search } from 'lucide-svelte';
+	import Search from '$lucide/search.svelte';
 	import { onDestroy } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import Timer from '../ui/timer/timer.svelte';
@@ -39,10 +39,10 @@
 
 		if (showTimer) {
 			showTimer = false;
-			setTimeout(() => (showTimer = true), 10);
+			window.setTimeout(() => (showTimer = true), 10);
 		} else showTimer = true;
 
-		timer = setTimeout(() => {
+		timer = window.setTimeout(() => {
 			showTimer = false;
 			submit();
 		}, 1000);

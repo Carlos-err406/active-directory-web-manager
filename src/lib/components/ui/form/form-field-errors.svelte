@@ -1,7 +1,6 @@
 <script lang="ts">
 	import * as FormPrimitive from 'formsnap';
 	import { cn } from '$lib/utils.js';
-	import { slide } from 'svelte/transition';
 
 	type $$Props = FormPrimitive.FieldErrorsProps & {
 		errorClasses?: string | undefined | null;
@@ -13,7 +12,7 @@
 </script>
 
 <FormPrimitive.FieldErrors
-	class={cn('text-[0.8rem] font-medium text-destructive ', className)}
+	class={cn('text-[0.8rem] font-medium text-destructive', className)}
 	{...$$restProps}
 	let:errors
 	let:fieldErrorsAttrs
@@ -21,9 +20,7 @@
 >
 	<slot {errors} {fieldErrorsAttrs} {errorAttrs}>
 		{#each errors as error}
-			<div transition:slide={{ axis: 'y', duration: 150 }} {...errorAttrs} class={cn(errorClasses)}>
-				{error}
-			</div>
+			<div {...errorAttrs} class={cn(errorClasses)}>{error}</div>
 		{/each}
 	</slot>
 </FormPrimitive.FieldErrors>

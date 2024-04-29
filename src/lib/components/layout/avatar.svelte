@@ -3,7 +3,7 @@
 	import { paths } from '$lib';
 	import { Button } from '$lib/components/ui/button';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import { LogOut } from 'lucide-svelte';
+	import LogOut from '$lucide/log-out.svelte';
 </script>
 
 <DropdownMenu.Root>

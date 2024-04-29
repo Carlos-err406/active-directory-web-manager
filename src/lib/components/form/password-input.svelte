@@ -1,9 +1,11 @@
 <script lang="ts">
-	import { Eye, EyeOff, LockKeyholeIcon } from 'lucide-svelte';
+	import EyeOff from '$lucide/eye-off.svelte';
+	import Eye from '$lucide/eye.svelte';
+	import LockKeyhole from '$lucide/lock-keyhole.svelte';
 	import { onDestroy } from 'svelte';
 	import { Button } from '../ui/button';
-	import Input, { type InputProps } from './input.svelte';
 	import type { Methods } from './form.svelte';
+	import Input, { type InputProps } from './input.svelte';
 	export let methods: Methods;
 	export let name = 'password';
 	export let { ...inputProps }: Omit<InputProps, 'type'> = {};
@@ -14,7 +16,7 @@
 		show = !show;
 		if (show) {
 			countdown = 0;
-			timer = setInterval(() => {
+			timer = window.setInterval(() => {
 				if (++countdown === 5) {
 					show = false;
 					clearInterval(timer);
@@ -44,7 +46,7 @@
 	</svelte:fragment>
 	<svelte:fragment slot="addornment-left">
 		<slot name="addornment-left">
-			<LockKeyholeIcon />
+			<LockKeyhole />
 		</slot>
 	</svelte:fragment>
 	<svelte:fragment slot="addornment-right">

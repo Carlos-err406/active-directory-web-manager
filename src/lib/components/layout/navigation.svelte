@@ -1,20 +1,27 @@
 <script lang="ts" context="module">
+	import Building2 from '$lucide/building-2.svelte';
+	import Code from '$lucide/code.svelte';
+	import FileTextIcon from '$lucide/file-text.svelte';
+	import Settings from '$lucide/settings.svelte';
+	import User from '$lucide/user.svelte';
+	import Users from '$lucide/users.svelte';
+	import type { Icon } from 'lucide-svelte';
+	import type { ComponentType } from 'svelte';
+
 	export interface NavigationItem {
 		name: string;
 		href: string;
-		icon: typeof SvelteComponent;
+		icon: ComponentType<Icon>;
 	}
-	import { Building2, Code, FileTextIcon, Settings, User, Users } from 'lucide-svelte';
-	import type { SvelteComponent } from 'svelte';
 	export const items: NavigationItem[] = [
-		{ href: paths.users.list, name: 'Users', icon: User as typeof SvelteComponent },
-		{ href: paths.groups.list, name: 'Groups', icon: Users as typeof SvelteComponent },
+		{ href: paths.users.list, name: 'Users', icon: User },
+		{ href: paths.groups.list, name: 'Groups', icon: Users },
 		{
 			href: paths.ous.list,
 			name: 'Organizational Units',
-			icon: Building2 as typeof SvelteComponent
+			icon: Building2
 		},
-		{ href: paths.logs.list, name: 'Logs', icon: FileTextIcon as typeof SvelteComponent }
+		{ href: paths.logs.list, name: 'Logs', icon: FileTextIcon }
 	];
 </script>
 

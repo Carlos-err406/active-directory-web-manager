@@ -1,10 +1,13 @@
 <script>
+	import { page } from '$app/stores';
 	import { Button } from '$lib/components/ui/button';
 	import * as Sheet from '$lib/components/ui/sheet';
-	import { Code, PanelLeft, PanelRight, Settings } from 'lucide-svelte';
-	import { items } from './navigation.svelte';
+	import Code from '$lucide/code.svelte';
+	import PanelLeft from '$lucide/panel-left.svelte';
+	import PanelRight from '$lucide/panel-right.svelte';
+	import Settings from '$lucide/settings.svelte';
 	import clsx from 'clsx';
-	import { page } from '$app/stores';
+	import { items } from './navigation.svelte';
 </script>
 
 <Sheet.Root>
