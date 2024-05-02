@@ -23,7 +23,7 @@
 			case paths.ous.list:
 				breadcrumbs.set([{ name: 'Organizational Units' }]);
 				break;
-			case paths.logs:
+			case paths.logs.list:
 				breadcrumbs.set([{ name: 'Logs' }]);
 				break;
 			case paths.settings:

@@ -7,7 +7,9 @@
 </script>
 
 <ModeWatcher defaultMode="light" />
-<Toaster />
+
+<Toaster richColors theme="light" />
+
 {#if $globalLoader}
 	<div class="fixed z-50 flex h-screen w-full items-center justify-center backdrop-blur-sm">
 		<Loader size="xl" />

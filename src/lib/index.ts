@@ -1,5 +1,9 @@
 export const paths = {
-	auth: '/',
+	auth: {
+		signIn: '/',
+		dependencies: { captcha: 'auth:captcha' },
+		actions: { signIn: '/?/signIn', signOut: '/?/signOut' }
+	},
 	users: {
 		list: '/users',
 		me: '/users/me',

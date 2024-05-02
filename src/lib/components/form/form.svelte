@@ -35,6 +35,7 @@
 
 <script lang="ts">
 	import type { ActionResult, SubmitFunction } from '@sveltejs/kit';
+	import { toast } from 'svelte-sonner';
 	import type { HTMLFormAttributes } from 'svelte/elements';
 	import { superForm, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient, type ValidationAdapter } from 'sveltekit-superforms/adapters';
@@ -44,12 +45,22 @@
 	export let formOptions: FormOptions<typeof schema>;
 	export let form: Data | SuperValidated<Data>;
 	export let formElement: HTMLFormElement | undefined = undefined;
-
+	export let loadingText = 'Submitting...';
 	const methods = superForm(form, {
 		validators: zodClient(schema),
 		...(formOptions as _FormOptions)
 	});
-	const { enhance } = methods;
+	const { enhance, delayed } = methods;
+	let toastId: string | number | undefined = undefined;
+	$: if ($delayed) {
+		toastId = toast.loading(loadingText, {
+			dismissable: false,
+			important: true
+		});
+	} else {
+		toast.dismiss(toastId);
+		toastId = undefined;
+	}
 </script>
 
 <form bind:this={formElement} {...formProps} novalidate method="post" use:enhance>

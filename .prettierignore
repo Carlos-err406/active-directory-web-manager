@@ -5,3 +5,7 @@ yarn.lock
 *docker*
 .eslintignore
 .prettierignore
+
+keypair.pem
+publickey.crt
+.gitignore
