@@ -19,7 +19,7 @@ services:
       - 389:389
     networks:
       admanager.net:
-        ipv4_address: 172.16.238.11
+        ipv4_address: 172.16.239.12
 
   db:
     image: postgres:16.2-alpine3.19
@@ -64,7 +64,7 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.16.238.0/24
+        - subnet: 172.16.239.0/24
 
 volumes:
   admanager.pgvol:
