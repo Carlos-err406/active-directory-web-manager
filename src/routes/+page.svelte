@@ -20,6 +20,7 @@
 <main class="flex h-screen w-full items-center justify-center">
 	<Form
 		let:methods
+		let:loading
 		bind:form={data.form}
 		schema={signUpSchema}
 		loadingText="Signing in..."
@@ -81,7 +82,7 @@
 				</Input>
 			</Card.Content>
 			<Card.Footer>
-				<Button type="submit" class="w-full">Sign in</Button>
+				<Button type="submit" class="w-full" disabled={loading}>Sign in</Button>
 			</Card.Footer>
 		</Card.Root>
 	</Form>

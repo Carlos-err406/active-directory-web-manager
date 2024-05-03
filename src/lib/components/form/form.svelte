@@ -39,6 +39,7 @@
 	import type { HTMLFormAttributes } from 'svelte/elements';
 	import { superForm, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient, type ValidationAdapter } from 'sveltekit-superforms/adapters';
+	import { derived } from 'svelte/store';
 
 	export let schema: ZodSchema;
 	export let formProps: Partial<Omit<HTMLFormAttributes, 'novalidate' | 'method'>> = {};
@@ -50,9 +51,14 @@
 		validators: zodClient(schema),
 		...(formOptions as _FormOptions)
 	});
-	const { enhance, delayed } = methods;
+	const { enhance, delayed, submitting, timeout } = methods;
+	const loading = derived(
+		[delayed, submitting, timeout],
+		([$delayed, $submitting, $timeout]) => $delayed || $submitting || $timeout
+	);
+
 	let toastId: string | number | undefined = undefined;
-	$: if ($delayed) {
+	$: if ($loading) {
 		toastId = toast.loading(loadingText, {
 			dismissable: false,
 			important: true
@@ -64,5 +70,5 @@
 </script>
 
 <form bind:this={formElement} {...formProps} novalidate method="post" use:enhance>
-	<slot {methods} />
+	<slot {methods} loading={$loading} />
 </form>

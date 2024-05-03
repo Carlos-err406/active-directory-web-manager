@@ -12,6 +12,8 @@
 	let show = false;
 	let timer: number;
 	let countdown = 5;
+	const { form } = methods;
+	$: value = $form[name];
 	const toggleShow = () => {
 		show = !show;
 		if (show) {
@@ -28,8 +30,6 @@
 		}
 	};
 	onDestroy(() => clearInterval(timer));
-	const { form } = methods;
-	let value = $form[name];
 </script>
 
 <Input
@@ -58,14 +58,7 @@
 			on:click={toggleShow}
 		>
 			{#if value}
-				<div
-					class="relative rounded-full border-2 border-transparent transition-all"
-					class:border-muted-foreground={countdown < 5}
-					class:border-r-transparent={countdown >= 1}
-					class:border-b-transparent={countdown >= 2}
-					class:border-l-transparent={countdown >= 3}
-					class:border-t-transparent={countdown >= 4}
-				>
+				<div class="relative rounded-full border-2 border-transparent transition-all">
 					{#if show}
 						<EyeOff />
 					{:else}
