@@ -14,6 +14,11 @@
 	import { Button } from '../button';
 	$: pagination = $page.data.pagination as PaginationWithUrls<unknown>;
 	$: ({ searchParams } = $page.url);
+	const getPageParams = (value: string | number) => {
+		const pageParams = new URLSearchParams(searchParams);
+		pageParams.set('page', String(value));
+		return pageParams;
+	};
 </script>
 
 <Root
@@ -29,13 +34,12 @@
 			<PrevButton disabled={!pagination.previousPage} href={pagination.previousPage} />
 		</Item>
 		{#each pages as pageObject (pageObject.key)}
-			{@const pageParams = new URLSearchParams(searchParams)}
-			{@const _ = pageParams.set('page', pageObject.value.toString())}
 			{#if pageObject.type === 'ellipsis'}
 				<Item>
 					<Ellipsis />
 				</Item>
 			{:else}
+				{@const pageParams = getPageParams(pageObject.value)}
 				<Item>
 					<Button
 						class={cn(
@@ -46,10 +50,7 @@
 							'text-inherit'
 						)}
 						variant="link"
-						href={new URL(
-							`${$page.url.pathname}?${pageParams.toString()}`,
-							$page.url.origin
-						).toString()}
+						href="{$page.url.pathname}?${pageParams.toString()}"
 					>
 						{pageObject.value}
 					</Button>
