@@ -1,6 +1,9 @@
 /** @type { import("eslint").Linter.Config } */
 module.exports = {
 	root: true,
+	rules: {
+		'@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }]
+	},
 	extends: [
 		'eslint:recommended',
 		'plugin:@typescript-eslint/recommended',
