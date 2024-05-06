@@ -1,5 +1,5 @@
 import { LDAP_DOMAIN, LOGGER } from '$env/static/private';
-import { getLDAPClient } from '$lib/ldap';
+import { getLDAPClient } from '$lib/ldap/client';
 import { getPublicKey } from '$lib/server';
 import type { Session } from '$lib/types/session';
 import type { Handle } from '@sveltejs/kit';
