@@ -1,7 +1,7 @@
 import { LDAP_DOMAIN, NODE_ENV } from '$env/static/private';
 import { PUBLIC_BASE_DN } from '$env/static/public';
 import { paths } from '$lib';
-import { getLDAPClient } from '$lib/ldap';
+import { getLDAPClient } from '$lib/ldap/client';
 import { signUpSchema } from '$lib/schemas/signup-schema';
 import { getPublicKey } from '$lib/server';
 import { SESSION_ENTRY_ATTRIBUTES } from '$lib/types/session';
@@ -12,6 +12,7 @@ import { fail, setError, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import generate from 'vanilla-captcha';
 import type { Actions, PageServerLoad } from './$types';
+import { v4 } from 'uuid';
 
 export const load: PageServerLoad = async ({ cookies, depends }) => {
 	depends(paths.auth.dependencies.captcha);
@@ -28,16 +29,17 @@ export const load: PageServerLoad = async ({ cookies, depends }) => {
 			sameSite: 'strict',
 			maxAge: 60 * 5
 		});
-	} catch (err) {
-		console.log(err);
-		throw error(
-			500,
-			'Something went wrong while generating the captcha, please try refreshing the page'
-		);
+	} catch (e) {
+		const errorId = v4();
+		console.log({ errorId, e });
+		throw error(500, {
+			message: 'Something went wrong while generating the captcha, please try refreshing the page',
+			errorId
+		});
 	}
 	return {
 		form: await superValidate(zod(signUpSchema)),
-		captcha: 'data:image/jpeg;charset=utf-8;base64,' + captcha.toString('base64')
+		captcha: 'data:image/png;charset=utf-8;base64,' + captcha.toString('base64')
 	};
 };
 
