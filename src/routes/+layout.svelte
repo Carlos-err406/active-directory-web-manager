@@ -16,4 +16,6 @@
 	</div>
 {/if}
 
-<slot />
+<div class="flex h-full w-full">
+	<slot />
+</div>
