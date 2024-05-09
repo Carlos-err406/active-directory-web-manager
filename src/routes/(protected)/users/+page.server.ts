@@ -3,7 +3,7 @@ import { search } from '$lib/actions';
 import { extractPagination, type PaginationWithUrls } from '$lib/pagination';
 import type { User } from '$lib/types/user';
 import { error, redirect } from '@sveltejs/kit';
-import { AndFilter, EqualityFilter, NotFilter, type Filter } from 'ldapts';
+import { AndFilter, EqualityFilter, NotFilter, SubstringFilter, type Filter } from 'ldapts';
 import { v4 } from 'uuid';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -12,11 +12,13 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 	if (!auth) throw redirect(302, '/');
 	const { ldap } = auth;
 	const { searchParams, pathname } = url;
-	const sAMAccountNameQuery = searchParams.get('sAMAccountName');
+	
+	const sAMAccountNameQuery = searchParams.get('q');
 	const page = Number(searchParams.get('page') || 1);
 	const pageSize = Number(searchParams.get('pageSize') || 10);
 	const sortAttribute = searchParams.get('sort') || 'sAMAccountName';
 	const order = searchParams.get('order') || 'asc';
+
 	const filters: Filter[] = [
 		new NotFilter({
 			filter: new EqualityFilter({ attribute: 'objectClass', value: 'computer' })
@@ -26,7 +28,7 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 		)
 	];
 	sAMAccountNameQuery &&
-		filters.push(new EqualityFilter({ attribute: 'sAMAccountName', value: sAMAccountNameQuery }));
+		filters.push(new SubstringFilter({ attribute: 'sAMAccountName', any: [sAMAccountNameQuery] }));
 
 	const filter = new AndFilter({ filters });
 	try {
