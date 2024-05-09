@@ -50,7 +50,7 @@
 							'text-inherit'
 						)}
 						variant="link"
-						href="{$page.url.pathname}?${pageParams.toString()}"
+						href="{$page.url.pathname}?{pageParams.toString()}"
 					>
 						{pageObject.value}
 					</Button>

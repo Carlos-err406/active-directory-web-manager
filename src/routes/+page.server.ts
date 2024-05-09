@@ -1,4 +1,4 @@
-import { LDAP_DOMAIN, NODE_ENV } from '$env/static/private';
+import { LDAP_DOMAIN, NODE_ENV, CAPTCHA_LENGTH } from '$env/static/private';
 import { PUBLIC_BASE_DN } from '$env/static/public';
 import { paths } from '$lib';
 import { getLDAPClient } from '$lib/ldap/client';
@@ -16,7 +16,7 @@ import { v4 } from 'uuid';
 
 export const load: PageServerLoad = async ({ cookies, depends }) => {
 	depends(paths.auth.dependencies.captcha);
-	const { answer, captcha } = await generate(5);
+	const { answer, captcha } = await generate(Number(CAPTCHA_LENGTH) || 5);
 	try {
 		const captchaAnswerSigned = jwt.sign({ answer }, getPublicKey(), {
 			algorithm: 'RS512',
