@@ -2,7 +2,7 @@
 
 import type { Session } from '$lib/types/session';
 import type { Client, FilterParser } from 'ldapts';
-
+import type { Context } from '$lib/types/context';
 // for information about these interfaces
 declare global {
 	namespace App {
@@ -17,6 +17,14 @@ declare global {
 		// interface PageState {}
 		// interface Platform {}
 	}
+}
+
+declare module 'svelte' {
+	export function getContext<T extends keyof Context, K extends Context[T]>(key: T): K;
+	export function setContext<T extends keyof Context, K extends Context[T]>(
+		key: T,
+		context: K
+	): void;
 }
 
 declare module 'ldapts' {
