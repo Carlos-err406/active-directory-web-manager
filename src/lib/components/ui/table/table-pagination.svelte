@@ -28,7 +28,7 @@
 	perPage={pagination.pageSize}
 	let:pages
 >
-	<Content>
+	<Content class="flex w-full justify-end">
 		<PageSize />
 		<Item>
 			<PrevButton disabled={!pagination.previousPage} href={pagination.previousPage} />
