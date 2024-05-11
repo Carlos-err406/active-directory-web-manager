@@ -41,6 +41,7 @@ const getSequence = () => {
 		console.log('LOGGING is enabled, set LOGGER .env variable to 0 to disable');
 		const logger = getLoggerHook({
 			template: '[{date}] {url}{urlSearchParams} {method} {status}',
+			decodeSearchParams: true,
 			colorOptions: {
 				date: ({ status }) => (status >= 400 ? 'redBold' : 'yellow'),
 				method: ({ status }) => (status >= 400 ? 'redBold' : 'green'),
