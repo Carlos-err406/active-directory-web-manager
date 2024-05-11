@@ -1,3 +1,8 @@
+<script lang="ts" context="module">
+	import type { Table as HeadlessTable } from 'svelte-headless-table';
+	export type ViewModel = ReturnType<HeadlessTable<any>['createViewModel']>;
+</script>
+
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { Button } from '$lib/components/ui/button';
@@ -5,24 +10,13 @@
 	import ChevronDown from '$lucide/chevron-down.svelte';
 	import ChevronUp from '$lucide/chevron-up.svelte';
 	import Chevrons from '$lucide/chevrons-up-down.svelte';
-	import {
-		BodyRow,
-		Render,
-		Subscribe,
-		type HeaderRow,
-		type TableAttributes,
-		type TableBodyAttributes
-	} from 'svelte-headless-table';
-	import { derived, get, type Readable } from 'svelte/store';
+	import { Render, Subscribe } from 'svelte-headless-table';
+	import { derived, get } from 'svelte/store';
 
 	//eslint-disable-next-line @typescript-eslint/no-explicit-any
-	export let tableAttrs: Readable<TableAttributes<any>>;
-	//eslint-disable-next-line @typescript-eslint/no-explicit-any
-	export let headerRows: Readable<HeaderRow<any>[]>;
-	//eslint-disable-next-line @typescript-eslint/no-explicit-any
-	export let tableBodyAttrs: Readable<TableBodyAttributes<any>>;
-	//eslint-disable-next-line @typescript-eslint/no-explicit-any
-	export let pageRows: Readable<BodyRow<any>[]>;
+	export let viewModel: ViewModel;
+	$: ({ tableAttrs, headerRows, tableBodyAttrs, pageRows } = viewModel);
+
 	const pageParams = derived(page, ($page) => $page.url.searchParams);
 
 	const setSortAndOrder = (id: string) => {
@@ -50,7 +44,7 @@
 									{@const currentParams = setSortAndOrder(cell.id)}
 									<Button
 										variant="link"
-										href="/users?{get(currentParams).toString()}"
+										href="{$page.url.pathname}?{get(currentParams).toString()}"
 										class="text-inherit hover:no-underline"
 										on:click={props.sort.toggle}
 									>

@@ -51,16 +51,16 @@
 		})
 	]);
 
-	$: ({ flatColumns, ...rest } = table.createViewModel(columns));
-	const hidableCols = ['sAMAccountName', 'distinguishedName', 'mail'];
+	$: ({ flatColumns, ...viewModel } = table.createViewModel(columns));
+	const hidableCols = ['sAMAccountName', 'distinguishedName', 'mail', 'sn', 'givenName'];
 </script>
 
 <div class="w-full">
 	<div class="my-2 flex w-full justify-end">
 		<ColumnsDropdown {hidableCols} {flatColumns} />
 	</div>
-	<div class="w-full rounded-md border">
-		<DataTable {...rest} />
+	<div class="rounded-md border">
+		<DataTable viewModel={{ ...viewModel, flatColumns }} />
 	</div>
 	<Table.Pagination />
 </div>
