@@ -11,7 +11,7 @@
 
 <DropdownMenu.Root>
 	<DropdownMenu.Trigger asChild let:builder>
-		<Button builders={[builder]} variant="outline" size="icon" class="overflow-hidden rounded-full">
+		<Button builders={[builder]} variant="outline" size="icon" class="overflow-hidden h-fit rounded-full">
 			<img
 				src={jpegPhoto.length ? jpegPhoto : '/user-placeholder.jpg'}
 				width={36}
