@@ -2,8 +2,8 @@
 	import { page } from '$app/stores';
 	import ColumnsDropdown from '$lib/components/table/columns-dropdown.svelte';
 	import DataTable from '$lib/components/table/data-table.svelte';
-	import UserTableActions from '$lib/components/table/user-table-actions.svelte';
 	import * as Table from '$lib/components/ui/table';
+	import UserTableActions from '$lib/components/users/user-table-actions.svelte';
 	import { createRender, createTable } from 'svelte-headless-table';
 	import { addHiddenColumns, addSortBy } from 'svelte-headless-table/plugins';
 	import { derived, readable } from 'svelte/store';
