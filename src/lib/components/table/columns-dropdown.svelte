@@ -5,26 +5,22 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import ChevronDown from '$lucide/chevron-down.svelte';
 	import type { FlatColumn } from 'svelte-headless-table';
-	import { derived } from 'svelte/store';
 
 	export let hidableCols: string[] = [];
 	//eslint-disable-next-line @typescript-eslint/no-explicit-any
 	export let flatColumns: FlatColumn<any>[] = [];
 
-	const pageParams = derived(page, ($page) => $page.url.searchParams);
-	const hiddenColumnIds = derived(
-		pageParams,
-		($pageParams) => $pageParams.get('hide')?.split(',') || []
-	);
+	$: ({ searchParams } = $page.url);
+	$: hiddenColumnIds = searchParams.get('hide')?.split(',') || [];
 
 	const handleToggleHideColumnClick = (id: string) => {
-		const currentlyHidden = $hiddenColumnIds;
+		const currentlyHidden = hiddenColumnIds;
 		if (currentlyHidden.includes(id)) {
 			currentlyHidden.splice(currentlyHidden.indexOf(id), 1);
 		} else {
 			currentlyHidden.push(id);
 		}
-		const params = new URLSearchParams($pageParams);
+		const params = new URLSearchParams(searchParams);
 		if (currentlyHidden.length === 0) {
 			params.delete('hide');
 		} else {
@@ -44,7 +40,7 @@
 		{#each flatColumns as col}
 			{#if hidableCols.includes(col.id)}
 				<DropdownMenu.CheckboxItem
-					checked={!$hiddenColumnIds.includes(col.id)}
+					checked={!hiddenColumnIds.includes(col.id)}
 					on:click={() => handleToggleHideColumnClick(col.id)}
 				>
 					{col.header}

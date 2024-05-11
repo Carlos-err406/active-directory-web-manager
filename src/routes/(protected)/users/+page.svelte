@@ -6,22 +6,18 @@
 	import UserTableActions from '$lib/components/users/user-table-actions.svelte';
 	import { createRender, createTable } from 'svelte-headless-table';
 	import { addHiddenColumns, addSortBy } from 'svelte-headless-table/plugins';
-	import { derived, readable } from 'svelte/store';
+	import { readable } from 'svelte/store';
 	import type { PageData } from './$types';
 	export let data: PageData;
 
 	$: ({ pagination } = data);
-	const hiddenColumnIds = derived(
-		page,
-		($page) => $page.url.searchParams.get('hide')?.split(',') || []
-	);
 
 	$: table = createTable(readable(pagination.data), {
 		sort: addSortBy({
 			disableMultiSort: true
 		}),
 		hide: addHiddenColumns({
-			initialHiddenColumnIds: $hiddenColumnIds
+			initialHiddenColumnIds: $page.url.searchParams.get('hide')?.split(',') || []
 		})
 	});
 
