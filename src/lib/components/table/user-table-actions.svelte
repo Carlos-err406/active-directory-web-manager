@@ -1,12 +1,11 @@
 <script lang="ts">
-	import Ellipsis from 'lucide-svelte/icons/ellipsis';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Button } from '$lib/components/ui/button';
-	import Trash from '$lucide/trash-2.svelte';
-	import Edit from '$lucide/pencil-line.svelte';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import Eye from '$lucide/eye.svelte';
+	import Edit from '$lucide/pencil-line.svelte';
+	import Trash from '$lucide/trash-2.svelte';
+	import Ellipsis from 'lucide-svelte/icons/ellipsis';
 	export let id: string;
-	
 </script>
 
 <DropdownMenu.Root>
@@ -20,10 +19,10 @@
 		<DropdownMenu.Group>
 			<DropdownMenu.Label>Actions</DropdownMenu.Label>
 			<DropdownMenu.Separator />
-			<DropdownMenu.Item class="flex flex-nowrap gap-2">
+			<DropdownMenu.LinkItem href={`/users/${id}`} class="flex flex-nowrap gap-2">
 				<Eye class="size-5" />
 				View user details
-			</DropdownMenu.Item>
+			</DropdownMenu.LinkItem>
 			<DropdownMenu.Item class="flex flex-nowrap gap-2">
 				<Edit class="size-5" />
 				Edit

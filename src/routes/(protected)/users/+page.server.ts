@@ -12,13 +12,12 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 	if (!auth) throw redirect(302, '/');
 	const { ldap } = auth;
 	const { searchParams, pathname } = url;
-	
+
 	const sAMAccountNameQuery = searchParams.get('q');
 	const page = Number(searchParams.get('page') || 1);
 	const pageSize = Number(searchParams.get('pageSize') || 10);
 	const sortAttribute = searchParams.get('sort') || 'sAMAccountName';
 	const order = searchParams.get('order') || 'asc';
-
 	const filters: Filter[] = [
 		new NotFilter({
 			filter: new EqualityFilter({ attribute: 'objectClass', value: 'computer' })

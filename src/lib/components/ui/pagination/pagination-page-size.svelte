@@ -21,11 +21,13 @@
 		{#each sizes as size}
 			<Item class="p-0">
 				<a
-					class="h-full w-full py-1 px-3 rounded"
+					class="h-full w-full rounded px-3 py-1"
 					class:bg-muted={size === $page.data.pagination?.pageSize}
 					data-sveltekit-preload-data="hover"
-					href="{base}?page=1&pageSize={size}">{size}</a
+					href="{base}?page=1&pageSize={size}"
 				>
+					{size}
+				</a>
 			</Item>
 		{/each}
 	</Content>
