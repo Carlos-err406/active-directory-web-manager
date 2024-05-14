@@ -8,9 +8,10 @@ export type User = {
 	whenCreated: string;
 	uSNCreated: string;
 	name: string;
+	givenName: string;
+	sn: string;
 	userAccountControl: string;
 	badPwdCount: string;
-	codePage: string;
 	countryCode: string;
 	badPasswordTime: string;
 	lastLogoff: string;
