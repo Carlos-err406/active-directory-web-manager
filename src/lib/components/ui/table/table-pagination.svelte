@@ -22,13 +22,12 @@
 </script>
 
 <Root
-	class="mt-4"
 	page={pagination.page}
 	count={pagination.totalEntries}
 	perPage={pagination.pageSize}
 	let:pages
 >
-	<Content class="flex w-full justify-end">
+	<Content>
 		<PageSize />
 		<Item>
 			<PrevButton disabled={!pagination.previousPage} href={pagination.previousPage} />
