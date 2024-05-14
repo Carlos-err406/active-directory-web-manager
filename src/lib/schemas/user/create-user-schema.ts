@@ -1,0 +1,37 @@
+import { PUBLIC_BASE_DN } from '$env/static/public';
+import { z } from 'zod';
+
+export const createUserSchema = z
+	.object({
+		base: z
+			.string({ required_error: 'base is required' })
+			.refine((val) => val.endsWith(PUBLIC_BASE_DN), 'base must end with ' + PUBLIC_BASE_DN),
+		sAMAccountName: z
+			.string({ required_error: 'sAMAccountName is required' })
+			.regex(/^[^\s]+$/, 'sAMAccountName cannot contain spaces')
+			.trim()
+			.min(1, 'sAMAccountName is required'),
+		givenName: z
+			.string({ required_error: 'givenName is required' })
+			.trim()
+			.min(1, 'givenName is required'),
+		sn: z.string().trim().optional(),
+		mail: z.string().email().trim().min(1, 'mail is required'),
+		description: z.string().max(100, 'description cannot be longer than 100 characters').optional(),
+		password: z
+			.string({ required_error: 'password is required' })
+			.min(8, 'Password must be at least 8 characters long')
+			.regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+			.regex(/[A-Z]/, 'Password must contain at least one capital letter')
+			.regex(/[0-9]/, 'Password must contain at least one number')
+			.regex(
+				/[!@#$%^&*()_+\-=[\]{}|;':",./<>?]/,
+				'Password must contain at leat one special character'
+			),
+		passwordConfirmation: z.string().min(1, 'Password confirmation is required')
+	})
+	.refine(({ password, passwordConfirmation }) => password === passwordConfirmation, {
+		message: 'Passwords do not match',
+		path: ['passwordConfirmation']
+	});
+export type CreateUserSchema = typeof createUserSchema;
