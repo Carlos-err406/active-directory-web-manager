@@ -1,8 +1,8 @@
 // See https://kit.svelte.dev/docs/types#app
 
+import type { Context } from '$lib/types/context';
 import type { Session } from '$lib/types/session';
 import type { Client, FilterParser } from 'ldapts';
-import type { Context } from '$lib/types/context';
 // for information about these interfaces
 declare global {
 	namespace App {

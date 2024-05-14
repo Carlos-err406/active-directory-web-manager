@@ -7,7 +7,13 @@ export const paths = {
 	users: {
 		list: '/users',
 		me: '/users/me',
-		dn: (dn: string) => `/users/${dn}`
+		dn: (dn: string) => `/users/${dn}`,
+		actions: {
+			create: '/users?/create',
+			update: '/users?/update',
+			delete: '/users?/delete',
+			deleteMany: '/users?/deleteMany'
+		}
 	},
 	groups: {
 		list: '/groups',
