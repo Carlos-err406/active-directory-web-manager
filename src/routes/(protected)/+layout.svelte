@@ -35,7 +35,7 @@
 	});
 </script>
 
-<div class="absolute h-full w-full rounded bg-muted/40">
+<div class="absolute h-full w-full rounded bg-muted/40 max-h-svh overflow-y-auto">
 	<Navigation />
 	<div class="flex h-full w-full flex-col sm:gap-4 sm:py-4 sm:pl-14">
 		<Header />
