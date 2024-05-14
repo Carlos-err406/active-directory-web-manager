@@ -6,7 +6,7 @@
 	$: ({ user } = data);
 </script>
 
-<div class="h-full w-full bg-gray-100 py-12 dark:bg-gray-800 md:py-16">
+<div class="h-full w-full py-12 md:py-16">
 	<div class="container px-4 md:px-6">
 		<div class="mx-auto max-w-3xl space-y-6">
 			<div class="flex w-full items-center justify-center gap-10">
@@ -38,10 +38,12 @@
 				</span>
 				<span>Member of:</span>
 				<div class="flex flex-wrap space-y-2 text-gray-500 dark:text-gray-400">
-					{#each user.memberOf as groupDn}
+					{#each user.memberOf || [] as groupDn}
 						<span>
 							{groupDn}
 						</span>
+					{:else}
+						<span> - </span>
 					{/each}
 				</div>
 				<span>Distinguished Name</span>
