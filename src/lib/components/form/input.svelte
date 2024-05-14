@@ -6,7 +6,7 @@
 
 <script lang="ts">
 	import * as Form from '$lib/components/ui/form';
-	import clsx from 'clsx';
+	import { cn } from '$lib/utils';
 	import { Input } from '../ui/input';
 	export let methods: Methods;
 	const { form } = methods;
@@ -17,13 +17,13 @@
 
 <Form.Field form={methods} {name}>
 	<Form.Control let:attrs>
-		<Form.Label class={clsx(inputProps.required && 'required')}><slot name="label" /></Form.Label>
+		<Form.Label class={cn(inputProps.required && 'required')}><slot name="label" /></Form.Label>
 		<div class="relative">
 			<div class="addornment absolute left-2 top-2.5">
 				<slot name="addornment-left" />
 			</div>
 			<Input
-				class={clsx(
+				class={cn(
 					!!$$slots['addornment-left'] && 'pl-10',
 					!!$$slots['addornment-right'] && 'pr-10',
 					'w-full'
