@@ -1,14 +1,26 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import ColumnsDropdown from '$lib/components/table/columns-dropdown.svelte';
+	import DataTableCheckbox from '$lib/components/table/data-table-checkbox.svelte';
 	import DataTable from '$lib/components/table/data-table.svelte';
-	import * as Table from '$lib/components/ui/table';
+	import CreateUserDialog from '$lib/components/users/create-user-dialog.svelte';
+	import DeleteManyDialog from '$lib/components/users/delete-many-dialog.svelte';
 	import UserTableActions from '$lib/components/users/user-table-actions.svelte';
-	import { createRender, createTable } from 'svelte-headless-table';
-	import { addHiddenColumns, addSortBy } from 'svelte-headless-table/plugins';
+	import { DataBodyCell, createRender, createTable } from 'svelte-headless-table';
+	import { addHiddenColumns, addSelectedRows, addSortBy } from 'svelte-headless-table/plugins';
 	import { readable } from 'svelte/store';
+	import { slide } from 'svelte/transition';
 	import type { PageData } from './$types';
+
 	export let data: PageData;
+	const hidableCols = [
+		'sAMAccountName',
+		'distinguishedName',
+		'mail',
+		'sn',
+		'givenName',
+		'description'
+	];
 
 	$: ({ pagination } = data);
 
@@ -18,26 +30,64 @@
 		}),
 		hide: addHiddenColumns({
 			initialHiddenColumnIds: $page.url.searchParams.get('hide')?.split(',') || []
-		})
+		}),
+		select: addSelectedRows()
 	});
 
 	$: columns = table.createColumns([
+		table.column({
+			accessor: 'distinguishedName',
+			header: (_, { pluginStates }) => {
+				const { allPageRowsSelected } = pluginStates.select;
+				return createRender(DataTableCheckbox, {
+					checked: allPageRowsSelected
+				});
+			},
+			cell: ({ row }, { pluginStates }) => {
+				const { getRowState } = pluginStates.select;
+				const { isSelected } = getRowState(row);
+
+				return createRender(DataTableCheckbox, {
+					checked: isSelected
+				});
+			},
+			plugins: {
+				sort: {
+					disable: true
+				}
+			}
+		}),
 		table.column({
 			accessor: 'sAMAccountName',
 			header: 'sAMAccountName'
 		}),
 		table.column({
-			accessor: 'distinguishedName',
-			header: 'DistinguishedName'
+			accessor: 'givenName',
+			header: 'givenName',
+			cell: ({ value }) => value ?? '-'
+		}),
+		table.column({
+			accessor: 'sn',
+			header: 'sn',
+			cell: ({ value }) => value ?? '-'
+		}),
+		table.column({
+			accessor: 'dn',
+			header: 'distinguishedName'
 		}),
 		table.column({
 			accessor: 'mail',
-			header: 'Mail',
+			header: 'mail',
+			cell: ({ value }) => value ?? '-'
+		}),
+		table.column({
+			accessor: 'description',
+			header: 'description',
 			cell: ({ value }) => value ?? '-'
 		}),
 		table.column({
 			accessor: ({ dn }) => dn,
-			header: '',
+			header: 'Actions',
 			plugins: {
 				sort: { disable: true }
 			},
@@ -47,16 +97,25 @@
 		})
 	]);
 
-	$: ({ flatColumns, ...viewModel } = table.createViewModel(columns));
-	const hidableCols = ['sAMAccountName', 'distinguishedName', 'mail', 'sn', 'givenName'];
+	$: ({ flatColumns, pluginStates, rows, ...viewModel } = table.createViewModel(columns));
+	$: ({ selectedDataIds } = pluginStates.select);
+
+	$: selectedDns = Object.keys($selectedDataIds)
+		.map((id) => $rows.find((row) => row.id === id)!)
+		.map((row) => (row.cellForId.distinguishedName as unknown as DataBodyCell<string>).value)
+		.filter(Boolean) as string[];
 </script>
 
 <div class="w-full">
-	<div class="my-2 flex w-full justify-end">
+	<div class="my-2 flex w-full justify-end gap-4">
 		<ColumnsDropdown {hidableCols} {flatColumns} />
+		<CreateUserDialog />
 	</div>
-	<div class="rounded-md border">
-		<DataTable viewModel={{ ...viewModel, flatColumns }} />
-	</div>
-	<Table.Pagination />
+	<DataTable viewModel={{ ...viewModel, flatColumns, rows, pluginStates }}>
+		<svelte:fragment slot="selected-row-actions">
+			<div transition:slide={{ axis: 'x' }}>
+				<DeleteManyDialog dns={selectedDns} />
+			</div>
+		</svelte:fragment>
+	</DataTable>
 </div>
