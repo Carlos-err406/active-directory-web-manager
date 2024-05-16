@@ -3,6 +3,7 @@
 	import ColumnsDropdown from '$lib/components/table/columns-dropdown.svelte';
 	import DataTableCheckbox from '$lib/components/table/data-table-checkbox.svelte';
 	import DataTable from '$lib/components/table/data-table.svelte';
+	import ResetFiltersButton from '$lib/components/table/reset-filters-dropdown.svelte';
 	import CreateUserDialog from '$lib/components/users/create-user-dialog.svelte';
 	import DeleteManyUsersDialog from '$lib/components/users/delete-many-users-dialog.svelte';
 	import UserTableActions from '$lib/components/users/user-table-actions.svelte';
@@ -101,6 +102,7 @@
 
 <div class="w-full">
 	<div class="my-2 flex w-full justify-end gap-4">
+		<ResetFiltersButton />
 		<ColumnsDropdown {hidableCols} {flatColumns} />
 		<CreateUserDialog />
 	</div>
