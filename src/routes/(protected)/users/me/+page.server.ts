@@ -27,5 +27,5 @@ export const load: PageServerLoad = async ({ locals }) => {
 	if (searchEntries.length === 0) throw error(404, 'User not found');
 	const [user] = searchEntries;
 	if (!user) throw error(404, 'User not found');
-	return { user: user as User };
+	return { user: user as User, showSearch: false };
 };

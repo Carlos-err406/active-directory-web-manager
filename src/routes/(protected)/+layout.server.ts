@@ -5,5 +5,5 @@ export const load: LayoutServerLoad = async ({ locals }) => {
 	const auth = await locals.auth();
 	if (!auth) throw redirect(302, '/');
 
-	return { session: auth.session };
+	return { session: auth.session, showSearch: true };
 };

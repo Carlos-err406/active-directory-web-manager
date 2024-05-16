@@ -1,12 +1,10 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import SearchForm from '$lib/components/form/search-form.svelte';
-	import Avatar from './avatar.svelte';
-	import NavigationSheet from './navigation-sheet.svelte';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
 	import { breadcrumbs } from '$lib/stores';
-	import { getContext } from 'svelte';
-	import type { Writable } from 'svelte/store';
-	const showSearch = getContext<Writable<boolean>>('showSearch');
+	import Avatar from './avatar.svelte';
+	import NavigationSheet from './navigation-sheet.svelte';
 </script>
 
 <header
@@ -14,7 +12,7 @@
 >
 	<div class="flex w-full items-center gap-4">
 		<NavigationSheet />
-		{#if $showSearch}
+		{#if $page.data.showSearch}
 			<SearchForm />
 		{/if}
 		<Breadcrumb.Root class="hidden md:flex">
