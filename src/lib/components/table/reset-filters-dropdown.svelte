@@ -1,12 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import {
-		ArrowUpDown,
-		EyeOff,
-		FilterX,
-		LucideBookOpenText,
-		Search
-	} from 'lucide-svelte';
+	import { ArrowUpDown, EyeOff, FilterX, LucideBookOpenText, Search } from 'lucide-svelte';
 	import { derived } from 'svelte/store';
 	import { slide } from 'svelte/transition';
 	import { Button } from '../ui/button';
