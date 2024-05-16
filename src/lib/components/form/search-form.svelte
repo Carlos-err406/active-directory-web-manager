@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { afterNavigate, goto } from '$app/navigation';
+	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { searchSchema as schema, type SearchSchema } from '$lib/schemas/search-schema';
 	import Search from '$lucide/search.svelte';
@@ -12,21 +12,18 @@
 	let timer: number;
 	let showTimer = false;
 	let formElement: HTMLFormElement;
-	let form = {
-		q: $page.url.searchParams.get('q')
-	};
-	afterNavigate(() => {
-		form.q = $page.url.searchParams.get('q');
-	});
+	$: ({ searchForm } = $page.data);
+	let q = $page.url.searchParams.get('q');
+
 	const onResult = async (event: ResultType<SearchSchema>) => {
 		const { result } = event;
 		if (result.type === 'success') {
 			const { data } = result;
 			if (!data) return;
-			form.q = data.form.data.q || null;
+			q = data.form.data.q || null;
 			const { searchParams } = $page.url;
 			const search = new URLSearchParams(searchParams);
-			if (form.q) search.set('q', form.q);
+			if (q) search.set('q', q);
 			else search.delete('q');
 			await goto(`${$page.url.pathname}?${search.toString()}`);
 		} else {
@@ -57,10 +54,12 @@
 <Form
 	bind:formElement
 	let:methods
-	bind:form
+	bind:form={searchForm}
 	{schema}
+	loadingText="Searching..."
 	formProps={{ action: '?/search' }}
 	formOptions={{
+		delayMs: 4000,
 		resetForm: false,
 		validationMethod: 'oninput',
 		onResult

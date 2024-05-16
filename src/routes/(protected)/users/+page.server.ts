@@ -2,6 +2,7 @@ import { PUBLIC_BASE_DN } from '$env/static/public';
 import { search } from '$lib/actions';
 import { encodePassword, getEntryByDn, getEntryBySAMAccountName } from '$lib/ldap';
 import { extractPagination, type PaginationWithUrls } from '$lib/pagination';
+import { searchSchema } from '$lib/schemas/search-schema';
 import { createUserSchema } from '$lib/schemas/user/create-user-schema';
 import { deleteManyUsersSchema, deleteUserSchema } from '$lib/schemas/user/delete-user.schema';
 import type { User } from '$lib/types/user';
@@ -73,7 +74,8 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 
 		return {
 			pagination: paginationWithURLs,
-			createUserForm: await superValidate(zod(createUserSchema))
+			createUserForm: await superValidate(zod(createUserSchema)),
+			searchForm: await superValidate(zod(searchSchema))
 		};
 	} catch (e) {
 		const errorId = v4();
