@@ -13,14 +13,7 @@
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-	const hidableCols = [
-		'sAMAccountName',
-		'distinguishedName',
-		'mail',
-		'sn',
-		'givenName',
-		'description'
-	];
+	const hidableCols = ['sAMAccountName', 'dn', 'mail', 'sn', 'givenName', 'description'];
 
 	$: ({ pagination } = data);
 
