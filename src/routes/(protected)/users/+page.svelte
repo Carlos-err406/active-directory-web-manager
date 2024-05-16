@@ -4,7 +4,7 @@
 	import DataTableCheckbox from '$lib/components/table/data-table-checkbox.svelte';
 	import DataTable from '$lib/components/table/data-table.svelte';
 	import CreateUserDialog from '$lib/components/users/create-user-dialog.svelte';
-	import DeleteManyDialog from '$lib/components/users/delete-many-dialog.svelte';
+	import DeleteManyUsersDialog from '$lib/components/users/delete-many-users-dialog.svelte';
 	import UserTableActions from '$lib/components/users/user-table-actions.svelte';
 	import { DataBodyCell, createRender, createTable } from 'svelte-headless-table';
 	import { addHiddenColumns, addSelectedRows, addSortBy } from 'svelte-headless-table/plugins';
@@ -107,7 +107,7 @@
 	<DataTable viewModel={{ ...viewModel, flatColumns, rows, pluginStates }}>
 		<svelte:fragment slot="selected-row-actions">
 			<div transition:slide={{ axis: 'x' }}>
-				<DeleteManyDialog dns={selectedDns} />
+				<DeleteManyUsersDialog dns={selectedDns} />
 			</div>
 		</svelte:fragment>
 	</DataTable>
