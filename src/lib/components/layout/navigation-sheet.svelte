@@ -1,13 +1,13 @@
 <script>
-	import { page } from '$app/stores';
+	import { paths } from '$lib';
 	import { Button } from '$lib/components/ui/button';
 	import * as Sheet from '$lib/components/ui/sheet';
 	import Code from '$lucide/code.svelte';
 	import PanelLeft from '$lucide/panel-left.svelte';
 	import PanelRight from '$lucide/panel-right.svelte';
 	import Settings from '$lucide/settings.svelte';
-	import clsx from 'clsx';
 	import { items } from './navigation.svelte';
+	import SheetNavigationItem from './sheet-navigation-item.svelte';
 </script>
 
 <Sheet.Root>
@@ -29,28 +29,16 @@
 			</div>
 			<hr class="w-full bg-muted" />
 			{#each items as { name, icon, href }}
-				<a
-					data-sveltekit-preload-data="hover"
-					{href}
-					class={clsx(
-						'flex items-center gap-4 px-2.5 py-3 text-muted-foreground transition-all hover:text-foreground',
-						$page.url.pathname.startsWith(href) &&
-							'border-l-4 border-l-primary bg-accent !text-foreground shadow-lg'
-					)}
-				>
-					<svelte:component this={icon} class="h-5 w-5" />
+				<SheetNavigationItem {href}>
+					<svelte:component this={icon} class="size-5" />
 					{name}
-				</a>
+				</SheetNavigationItem>
 			{/each}
 			<hr class="mt-auto w-full bg-muted" />
-			<a
-				data-sveltekit-preload-data="hover"
-				href="/settings"
-				class="flex items-center gap-4 justify-self-end px-2.5 text-muted-foreground hover:text-foreground"
-			>
-				<Settings class="h-5 w-5" />
+			<SheetNavigationItem href={paths.settings}>
+				<Settings class="size-5" />
 				Settings
-			</a>
+			</SheetNavigationItem>
 		</nav>
 	</Sheet.Content>
 </Sheet.Root>

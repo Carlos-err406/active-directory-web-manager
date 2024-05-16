@@ -5,15 +5,8 @@
 	import Settings from '$lucide/settings.svelte';
 	import User from '$lucide/user.svelte';
 	import Users from '$lucide/users.svelte';
-	import type { Icon } from 'lucide-svelte';
-	import type { ComponentType } from 'svelte';
 
-	export interface NavigationItem {
-		name: string;
-		href: string;
-		icon: ComponentType<Icon>;
-	}
-	export const items: NavigationItem[] = [
+	export const items: NavigationItemType[] = [
 		{ href: paths.users.list, name: 'Users', icon: User },
 		{ href: paths.groups.list, name: 'Groups', icon: Users },
 		{
@@ -26,10 +19,9 @@
 </script>
 
 <script lang="ts">
-	import { page } from '$app/stores';
 	import { paths } from '$lib';
 	import * as Tooltip from '$lib/components/ui/tooltip';
-	import clsx from 'clsx';
+	import NavigationItem, { type NavigationItemType } from './navigation-item.svelte';
 </script>
 
 <aside class="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
@@ -47,20 +39,10 @@
 		{#each items as { href, icon, name }}
 			<Tooltip.Root>
 				<Tooltip.Trigger asChild let:builder>
-					<a
-						{href}
-						data-sveltekit-preload-data="hover"
-						class={clsx(
-							'flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8',
-							$page.url.pathname.startsWith(href) &&
-								'border-l-2 border-l-primary bg-accent !text-foreground shadow-lg'
-						)}
-						use:builder.action
-						{...builder}
-					>
-						<svelte:component this={icon} class="h-5 w-5" />
+					<NavigationItem {href} {builder}>
+						<svelte:component this={icon} class="size-5" />
 						<span class="sr-only">{name}</span>
-					</a>
+					</NavigationItem>
 				</Tooltip.Trigger>
 				<Tooltip.Content side="right">{name}</Tooltip.Content>
 			</Tooltip.Root>
@@ -69,20 +51,10 @@
 		<nav class="flex flex-col items-center gap-4 px-2 py-4">
 			<Tooltip.Root>
 				<Tooltip.Trigger asChild let:builder>
-					<a
-						data-sveltekit-preload-data="hover"
-						href={paths.settings}
-						class={clsx(
-							'flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8',
-							$page.url.pathname === '/settings' &&
-								'border-l-2 border-l-primary bg-accent !text-foreground shadow-lg'
-						)}
-						use:builder.action
-						{...builder}
-					>
-						<Settings class="h-5 w-5" />
+					<NavigationItem href={paths.settings} {builder}>
+						<Settings class="size-5" />
 						<span class="sr-only">Settings</span>
-					</a>
+					</NavigationItem>
 				</Tooltip.Trigger>
 				<Tooltip.Content side="right">Settings</Tooltip.Content>
 			</Tooltip.Root>
