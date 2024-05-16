@@ -37,9 +37,10 @@
 	import type { ActionResult, SubmitFunction } from '@sveltejs/kit';
 	import { toast } from 'svelte-sonner';
 	import type { HTMLFormAttributes } from 'svelte/elements';
+	import { derived } from 'svelte/store';
 	import { superForm, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient, type ValidationAdapter } from 'sveltekit-superforms/adapters';
-	import { derived } from 'svelte/store';
+	import { onDestroy } from 'svelte';
 
 	export let schema: ZodSchema;
 	export let formProps: Partial<Omit<HTMLFormAttributes, 'novalidate' | 'method'>> = {};
@@ -51,11 +52,8 @@
 		validators: zodClient(schema),
 		...(formOptions as _FormOptions)
 	});
-	const { enhance, delayed, submitting, timeout } = methods;
-	const loading = derived(
-		[delayed, submitting, timeout],
-		([$delayed, $submitting, $timeout]) => $delayed || $submitting || $timeout
-	);
+	const { enhance, delayed } = methods;
+	const loading = derived([delayed], ([$delayed]) => $delayed);
 
 	let toastId: string | number | undefined = undefined;
 	$: if ($loading) {
@@ -63,10 +61,16 @@
 			dismissable: false,
 			important: true
 		});
-	} else {
+	} else if (toastId) {
 		toast.dismiss(toastId);
 		toastId = undefined;
 	}
+	onDestroy(() => {
+		if (toastId) {
+			toast.dismiss(toastId);
+			toastId = undefined;
+		}
+	});
 </script>
 
 <form bind:this={formElement} {...formProps} novalidate method="post" use:enhance>
