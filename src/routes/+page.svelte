@@ -26,7 +26,6 @@
 		loadingText="Signing in..."
 		formProps={{ action: paths.auth.actions.signIn }}
 		formOptions={{
-			validationMethod: 'oninput',
 			resetForm: false,
 			onError: ({ result }) => {
 				toast.error(result.error.message);
