@@ -27,8 +27,8 @@
 </script>
 
 <div>
-	<div class="flex h-fit max-h-[calc(100svh-220px)] min-h-48 w-full rounded-md border">
-		<Table.Root {...$tableAttrs} class="h-fit">
+	<div class="flex h-full max-h-[calc(100svh-220px)] min-h-48 w-full rounded-md border">
+		<Table.Root {...$tableAttrs} class="h-full">
 			<Table.Header>
 				{#each $headerRows as headerRow}
 					<Subscribe rowAttrs={headerRow.attrs()}>
