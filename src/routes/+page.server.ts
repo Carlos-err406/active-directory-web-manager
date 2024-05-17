@@ -1,6 +1,7 @@
-import { LDAP_DOMAIN, NODE_ENV, CAPTCHA_LENGTH } from '$env/static/private';
-import { PUBLIC_BASE_DN } from '$env/static/public';
+import { ADMIN_GROUP, CAPTCHA_LENGTH, NODE_ENV } from '$env/static/private';
+import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
 import { paths } from '$lib';
+import { userBelongsToGroup } from '$lib/ldap';
 import { getLDAPClient } from '$lib/ldap/client';
 import { signUpSchema } from '$lib/schemas/signup-schema';
 import { getPublicKey } from '$lib/server';
@@ -10,9 +11,9 @@ import jwt from 'jsonwebtoken';
 import { InvalidCredentialsError } from 'ldapts';
 import { fail, setError, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
+import { v4 } from 'uuid';
 import generate from 'vanilla-captcha';
 import type { Actions, PageServerLoad } from './$types';
-import { v4 } from 'uuid';
 
 export const load: PageServerLoad = async ({ cookies, depends }) => {
 	depends(paths.auth.dependencies.captcha);
@@ -63,7 +64,7 @@ export const actions: Actions = {
 		const [sAMAccountName] = email.split('@');
 		const ldap = getLDAPClient();
 		try {
-			await ldap.bind(`${sAMAccountName}@${LDAP_DOMAIN}`, password);
+			await ldap.bind(`${sAMAccountName}@${PUBLIC_LDAP_DOMAIN}`, password);
 		} catch (e) {
 			await ldap.unbind();
 			console.log(e);
@@ -81,8 +82,9 @@ export const actions: Actions = {
 			throw error(401, 'Invalid Credentials');
 		}
 		const [user] = searchEntries;
+		const isAdmin = await userBelongsToGroup(ldap, user.distinguishedName as string, ADMIN_GROUP);
 		try {
-			const session = jwt.sign(user, getPublicKey(), {
+			const session = jwt.sign({ ...user, isAdmin }, getPublicKey(), {
 				algorithm: 'RS512',
 				expiresIn: '2h'
 			});

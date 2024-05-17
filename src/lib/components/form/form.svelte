@@ -48,14 +48,22 @@
 	export let form: Data | SuperValidated<Data>;
 	export let formElement: HTMLFormElement | undefined = undefined;
 	export let loadingText = 'Submitting...';
+	let toastId: string | number | undefined = undefined;
+
 	const methods = superForm(form, {
 		validators: zodClient(schema),
-		...(formOptions as _FormOptions)
+		...(formOptions as _FormOptions),
+		onResult: (event) => {
+			if (formOptions?.onResult) formOptions.onResult(event as ResultType<typeof schema>);
+			if (toastId) {
+				toast.dismiss(toastId);
+				toastId = undefined;
+			}
+		}
 	});
 	const { enhance, delayed } = methods;
 	const loading = derived([delayed], ([$delayed]) => $delayed);
 
-	let toastId: string | number | undefined = undefined;
 	$: if ($loading) {
 		toastId = toast.loading(loadingText, {
 			dismissable: false,

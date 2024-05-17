@@ -12,7 +12,8 @@ export const paths = {
 			create: '/users?/create',
 			update: '/users?/update',
 			delete: '/users?/delete',
-			deleteMany: '/users?/deleteMany'
+			deleteMany: '/users?/deleteMany',
+			changePassword: '/users?/changePassword'
 		}
 	},
 	groups: {

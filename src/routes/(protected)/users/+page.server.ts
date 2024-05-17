@@ -1,17 +1,22 @@
-import { PUBLIC_BASE_DN } from '$env/static/public';
+import { NODE_ENV } from '$env/static/private';
+import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
 import { search } from '$lib/actions';
 import { encodePassword, getEntryByDn, getEntryBySAMAccountName } from '$lib/ldap';
 import { extractPagination, type PaginationWithUrls } from '$lib/pagination';
 import { searchSchema } from '$lib/schemas/search-schema';
+import { changePasswordSchema } from '$lib/schemas/user/change-password-schema';
 import { createUserSchema } from '$lib/schemas/user/create-user-schema';
 import { deleteManyUsersSchema, deleteUserSchema } from '$lib/schemas/user/delete-user.schema';
+import { getPublicKey } from '$lib/server';
 import type { User } from '$lib/types/user';
 import { error, redirect } from '@sveltejs/kit';
+import jwt from 'jsonwebtoken';
 import {
 	AndFilter,
 	Attribute,
 	Change,
 	EqualityFilter,
+	InvalidCredentialsError,
 	NotFilter,
 	OrFilter,
 	SubstringFilter,
@@ -74,7 +79,10 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 
 		return {
 			pagination: paginationWithURLs,
+			deleteManyUsersForm: await superValidate(zod(deleteManyUsersSchema)),
+			deleteUserForm: await superValidate(zod(deleteUserSchema)),
 			createUserForm: await superValidate(zod(createUserSchema)),
+			changePasswordForm: await superValidate(zod(changePasswordSchema)),
 			searchForm: await superValidate(zod(searchSchema))
 		};
 	} catch (e) {
@@ -199,5 +207,67 @@ export const actions: Actions = {
 			form,
 			success: true
 		};
+	},
+	changePassword: async (event) => {
+		const { locals, cookies } = event;
+		const auth = await locals.auth();
+		const access = cookies.get('ad-access');
+		if (!access || !auth) throw redirect(302, '/'); //type narrowing
+
+		const form = await superValidate(event, zod(changePasswordSchema));
+		if (!form.valid) return fail(400, { form });
+		const { ldap, session } = auth;
+		const { dn, password, oldPassword } = form.data;
+
+		const isUpdatingSelfPassword = session.distinguishedName === dn;
+
+		const [user] = await getEntryByDn(ldap, dn);
+		if (!user) throw error(404, 'User not found');
+		console.log({ session });
+		if (!session.isAdmin) {
+			try {
+				const { sAMAccountName } = user;
+				await ldap.bind(`${sAMAccountName}@${PUBLIC_LDAP_DOMAIN}`, oldPassword);
+			} catch (e) {
+				console.log('Update password failed', { e });
+				if (e instanceof InvalidCredentialsError) {
+					return setError(form, 'oldPassword', 'Invalid password');
+				} else {
+					throw error(500, 'Something unexpected happened while validating your password');
+				}
+			}
+		}
+		const encodedPassword = encodePassword(password);
+		const passwordChange: Change = new Change({
+			operation: 'replace',
+			modification: new Attribute({ type: 'unicodePwd', values: [encodedPassword] })
+		});
+
+		try {
+			await ldap.modify(dn, passwordChange);
+		} catch (e) {
+			console.log(e);
+			throw error(500, 'Something unexpected happened while changing the password');
+		}
+		if (isUpdatingSelfPassword) {
+			//update access token
+			const { email } = jwt.verify(access, getPublicKey(), {
+				algorithms: ['RS512']
+			}) as { email: string };
+			const newAccess = jwt.sign({ email, password }, getPublicKey(), {
+				algorithm: 'RS512',
+				expiresIn: '2h'
+			});
+			cookies.set('ad-access', newAccess, {
+				path: '/',
+				expires: new Date(Date.now() + 60 * 60 * 2 * 1000),
+				httpOnly: true,
+				sameSite: 'strict',
+				secure: NODE_ENV === 'production'
+			});
+		}
+		await ldap.unbind();
+
+		return { form };
 	}
 };

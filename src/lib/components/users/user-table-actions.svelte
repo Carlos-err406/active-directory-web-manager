@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
-	import { invalidate } from '$app/navigation';
 	import { paths } from '$lib';
 	import { Button } from '$lib/components/ui/button';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
@@ -9,9 +7,12 @@
 	import Edit from '$lucide/pencil-line.svelte';
 	import Trash from '$lucide/trash-2.svelte';
 	import { LockKeyholeOpen } from 'lucide-svelte';
-	import { toast } from 'svelte-sonner';
+	import ChangePasswordDialog from './change-password-dialog.svelte';
+	import DeleteUserDialog from './delete-user-dialog.svelte';
 	export let id: string;
 	let open = false;
+	let isChangePasswordDialogOpen = false;
+	let isDeleteUserDialogOpen = false;
 </script>
 
 <DropdownMenu.Root bind:open>
@@ -33,35 +34,22 @@
 				<Edit class="size-5" />
 				Edit
 			</DropdownMenu.Item>
-			<DropdownMenu.Item class="flex flex-nowrap gap-2">
+			<DropdownMenu.Item
+				class="flex flex-nowrap gap-2"
+				on:click={() => (isChangePasswordDialogOpen = true)}
+			>
 				<LockKeyholeOpen class="size-5" />
 				Change password
 			</DropdownMenu.Item>
-			<form
-				action={paths.users.actions.delete}
-				method="post"
-				use:enhance={() => {
-					return ({ result }) => {
-						open = false;
-						if (result.type === 'success') {
-							toast.success('User deleted successfully');
-							invalidate('protected:users');
-						} else if (result.type === 'error') {
-							toast.error(result.error.message);
-						}
-					};
-				}}
+			<DropdownMenu.Item
+				class="!hover:text-destructive flex flex-nowrap gap-2 !text-destructive"
+				on:click={() => (isDeleteUserDialogOpen = true)}
 			>
-				<input type="hidden" name="dn" value={id} />
-				<Button
-					type="submit"
-					variant="ghost"
-					class="flex w-full flex-nowrap justify-start gap-2 px-2 text-start text-destructive hover:text-destructive"
-				>
-					<Trash class="size-5" />
-					Delete
-				</Button>
-			</form>
+				<Trash class="size-5" />
+				Delete
+			</DropdownMenu.Item>
 		</DropdownMenu.Group>
 	</DropdownMenu.Content>
 </DropdownMenu.Root>
+<DeleteUserDialog dn={id} bind:open={isDeleteUserDialogOpen} />
+<ChangePasswordDialog dn={id} bind:open={isChangePasswordDialogOpen} />

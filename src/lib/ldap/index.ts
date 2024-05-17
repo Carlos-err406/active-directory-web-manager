@@ -34,3 +34,16 @@ export const getEntryBySAMAccountName = async (
 	sAMAccountName: string,
 	opts?: GetEntryOpts
 ) => getEntryByAttribute(ldap, 'sAMAccountName', sAMAccountName, { ...opts });
+
+export const userBelongsToGroup = async (ldap: Client, userDN: string, groupName: string) => {
+	const [user] = await getEntryByDn(ldap, userDN);
+	if (!user) return false;
+	const { memberOf } = user;
+	if (!memberOf || memberOf.length === 0) return false;
+
+	const [group] = await getEntryBySAMAccountName(ldap, groupName);
+	if (!group) return false;
+	const { distinguishedName: groupDn } = group;
+
+	return (memberOf as string[]).includes(groupDn as string);
+};

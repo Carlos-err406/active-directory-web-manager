@@ -1,4 +1,5 @@
-import { LDAP_DOMAIN, LOGGER } from '$env/static/private';
+import { LOGGER } from '$env/static/private';
+import { PUBLIC_LDAP_DOMAIN } from '$env/static/public';
 import { getLDAPClient } from '$lib/ldap/client';
 import { getPublicKey } from '$lib/server';
 import type { Session } from '$lib/types/session';
@@ -19,7 +20,7 @@ const authenticationSetter: Handle = async ({ event, resolve }) => {
 				algorithms: ['RS512']
 			}) as { email: string; password: string };
 			const [sAMAccountName] = email.split('@');
-			await ldap.bind(`${sAMAccountName}@${LDAP_DOMAIN}`, password);
+			await ldap.bind(`${sAMAccountName}@${PUBLIC_LDAP_DOMAIN}`, password);
 			return {
 				ldap,
 				session: jwt.verify(session, getPublicKey(), { algorithms: ['RS512'] }) as Session

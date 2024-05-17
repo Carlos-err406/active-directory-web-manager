@@ -1,4 +1,5 @@
 export type Session = {
+	isAdmin: boolean;
 	memberOf: string[];
 	jpegPhoto: string;
 	dn: string;
