@@ -20,10 +20,10 @@ export const getEntryByAttribute = async (
 	{ base = PUBLIC_BASE_DN, extraFilters }: GetEntryOpts
 ) => {
 	let filters: Filter[] = [new EqualityFilter({ attribute, value })];
-	if (extraFilters) filters = filters.concat(extraFilters);
+	if (extraFilters) filters = filters.concat(...extraFilters);
 	const filter = new AndFilter({ filters }).toString();
 	const { searchEntries } = await ldap.search(base, { filter });
-	return searchEntries;
+	return searchEntries[0];
 };
 
 export const getEntryByDn = async (ldap: Client, dn: string, opts?: GetEntryOpts) =>
@@ -36,12 +36,12 @@ export const getEntryBySAMAccountName = async (
 ) => getEntryByAttribute(ldap, 'sAMAccountName', sAMAccountName, { ...opts });
 
 export const userBelongsToGroup = async (ldap: Client, userDN: string, groupName: string) => {
-	const [user] = await getEntryByDn(ldap, userDN);
+	const user = await getEntryByDn(ldap, userDN);
 	if (!user) return false;
 	const { memberOf } = user;
 	if (!memberOf || memberOf.length === 0) return false;
 
-	const [group] = await getEntryBySAMAccountName(ldap, groupName);
+	const group = await getEntryBySAMAccountName(ldap, groupName);
 	if (!group) return false;
 	const { distinguishedName: groupDn } = group;
 

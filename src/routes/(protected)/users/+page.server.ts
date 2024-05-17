@@ -39,6 +39,7 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 	const pageSize = Number(searchParams.get('pageSize') || 10);
 	const sortAttribute = searchParams.get('sort') || 'sAMAccountName';
 	const order = searchParams.get('order') || 'asc';
+
 	const filters: Filter[] = [
 		new NotFilter({
 			filter: new EqualityFilter({ attribute: 'objectClass', value: 'computer' })
@@ -107,7 +108,7 @@ export const actions: Actions = {
 		const { ldap } = auth;
 		const { sAMAccountName, base, givenName, sn, mail, password, description } = form.data;
 
-		const [entry] = await getEntryBySAMAccountName(ldap, sAMAccountName);
+		const entry = await getEntryBySAMAccountName(ldap, sAMAccountName);
 
 		if (entry) return setError(form, 'sAMAccountName', 'User already exists');
 
@@ -139,13 +140,9 @@ export const actions: Actions = {
 			await ldap.del(dn);
 			throw error(500, "Something unexpected happened while creating setting the user's password");
 		}
-		const [createdEntry] = await getEntryByDn(ldap, dn);
-		console.log({ createdEntry });
+
 		await ldap.unbind();
-		return {
-			form,
-			success: true
-		};
+		return { form };
 	},
 	delete: async (event) => {
 		const { locals } = event;
@@ -221,7 +218,7 @@ export const actions: Actions = {
 
 		const isUpdatingSelfPassword = session.distinguishedName === dn;
 
-		const [user] = await getEntryByDn(ldap, dn);
+		const user = await getEntryByDn(ldap, dn);
 		if (!user) throw error(404, 'User not found');
 		console.log({ session });
 		if (!session.isAdmin) {

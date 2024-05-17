@@ -35,12 +35,12 @@
 
 <script lang="ts">
 	import type { ActionResult, SubmitFunction } from '@sveltejs/kit';
+	import { onDestroy } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import type { HTMLFormAttributes } from 'svelte/elements';
 	import { derived } from 'svelte/store';
 	import { superForm, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient, type ValidationAdapter } from 'sveltekit-superforms/adapters';
-	import { onDestroy } from 'svelte';
 
 	export let schema: ZodSchema;
 	export let formProps: Partial<Omit<HTMLFormAttributes, 'novalidate' | 'method'>> = {};
@@ -49,36 +49,32 @@
 	export let formElement: HTMLFormElement | undefined = undefined;
 	export let loadingText = 'Submitting...';
 	let toastId: string | number | undefined = undefined;
-
+	const killToast = () => {
+		toast.dismiss(toastId);
+		toastId = undefined;
+	};
+	const triggerToast = () =>
+		toast.loading(loadingText, {
+			dismissable: true,
+			important: false
+		});
 	const methods = superForm(form, {
 		validators: zodClient(schema),
 		...(formOptions as _FormOptions),
-		onResult: (event) => {
-			if (formOptions?.onResult) formOptions.onResult(event as ResultType<typeof schema>);
-			if (toastId) {
-				toast.dismiss(toastId);
-				toastId = undefined;
-			}
+		onSubmit: (input) => {
+			toastId = triggerToast();
+			if (formOptions?.onSubmit) formOptions.onSubmit(input);
 		}
 	});
-	const { enhance, delayed } = methods;
-	const loading = derived([delayed], ([$delayed]) => $delayed);
+	const { enhance, submitting, delayed, timeout } = methods;
+	const loading = derived(
+		[submitting, delayed, timeout],
+		([$submitting, $delayed, $timeout]) => $submitting || $delayed || $timeout
+	);
 
-	$: if ($loading) {
-		toastId = toast.loading(loadingText, {
-			dismissable: false,
-			important: true
-		});
-	} else if (toastId) {
-		toast.dismiss(toastId);
-		toastId = undefined;
-	}
-	onDestroy(() => {
-		if (toastId) {
-			toast.dismiss(toastId);
-			toastId = undefined;
-		}
-	});
+	$: if (!$loading) killToast();
+
+	onDestroy(killToast);
 </script>
 
 <form bind:this={formElement} {...formProps} novalidate method="post" use:enhance>
