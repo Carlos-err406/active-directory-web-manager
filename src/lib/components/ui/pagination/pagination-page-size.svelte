@@ -8,6 +8,7 @@
 	$: ({ searchParams } = $page.url);
 	const getSizeParams = (pageSize: number) => {
 		const params = new URLSearchParams(searchParams);
+		params.set('page', '1');
 		params.set('pageSize', String(pageSize));
 		return params.toString();
 	};
