@@ -1,7 +1,10 @@
 import { PUBLIC_BASE_DN } from '$env/static/public';
+import { changePasswordSchema } from '$lib/schemas/user/change-password-schema';
 import type { User } from '$lib/types/user';
 import { error, redirect } from '@sveltejs/kit';
 import type { Entry } from 'ldapts';
+import { superValidate } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
 import { v4 } from 'uuid';
 import type { PageServerLoad } from './$types';
 
@@ -27,5 +30,9 @@ export const load: PageServerLoad = async ({ locals }) => {
 	if (searchEntries.length === 0) throw error(404, 'User not found');
 	const [user] = searchEntries;
 	if (!user) throw error(404, 'User not found');
-	return { user: user as User, showSearch: false };
+	return {
+		user: user as User,
+		showSearch: false,
+		changePasswordForm: await superValidate(zod(changePasswordSchema))
+	};
 };
