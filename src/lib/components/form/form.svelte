@@ -35,7 +35,6 @@
 
 <script lang="ts">
 	import type { ActionResult, SubmitFunction } from '@sveltejs/kit';
-	import { onDestroy } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import type { HTMLFormAttributes } from 'svelte/elements';
 	import { derived } from 'svelte/store';
@@ -73,8 +72,6 @@
 	);
 
 	$: if (!$loading) killToast();
-
-	onDestroy(killToast);
 </script>
 
 <form bind:this={formElement} {...formProps} novalidate method="post" use:enhance>
