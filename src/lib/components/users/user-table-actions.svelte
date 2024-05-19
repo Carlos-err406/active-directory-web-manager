@@ -4,9 +4,9 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import Ellipsis from '$lucide/ellipsis.svelte';
 	import Eye from '$lucide/eye.svelte';
+	import LockKeyholeOpen from '$lucide/lock-keyhole-open.svelte';
 	import Edit from '$lucide/pencil-line.svelte';
 	import Trash from '$lucide/trash-2.svelte';
-	import { LockKeyholeOpen } from 'lucide-svelte';
 	import ChangePasswordDialog from './change-password-dialog.svelte';
 	import DeleteUserDialog from './delete-user-dialog.svelte';
 	export let id: string;
