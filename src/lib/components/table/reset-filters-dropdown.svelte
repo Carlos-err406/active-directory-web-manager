@@ -1,6 +1,10 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { ArrowUpDown, EyeOff, FilterX, LucideBookOpenText, Search } from 'lucide-svelte';
+	import ArrowUpDown from '$lucide/arrow-up-down.svelte';
+	import BookOpenText from '$lucide/book-open-text.svelte';
+	import EyeOff from '$lucide/eye-off.svelte';
+	import FilterX from '$lucide/filter-x.svelte';
+	import Search from '$lucide/search.svelte';
 	import { derived } from 'svelte/store';
 	import { slide } from 'svelte/transition';
 	import { Button } from '../ui/button';
@@ -81,7 +85,7 @@
 			{/if}
 			{#if $page.url.searchParams.has('pageSize') || $page.url.searchParams.has('page')}
 				<DropdownMenu.LinkItem href={$noPagePageSize} class="flex gap-2 hover:no-underline">
-					<LucideBookOpenText class="size-4 flex-none" />
+					<BookOpenText class="size-4 flex-none" />
 					<span>Clear Page and Page size</span>
 				</DropdownMenu.LinkItem>
 			{/if}
