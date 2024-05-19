@@ -52,16 +52,17 @@
 		toast.dismiss(toastId);
 		toastId = undefined;
 	};
-	const triggerToast = () =>
-		toast.loading(loadingText, {
+	const triggerToast = () => {
+		toastId = toast.loading(loadingText, {
 			dismissable: true,
 			important: false
 		});
+	};
 	const methods = superForm(form, {
 		validators: zodClient(schema),
 		...(formOptions as _FormOptions),
 		onSubmit: (input) => {
-			toastId = triggerToast();
+			triggerToast();
 			if (formOptions?.onSubmit) formOptions.onSubmit(input);
 		}
 	});
@@ -74,6 +75,6 @@
 	$: if (!$loading) killToast();
 </script>
 
-<form bind:this={formElement} {...formProps} novalidate method="post" use:enhance>
+<form bind:this={formElement} novalidate method="post" {...formProps} use:enhance>
 	<slot {methods} loading={$loading} />
 </form>

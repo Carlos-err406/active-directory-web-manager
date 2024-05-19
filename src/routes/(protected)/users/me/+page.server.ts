@@ -32,7 +32,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	if (!user) throw error(404, 'User not found');
 	return {
 		user: user as User,
-		showSearch: false,
+		searchForm: null,
 		changePasswordForm: await superValidate(zod(changePasswordSchema))
 	};
 };

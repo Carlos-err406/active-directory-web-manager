@@ -5,6 +5,7 @@ import { error, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { PageServerLoad } from './$types';
+
 export const load: PageServerLoad = async ({ params, locals }) => {
 	const auth = await locals.auth();
 	if (!auth) throw redirect(302, '/');
@@ -21,7 +22,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	}
 	return {
 		user,
-		showSearch: false,
+		searchForm: null,
 		changePasswordForm: await superValidate(zod(changePasswordSchema))
 	};
 };

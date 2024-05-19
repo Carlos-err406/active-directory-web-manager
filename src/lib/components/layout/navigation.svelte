@@ -2,6 +2,7 @@
 	import Building2 from '$lucide/building-2.svelte';
 	import Code from '$lucide/code.svelte';
 	import FileTextIcon from '$lucide/file-text.svelte';
+	import FolderTree from '$lucide/folder-tree.svelte';
 	import Settings from '$lucide/settings.svelte';
 	import User from '$lucide/user.svelte';
 	import Users from '$lucide/users.svelte';
@@ -14,6 +15,7 @@
 			name: 'Organizational Units',
 			icon: Building2
 		},
+		{ href: paths.tree.list, name: 'Tree view', icon: FolderTree },
 		{ href: paths.logs.list, name: 'Logs', icon: FileTextIcon }
 	];
 </script>

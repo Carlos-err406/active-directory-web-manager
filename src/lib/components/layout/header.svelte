@@ -12,7 +12,7 @@
 >
 	<div class="flex w-full items-center gap-4">
 		<NavigationSheet />
-		{#if $page.data.showSearch}
+		{#if $page.data.searchForm}
 			<SearchForm />
 		{/if}
 		<Breadcrumb.Root class="hidden md:flex">

@@ -24,6 +24,9 @@ export const paths = {
 		list: '/ous',
 		dn: (dn: string) => `/ous/${dn}`
 	},
+	tree: {
+		list: '/tree'
+	},
 	settings: '/settings',
 	logs: { list: '/logs' }
 };

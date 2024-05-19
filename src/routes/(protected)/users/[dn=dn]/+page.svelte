@@ -39,7 +39,9 @@
 						{user.sAMAccountName.slice(0, 2)}
 					</AvatarFallback>
 				</Avatar>
-				<h1 class="text-3xl font-bold tracking-tight md:text-4xl">{user.sAMAccountName}</h1>
+				<h1 class="text-3xl font-bold tracking-tight md:text-4xl">
+					{user.displayName || user.sAMAccountName}
+				</h1>
 			</div>
 			<div class="user-info grid grid-cols-2 gap-y-3">
 				<span>sAMAccountName:</span>
