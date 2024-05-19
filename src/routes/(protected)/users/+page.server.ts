@@ -22,7 +22,7 @@ import {
 	SubstringFilter,
 	type Filter
 } from 'ldapts';
-import { fail, setError, superValidate } from 'sveltekit-superforms';
+import { fail, setError, superValidate, withFiles } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { v4 } from 'uuid';
 import type { Actions, PageServerLoad } from './$types';
@@ -106,22 +106,28 @@ export const actions: Actions = {
 		const form = await superValidate(event, zod(createUserSchema));
 		if (!form.valid) return fail(400, { form });
 		const { ldap } = auth;
-		const { sAMAccountName, base, givenName, sn, mail, password, description } = form.data;
-
+		const { sAMAccountName, base, givenName, sn, mail, password, description, jpegPhotoBase64 } =
+			form.data;
 		const entry = await getEntryBySAMAccountName(ldap, sAMAccountName);
 
 		if (entry) return setError(form, 'sAMAccountName', 'User already exists');
-
-		const attributes: Record<string, string | string[]> = {
+		const attributes: Record<string, string[] | string> = {
 			objectClass: ['top', 'person', 'organizationalPerson', 'user'],
-			sAMAccountName,
 			userAccountControl: ['512'],
+			displayName: givenName,
+			sAMAccountName,
 			givenName,
 			mail
 		};
-		if (sn) attributes['sn'] = sn;
+		if (sn) {
+			attributes['sn'] = sn;
+			attributes['displayName'] = `${givenName} ${sn}`;
+		}
 		if (description) attributes['description'] = description;
-
+		if (jpegPhotoBase64) {
+			const [, content] = jpegPhotoBase64.split('base64,');
+			attributes['jpegPhoto'] = Buffer.from(content, 'base64').toString('base64');
+		}
 		const dn = `CN=${sAMAccountName},${base}`;
 
 		await ldap.add(dn, attributes);
@@ -142,7 +148,7 @@ export const actions: Actions = {
 		}
 
 		await ldap.unbind();
-		return { form };
+		return withFiles({ form });
 	},
 	delete: async (event) => {
 		const { locals } = event;

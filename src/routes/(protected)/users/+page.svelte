@@ -7,6 +7,7 @@
 	import CreateUserDialog from '$lib/components/users/create-user-dialog.svelte';
 	import DeleteManyUsersDialog from '$lib/components/users/delete-many-users-dialog.svelte';
 	import UserTableActions from '$lib/components/users/user-table-actions.svelte';
+	import type { User } from '$lib/types/user';
 	import { DataBodyCell, createRender, createTable } from 'svelte-headless-table';
 	import { addHiddenColumns, addSelectedRows, addSortBy } from 'svelte-headless-table/plugins';
 	import { readable } from 'svelte/store';
@@ -14,7 +15,15 @@
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-	const hidableCols = ['sAMAccountName', 'dn', 'mail', 'sn', 'givenName', 'description'];
+	const hidableCols: (keyof User)[] = [
+		'sAMAccountName',
+		'dn',
+		'displayName',
+		'mail',
+		'sn',
+		'givenName',
+		'description'
+	];
 
 	$: ({ pagination } = data);
 
@@ -55,6 +64,13 @@
 			accessor: 'sAMAccountName',
 			header: 'sAMAccountName'
 		}),
+
+		table.column({
+			accessor: 'displayName',
+			header: 'displayName',
+			cell: ({ value }) => value ?? '-'
+		}),
+
 		table.column({
 			accessor: 'givenName',
 			header: 'givenName',

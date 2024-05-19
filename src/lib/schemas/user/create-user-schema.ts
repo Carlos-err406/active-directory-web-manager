@@ -1,11 +1,26 @@
 import { PUBLIC_BASE_DN } from '$env/static/public';
 import { z } from 'zod';
 
+export const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+export const MAX_FILE_SIZE_MB = 6;
+
 export const createUserSchema = z
 	.object({
 		base: z
 			.string({ required_error: 'base is required' })
 			.refine((val) => val.endsWith(PUBLIC_BASE_DN), 'base must end with ' + PUBLIC_BASE_DN),
+		jpegPhoto: z
+			.instanceof(File)
+			.optional()
+			.refine(
+				(file) => !file || (file && ALLOWED_FILE_TYPES.includes(file.type)),
+				'Allowed image types are jpeg, png, webp'
+			)
+			.refine(
+				(file) => !file || (file && file.size < MAX_FILE_SIZE_MB * 1024 * 1024),
+				'File too large, max 6MB'
+			),
+		jpegPhotoBase64: z.string().optional(),
 		sAMAccountName: z
 			.string({ required_error: 'sAMAccountName is required' })
 			.regex(/^[^\s]+$/, 'sAMAccountName cannot contain spaces')
@@ -33,5 +48,10 @@ export const createUserSchema = z
 	.refine(({ password, passwordConfirmation }) => password === passwordConfirmation, {
 		message: 'Passwords do not match',
 		path: ['passwordConfirmation']
-	});
+	})
+	.refine(
+		({ jpegPhoto, jpegPhotoBase64 }) =>
+			(!jpegPhoto && !jpegPhotoBase64) || (jpegPhoto && jpegPhotoBase64),
+		{ message: 'Error in photo', path: ['jpegPhoto'] }
+	);
 export type CreateUserSchema = typeof createUserSchema;

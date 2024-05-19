@@ -8,10 +8,16 @@
 	import PasswordInput from '$lib/components/form/password-input.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
-	import { createUserSchema } from '$lib/schemas/user/create-user-schema';
-	import Mail from '$lucide/mail.svelte';
+	import {
+		ALLOWED_FILE_TYPES,
+		MAX_FILE_SIZE_MB,
+		createUserSchema
+	} from '$lib/schemas/user/create-user-schema';
+	import { cn } from '$lib/utils';
 	import Captions from '$lucide/captions.svelte';
+	import Mail from '$lucide/mail.svelte';
 	import { toast } from 'svelte-sonner';
+	import ImageInput from '../form/image-input.svelte';
 	let open: boolean;
 	export let base = PUBLIC_BASE_DN;
 	$: form = $page.data.createUserForm;
@@ -21,7 +27,7 @@
 	<Dialog.Trigger asChild let:builder>
 		<Button builders={[builder]}>Create User</Button>
 	</Dialog.Trigger>
-	<Dialog.Content class="">
+	<Dialog.Content>
 		<Dialog.Header>
 			<Dialog.Title>Create User</Dialog.Title>
 			<Dialog.Description>Fill in the following data to create a new user</Dialog.Description>
@@ -32,9 +38,9 @@
 			bind:form
 			schema={createUserSchema}
 			loadingText="Creating user..."
-			formProps={{ action: paths.users.actions.create }}
+			formProps={{ action: paths.users.actions.create, enctype: 'multipart/form-data' }}
 			formOptions={{
-				resetForm: false,
+				resetForm: true,
 				onError: ({ result }) => {
 					toast.error(result.error.message);
 				},
@@ -49,6 +55,21 @@
 		>
 			<input hidden name="base" value={base} />
 			<div class="grid grid-cols-2 gap-4">
+				<div class="col-span-2">
+					<ImageInput
+						name="jpegPhoto"
+						b64Name="jpegPhotoBase64"
+						{methods}
+						addornmentRightClasses={cn('self-end')}
+						inputProps={{ accept: ALLOWED_FILE_TYPES.join(',') }}
+					>
+						<svelte:fragment slot="label">jpegPhoto</svelte:fragment>
+						<svelte:fragment slot="button-inner">Upload user profile picture</svelte:fragment>
+						<svelte:fragment slot="description">
+							Max file size {MAX_FILE_SIZE_MB}MB
+						</svelte:fragment>
+					</ImageInput>
+				</div>
 				<Input name="sAMAccountName" inputProps={{ required: true }} {methods}>
 					<svelte:fragment slot="label">sAMAccountName</svelte:fragment>
 				</Input>

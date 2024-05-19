@@ -10,6 +10,7 @@ export type User = {
 	name: string;
 	givenName: string;
 	sn: string;
+	displayName: string;
 	userAccountControl: string;
 	badPwdCount: string;
 	countryCode: string;
