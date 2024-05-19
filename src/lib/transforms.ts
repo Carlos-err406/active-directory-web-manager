@@ -1,3 +1,5 @@
+import type { User } from './types/user';
+
 export const blobToBase64 = (file: Blob) => {
 	return new Promise<string>((resolve, reject) => {
 		const fileReader = new FileReader();
@@ -24,4 +26,12 @@ export const b64ToObjectURL = (b64String: string, mimeType = 'image/jpeg'): stri
 	// Create an object URL from the blob
 	const objectURL = URL.createObjectURL(blob);
 	return objectURL;
+};
+
+export const jpegPhotoToB64 = (user: User) => {
+	if ('jpegPhoto' in user) {
+		const base64String = Buffer.from(user.jpegPhoto as string, 'base64').toString('base64');
+		user.jpegPhoto = `data:image/jpeg;base64,${base64String}`;
+	}
+	return user;
 };

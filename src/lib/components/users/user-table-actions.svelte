@@ -7,12 +7,17 @@
 	import LockKeyholeOpen from '$lucide/lock-keyhole-open.svelte';
 	import Edit from '$lucide/pencil-line.svelte';
 	import Trash from '$lucide/trash-2.svelte';
+	import Users from '$lucide/users.svelte';
 	import ChangePasswordDialog from './change-password-dialog.svelte';
 	import DeleteUserDialog from './delete-user-dialog.svelte';
+	import ManageUserMembership from './manage-user-membership.svelte';
+	import UpdateUserDialog from './update-user-dialog.svelte';
 	export let id: string;
 	let open = false;
 	let isChangePasswordDialogOpen = false;
 	let isDeleteUserDialogOpen = false;
+	let isUpdateUserDialogOpen = false;
+	let isManageMembershipDialogOpen = false;
 </script>
 
 <DropdownMenu.Root bind:open>
@@ -30,7 +35,17 @@
 				<Eye class="size-5" />
 				View user details
 			</DropdownMenu.LinkItem>
-			<DropdownMenu.Item class="flex flex-nowrap gap-2">
+			<DropdownMenu.Item
+				class="flex flex-nowrap gap-2"
+				on:click={() => (isManageMembershipDialogOpen = true)}
+			>
+				<Users class="size-5" />
+				Manage groups
+			</DropdownMenu.Item>
+			<DropdownMenu.Item
+				class="flex flex-nowrap gap-2"
+				on:click={() => (isUpdateUserDialogOpen = true)}
+			>
 				<Edit class="size-5" />
 				Edit
 			</DropdownMenu.Item>
@@ -51,5 +66,8 @@
 		</DropdownMenu.Group>
 	</DropdownMenu.Content>
 </DropdownMenu.Root>
+
 <DeleteUserDialog dn={id} bind:open={isDeleteUserDialogOpen} />
 <ChangePasswordDialog dn={id} bind:open={isChangePasswordDialogOpen} />
+<UpdateUserDialog dn={id} bind:open={isUpdateUserDialogOpen} />
+<ManageUserMembership dn={id} bind:open={isManageMembershipDialogOpen} />

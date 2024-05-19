@@ -11,8 +11,11 @@
 	import Image from '$lucide/image.svelte';
 	import Trash from '$lucide/trash-2.svelte';
 	import type { ClassValue } from 'clsx';
+	import { toast } from 'svelte-sonner';
 	import { scale, slide } from 'svelte/transition';
+	import { v4 } from 'uuid';
 	import { Button } from '../ui/button';
+	import { browser } from '$app/environment';
 
 	export let methods: Methods;
 	const { form } = methods;
@@ -20,25 +23,42 @@
 	export let b64Name: keyof typeof $form;
 	export let name: keyof typeof $form;
 	export let inputProps: InputProps = {};
+
 	export let imgClasses: ClassValue = '';
 	export let addornmentClasses: ClassValue = '';
 	export let addornmentRightClasses: ClassValue = '';
 	export let addornmentLeftClasses: ClassValue = '';
+
 	let fileList: FileList;
+
 	$: file = fileList?.[0];
-	let src: string | null = null;
 	let fileInput: HTMLInputElement;
-	let base64: string | null = null;
+	$: src = ($form[b64Name] as string) || null;
+
+	{
+		const url = $form[b64Name] as string;
+		if (url && browser) {
+			fetch(url)
+				.then((r) => r.blob())
+				.then((blob) => {
+					const f = new File([blob], v4(), { type: 'image/jpeg' });
+					const dataTransfer = new DataTransfer();
+					dataTransfer.items.add(f);
+					fileList = dataTransfer.files;
+					fileInput.files = fileList;
+				});
+		}
+	}
+
 	const reset = () => {
 		src = null;
-		base64 = null;
 		fileInput && (fileInput.value = '');
 	};
+
 	$: if (file) {
 		const blob = new Blob([file], { type: file.type });
-		src = URL.createObjectURL(blob);
-		blobToBase64(blob).then((value) => (base64 = value));
-	} else reset();
+		blobToBase64(blob).then((value) => (src = value));
+	}
 
 	$: !open && reset();
 </script>
@@ -46,7 +66,7 @@
 <Form.Field form={methods} {name}>
 	<Form.Control let:attrs>
 		<Form.Label class={cn(inputProps.required && 'required')}><slot name="label" /></Form.Label>
-		<slot {src} {file} {base64}>
+		<slot {src} {file} base64={src}>
 			<input
 				hidden
 				type="file"
@@ -57,19 +77,33 @@
 				{...inputProps}
 			/>
 		</slot>
-		<input hidden type="text" name={b64Name} value={base64} />
+		<input hidden type="text" name={b64Name} value={src} />
 		<div class="flex items-center">
 			<div class={cn('addornment', addornmentClasses, addornmentLeftClasses)}>
 				<slot name="addornment-left" />
 			</div>
 			<div>
 				{#if src}
-					<img
-						transition:scale={{ duration: 200 }}
-						{src}
-						class={cn('size-28', imgClasses)}
-						alt="jpeg"
-					/>
+					<button
+						type="button"
+						class="size-fit cursor-zoom-in"
+						on:click={async () => {
+							if (!src) {
+								toast.error('Error loading the photo');
+								return;
+							}
+							const blob = await fetch(src).then((r) => r.blob());
+							const url = URL.createObjectURL(blob);
+							window.open(url, '_blank');
+						}}
+					>
+						<img
+							transition:scale={{ duration: 200 }}
+							{src}
+							class={cn('size-28 rounded object-fill', imgClasses)}
+							alt="jpeg"
+						/>
+					</button>
 				{:else}
 					<div in:slide={{ axis: 'y', duration: 200, delay: 200 }}>
 						<Button on:click={() => fileInput.click()}>

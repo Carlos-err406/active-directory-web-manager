@@ -1,17 +1,32 @@
-import { NODE_ENV } from '$env/static/private';
 import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
 import { search } from '$lib/actions';
-import { encodePassword, getEntryByDn, getEntryBySAMAccountName } from '$lib/ldap';
+import {
+	deleteAttribute,
+	encodePassword,
+	extractBase,
+	getEntryByDn,
+	getEntryBySAMAccountName,
+	replaceAttribute
+} from '$lib/ldap';
 import { extractPagination, type PaginationWithUrls } from '$lib/pagination';
-import { searchSchema } from '$lib/schemas/search-schema';
 import { changePasswordSchema } from '$lib/schemas/user/change-password-schema';
 import { createUserSchema } from '$lib/schemas/user/create-user-schema';
 import { deleteManyUsersSchema, deleteUserSchema } from '$lib/schemas/user/delete-user.schema';
-import { getPublicKey } from '$lib/server';
+import { updateUserSchema } from '$lib/schemas/user/update-user.schema';
+import {
+	generateAccessToken,
+	generateSessionToken,
+	getAccessToken,
+	setAccessCookie,
+	setSessionCookie,
+	verifyAccessToken
+} from '$lib/server';
+import { jpegPhotoToB64 } from '$lib/transforms';
+import { SESSION_ENTRY_ATTRIBUTES } from '$lib/types/session';
 import type { User } from '$lib/types/user';
 import { error, redirect } from '@sveltejs/kit';
-import jwt from 'jsonwebtoken';
 import {
+	AlreadyExistsError,
 	AndFilter,
 	Attribute,
 	Change,
@@ -56,7 +71,6 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 		const { searchEntries } = await ldap.search(PUBLIC_BASE_DN, {
 			filter: filter.toString()
 		});
-		await ldap.unbind();
 
 		searchEntries.sort((a, b) => {
 			if ((a[sortAttribute] || '-') < (b[sortAttribute] || '-')) return order === 'asc' ? -1 : 1;
@@ -64,6 +78,8 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 			return 0;
 		});
 		const pagination = extractPagination<User>(searchEntries as User[], page, pageSize);
+
+		pagination.data.map(jpegPhotoToB64);
 
 		const previousPageSearchParams = new URLSearchParams(searchParams);
 		if (page - 1 > 0) previousPageSearchParams.set('page', (page - 1).toString());
@@ -78,13 +94,27 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 			previousPage: page <= 1 ? null : `${pathname}?${previousPageSearchParams.toString()}`
 		};
 
+		const [
+			deleteManyUsersForm,
+			deleteUserForm,
+			createUserForm,
+			updateUserForm,
+			changePasswordForm
+		] = await Promise.all([
+			superValidate(zod(deleteManyUsersSchema)),
+			superValidate(zod(deleteUserSchema)),
+			superValidate(zod(createUserSchema)),
+			superValidate(zod(updateUserSchema)),
+			superValidate(zod(changePasswordSchema))
+		]);
+
 		return {
 			pagination: paginationWithURLs,
-			deleteManyUsersForm: await superValidate(zod(deleteManyUsersSchema)),
-			deleteUserForm: await superValidate(zod(deleteUserSchema)),
-			createUserForm: await superValidate(zod(createUserSchema)),
-			changePasswordForm: await superValidate(zod(changePasswordSchema)),
-			searchForm: await superValidate(zod(searchSchema))
+			deleteManyUsersForm,
+			deleteUserForm,
+			createUserForm,
+			updateUserForm,
+			changePasswordForm
 		};
 	} catch (e) {
 		const errorId = v4();
@@ -93,6 +123,8 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 			message: 'Something unexpected happened while retrieving the users, try again later',
 			errorId
 		});
+	} finally {
+		await ldap.unbind();
 	}
 };
 
@@ -214,7 +246,7 @@ export const actions: Actions = {
 	changePassword: async (event) => {
 		const { locals, cookies } = event;
 		const auth = await locals.auth();
-		const access = cookies.get('ad-access');
+		const access = getAccessToken(cookies);
 		if (!access || !auth) throw redirect(302, '/'); //type narrowing
 
 		const form = await superValidate(event, zod(changePasswordSchema));
@@ -234,16 +266,16 @@ export const actions: Actions = {
 			} catch (e) {
 				console.log('Update password failed', { e });
 				if (e instanceof InvalidCredentialsError) {
-					return setError(form, 'oldPassword', 'Invalid password');
+					return setError(form, 'oldPassword', 'Incorrect password');
 				} else {
 					throw error(500, 'Something unexpected happened while validating your password');
 				}
 			}
 		}
 		const encodedPassword = encodePassword(password);
-		const passwordChange: Change = new Change({
-			operation: 'replace',
-			modification: new Attribute({ type: 'unicodePwd', values: [encodedPassword] })
+		const passwordChange: Change = replaceAttribute({
+			type: 'unicodePwd',
+			values: [encodedPassword]
 		});
 
 		try {
@@ -254,23 +286,94 @@ export const actions: Actions = {
 		}
 		if (isUpdatingSelfPassword) {
 			//update access token
-			const { email } = jwt.verify(access, getPublicKey(), {
-				algorithms: ['RS512']
-			}) as { email: string };
-			const newAccess = jwt.sign({ email, password }, getPublicKey(), {
-				algorithm: 'RS512',
-				expiresIn: '2h'
-			});
-			cookies.set('ad-access', newAccess, {
-				path: '/',
-				expires: new Date(Date.now() + 60 * 60 * 2 * 1000),
-				httpOnly: true,
-				sameSite: 'strict',
-				secure: NODE_ENV === 'production'
-			});
+			const { email } = verifyAccessToken(access);
+			const newAccess = generateAccessToken({ email, password });
+			setAccessCookie(cookies, newAccess);
 		}
 		await ldap.unbind();
-
 		return { form };
+	},
+	update: async (event) => {
+		const { locals, cookies } = event;
+		const auth = await locals.auth();
+		const access = getAccessToken(cookies);
+		if (!access || !auth) throw redirect(302, '/'); //type narrowing
+
+		const form = await superValidate(event, zod(updateUserSchema));
+		if (!form.valid) return fail(400, { form });
+		const { ldap, session } = auth;
+
+		const { sAMAccountName, givenName, sn, mail, description, jpegPhotoBase64, dn } = form.data;
+
+		const user = await getEntryByDn<User>(ldap, dn);
+		if (!user) throw error(404, 'User not found');
+
+		const changes: Change[] = [];
+
+		if (sAMAccountName && sAMAccountName !== user.sAMAccountName)
+			changes.push(replaceAttribute({ type: 'sAMAccountName', values: [sAMAccountName] }));
+
+		if (givenName && givenName !== user.givenName)
+			changes.push(replaceAttribute({ type: 'givenName', values: [givenName] }));
+
+		if (description && description !== user.description)
+			changes.push(replaceAttribute({ type: 'description', values: [description] }));
+		else changes.push(deleteAttribute('description'));
+
+		if (sn && sn !== user.sn) changes.push(replaceAttribute({ type: 'sn', values: [sn] }));
+		else changes.push(deleteAttribute('sn'));
+
+		if (mail && mail !== user.mail)
+			changes.push(replaceAttribute({ type: 'mail', values: [mail] }));
+		else changes.push(deleteAttribute('mail'));
+
+		const displayNamePlaceholder = `${givenName} ${sn}`;
+		if (displayNamePlaceholder !== user.displayName)
+			changes.push(replaceAttribute({ type: 'displayName', values: [displayNamePlaceholder] }));
+
+		if (jpegPhotoBase64) {
+			const [, content] = jpegPhotoBase64.split('base64,');
+			const jpegPhoto = Buffer.from(content, 'base64').toString('base64');
+			changes.push(replaceAttribute({ type: 'jpegPhoto', values: [jpegPhoto] }));
+		} else {
+			changes.push(deleteAttribute('jpegPhoto'));
+		}
+
+		try {
+			await ldap.modify(dn, changes);
+		} catch (e) {
+			console.log(e);
+			if (e instanceof AlreadyExistsError) {
+				return setError(form, 'sAMAccountName', 'sAMAccountName already in use!');
+			}
+			throw error(500, 'Something unexpected happened while updating the user');
+		}
+		if (sAMAccountName && sAMAccountName !== user.sAMAccountName) {
+			const base = extractBase(user.dn);
+			const newDN = `CN=${sAMAccountName},${base}`;
+			try {
+				await ldap.modifyDN(dn, newDN);
+			} catch (e) {
+				console.log(e);
+				throw error(500, 'Something unexpected happened while updating the distinguishedName');
+			}
+		}
+		const isSelfUpdating = session.distinguishedName === dn;
+		if (isSelfUpdating) {
+			const updatedUser = await getEntryBySAMAccountName<User>(ldap, sAMAccountName, {
+				searchOpts: { attributes: SESSION_ENTRY_ATTRIBUTES }
+			});
+			const newSession = await generateSessionToken(ldap, updatedUser);
+			setSessionCookie(cookies, newSession);
+			const { password } = verifyAccessToken(access);
+			const newAccess = generateAccessToken({
+				email: `${updatedUser.sAMAccountName}@${PUBLIC_LDAP_DOMAIN}`,
+				password
+			});
+			setAccessCookie(cookies, newAccess);
+		}
+
+		await ldap.unbind();
+		return withFiles({ form });
 	}
 };

@@ -1,14 +1,12 @@
-import { PUBLIC_BASE_DN } from '$env/static/public';
 import { z } from 'zod';
+import { base } from '../dn-schema';
 
 export const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 export const MAX_FILE_SIZE_MB = 6;
 
 export const createUserSchema = z
 	.object({
-		base: z
-			.string({ required_error: 'base is required' })
-			.refine((val) => val.endsWith(PUBLIC_BASE_DN), 'base must end with ' + PUBLIC_BASE_DN),
+		base,
 		jpegPhoto: z
 			.instanceof(File)
 			.optional()

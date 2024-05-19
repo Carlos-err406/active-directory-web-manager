@@ -1,29 +1,30 @@
 import { LOGGER } from '$env/static/private';
 import { PUBLIC_LDAP_DOMAIN } from '$env/static/public';
 import { getLDAPClient } from '$lib/ldap/client';
-import { getPublicKey } from '$lib/server';
-import type { Session } from '$lib/types/session';
+import {
+	getAccessToken,
+	getSessionToken,
+	verifyAccessToken,
+	verifySessionToken
+} from '$lib/server';
 import type { Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
-import jwt from 'jsonwebtoken';
 import { getLoggerHook } from 'sveltekit-logger-hook';
 
 const authenticationSetter: Handle = async ({ event, resolve }) => {
 	const auth = async ({ cookies }: typeof event) => {
-		const access = cookies.get('ad-access');
+		const access = getAccessToken(cookies);
 		if (!access) return null;
-		const session = cookies.get('ad-session');
+		const session = getSessionToken(cookies);
 		if (!session) return null;
 		try {
 			const ldap = getLDAPClient();
-			const { email, password } = jwt.verify(access, getPublicKey(), {
-				algorithms: ['RS512']
-			}) as { email: string; password: string };
+			const { email, password } = verifyAccessToken(access);
 			const [sAMAccountName] = email.split('@');
 			await ldap.bind(`${sAMAccountName}@${PUBLIC_LDAP_DOMAIN}`, password);
 			return {
 				ldap,
-				session: jwt.verify(session, getPublicKey(), { algorithms: ['RS512'] }) as Session
+				session: verifySessionToken(session)
 			};
 		} catch (err) {
 			console.log(err);
