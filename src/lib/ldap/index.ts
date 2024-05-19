@@ -1,5 +1,5 @@
 import { PUBLIC_BASE_DN } from '$env/static/public';
-import { AndFilter, Client, EqualityFilter, type Filter } from 'ldapts';
+import { AndFilter, Client, EqualityFilter, type Entry, type Filter } from 'ldapts';
 
 /**
  * Encodes password for ldap unicodePwd attribute
@@ -13,7 +13,7 @@ type GetEntryOpts = {
 	extraFilters?: Filter[];
 };
 
-export const getEntryByAttribute = async (
+export const getEntryByAttribute = async <T = Entry>(
 	ldap: Client,
 	attribute: string,
 	value: string,
@@ -23,22 +23,22 @@ export const getEntryByAttribute = async (
 	if (extraFilters) filters = filters.concat(...extraFilters);
 	const filter = new AndFilter({ filters }).toString();
 	const { searchEntries } = await ldap.search(base, { filter });
-	return searchEntries[0];
+	return searchEntries[0] as T;
 };
 
-export const getEntryByDn = async (ldap: Client, dn: string, opts?: GetEntryOpts) =>
-	getEntryByAttribute(ldap, 'distinguishedName', dn, { ...opts });
+export const getEntryByDn = async <T = Entry>(ldap: Client, dn: string, opts?: GetEntryOpts) =>
+	getEntryByAttribute<T>(ldap, 'distinguishedName', dn, { ...opts });
 
-export const getEntryBySAMAccountName = async (
+export const getEntryBySAMAccountName = async <T = Entry>(
 	ldap: Client,
 	sAMAccountName: string,
 	opts?: GetEntryOpts
-) => getEntryByAttribute(ldap, 'sAMAccountName', sAMAccountName, { ...opts });
+) => getEntryByAttribute<T>(ldap, 'sAMAccountName', sAMAccountName, { ...opts });
 
-export const userBelongsToGroup = async (ldap: Client, userDN: string, groupName: string) => {
-	const user = await getEntryByDn(ldap, userDN);
-	if (!user) return false;
-	const { memberOf } = user;
+export const entryBelongsToGroup = async (ldap: Client, entryDn: string, groupName: string) => {
+	const entry = await getEntryByDn(ldap, entryDn);
+	if (!entry) return false;
+	const { memberOf } = entry;
 	if (!memberOf || memberOf.length === 0) return false;
 
 	const group = await getEntryBySAMAccountName(ldap, groupName);

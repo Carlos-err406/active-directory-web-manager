@@ -1,7 +1,7 @@
 import { ADMIN_GROUP, CAPTCHA_LENGTH, NODE_ENV } from '$env/static/private';
 import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
 import { paths } from '$lib';
-import { userBelongsToGroup } from '$lib/ldap';
+import { entryBelongsToGroup } from '$lib/ldap';
 import { getLDAPClient } from '$lib/ldap/client';
 import { signUpSchema } from '$lib/schemas/signup-schema';
 import { getPublicKey } from '$lib/server';
@@ -82,7 +82,7 @@ export const actions: Actions = {
 			throw error(401, 'Invalid Credentials');
 		}
 		const [user] = searchEntries;
-		const isAdmin = await userBelongsToGroup(ldap, user.distinguishedName as string, ADMIN_GROUP);
+		const isAdmin = await entryBelongsToGroup(ldap, user.distinguishedName as string, ADMIN_GROUP);
 		try {
 			const session = jwt.sign({ ...user, isAdmin }, getPublicKey(), {
 				algorithm: 'RS512',
