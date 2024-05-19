@@ -11,13 +11,16 @@
 	export let open = false;
 	export let dn: string;
 	$: form = $page.data.changePasswordForm;
+	$: isSelf = $page.data.session.dn === dn;
 </script>
 
 <Dialog.Root bind:open>
 	<Dialog.Content>
 		<Dialog.Header>
 			<Dialog.Title>Change password</Dialog.Title>
-			<Dialog.Description>Fill in the following data to create a new user</Dialog.Description>
+			<Dialog.Description>
+				Fill in the following data to change {isSelf ? 'your' : 'the'} password
+			</Dialog.Description>
 		</Dialog.Header>
 		<Form
 			let:methods
