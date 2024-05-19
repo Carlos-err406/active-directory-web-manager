@@ -6,18 +6,20 @@
 	import ResetFiltersButton from '$lib/components/table/reset-filters-dropdown.svelte';
 	import CreateUserDialog from '$lib/components/users/create-user-dialog.svelte';
 	import DeleteManyUsersDialog from '$lib/components/users/delete-many-users-dialog.svelte';
+	import UserPhotoCell from '$lib/components/users/user-photo-cell.svelte';
 	import UserTableActions from '$lib/components/users/user-table-actions.svelte';
+	import { breadcrumbs } from '$lib/stores';
 	import type { User } from '$lib/types/user';
 	import { DataBodyCell, createRender, createTable } from 'svelte-headless-table';
 	import { addHiddenColumns, addSelectedRows, addSortBy } from 'svelte-headless-table/plugins';
 	import { readable } from 'svelte/store';
 	import { slide } from 'svelte/transition';
 	import type { PageData } from './$types';
-	import { breadcrumbs } from '$lib/stores';
 	export let data: PageData;
 	breadcrumbs.set([{ name: 'Users' }]);
 
 	const hidableCols: (keyof User)[] = [
+		'jpegPhoto',
 		'sAMAccountName',
 		'dn',
 		'displayName',
@@ -54,6 +56,21 @@
 
 				return createRender(DataTableCheckbox, {
 					checked: isSelected
+				});
+			},
+			plugins: {
+				sort: {
+					disable: true
+				}
+			}
+		}),
+		table.column({
+			accessor: 'jpegPhoto',
+			header: 'jpegPhoto',
+			cell: ({ value, row }) => {
+				return createRender(UserPhotoCell, {
+					jpegPhoto: value,
+					sAMAccountName: (row.cellForId.sAMAccountName as unknown as { value: string }).value
 				});
 			},
 			plugins: {
