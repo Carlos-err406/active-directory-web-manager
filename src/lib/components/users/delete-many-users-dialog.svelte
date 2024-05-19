@@ -22,7 +22,7 @@
 			<Dialog.Description
 				>This is a dangerous action!
 				{#if dns.length > 1}
-					<br /> You are deleting <strong>{dns.length}</strong> users!
+					<br /> You are deleting <strong>{dns.length}</strong> {dns.length > 1 ? 'users' : 'user'}!
 				{/if}
 			</Dialog.Description>
 		</Dialog.Header>
@@ -36,6 +36,7 @@
 				resetForm: false,
 				onError: ({ result }) => {
 					toast.error(result.error.message);
+					invalidate('protected:users');
 				},
 				onResult: ({ result }) => {
 					invalidate('protected:users');
