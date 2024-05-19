@@ -1,4 +1,5 @@
 <script lang="ts">
+	import './_page.pcss';
 	import { Avatar, AvatarFallback, AvatarImage } from '$lib/components/ui/avatar';
 	import { Button } from '$lib/components/ui/button';
 	import ChangePasswordDialog from '$lib/components/users/change-password-dialog.svelte';
@@ -27,23 +28,25 @@
 				</Avatar>
 				<h1 class="text-3xl font-bold tracking-tight md:text-4xl">{user.sAMAccountName}</h1>
 			</div>
-			<div class="grid grid-cols-2 gap-y-3">
+			<div class="user-info grid grid-cols-2 gap-y-3">
+				<span>description:</span>
+				<span class="user-info-value">{user.description}</span>
 				{#if user.description}
-					<span>Description</span>
-					<span class="text-gray-500 dark:text-gray-400">{user.description}</span>
+					<span>description:</span>
+					<span class="user-info-value">{user.description}</span>
 				{/if}
-				<span>Account Created on:</span>
-				<span class="text-gray-500 dark:text-gray-400">
+				<span>whenCreated:</span>
+				<span class="user-info-value">
 					{dayjs(user.whenCreated.replace('Z', '')).format('MMMM D, YYYY. hh:mm:ss A')}
 				</span>
-				<span>Account Last Updated on:</span>
-				<span class="text-gray-500 dark:text-gray-400">
+				<span>whenChanged:</span>
+				<span class="user-info-value">
 					{dayjs(user.whenChanged.replace('Z', '')).format('MMMM D, YYYY. hh:mm:ss A')}
 				</span>
-				<span>Distinguished Name</span>
-				<span class="text-gray-500 dark:text-gray-400">{user.dn}</span>
-				<span>Member of:</span>
-				<div class="flex flex-wrap space-y-2 text-gray-500 dark:text-gray-400">
+				<span>distinguishedName:</span>
+				<span class="user-info-value">{user.distinguishedName}</span>
+				<span>memberOf:</span>
+				<div class="user-info-value flex flex-wrap space-y-2">
 					{#each user.memberOf || [] as groupDn}
 						<span>
 							{groupDn}
