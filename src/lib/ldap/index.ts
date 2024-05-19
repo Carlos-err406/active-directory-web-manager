@@ -65,6 +65,20 @@ export const replaceAttribute = (opts: AttributeOptions) =>
 export const deleteAttribute = (type: AttributeOptions['type']) =>
 	new Change({ modification: new Attribute({ type }), operation: 'delete' });
 
+export const addAttribute = (opts: AttributeOptions) =>
+	new Change({ modification: new Attribute(opts), operation: 'add' });
+
+export const inferChange = <T>(entry: T, attribute: keyof T, value?: string | string[]) => {
+	const values = typeof value === 'string' ? [value] : value;
+	const att = attribute as string;
+	//if a value is passed and the entry does not have the attribute
+	if (value && !entry[attribute]) return addAttribute({ type: att, values });
+	//if no value is passed but the entry has the attribute
+	else if (!value && entry[attribute]) return deleteAttribute(att);
+	//if a value is passed but is different from the one pressent on the entrie's attribute
+	else if (value && value !== entry[attribute]) return replaceAttribute({ type: att, values });
+};
+
 export const extractBase = (dn: string) => {
 	const [, ...base] = dn.split(',');
 	return base.join(',');

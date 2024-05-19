@@ -9,11 +9,11 @@ export const paths = {
 		me: '/users/me',
 		dn: (dn: string) => `/users/${dn}`,
 		actions: {
-			create: '/users?/create',
-			update: '/users?/update',
-			delete: '/users?/delete',
-			deleteMany: '/users?/deleteMany',
-			changePassword: '/users?/changePassword'
+			create: '/users?/createUser',
+			update: '/users?/updateUser',
+			delete: '/users?/deleteUser',
+			deleteMany: '/users?/deleteManyUsers',
+			changePassword: '/users?/changeUserPassword'
 		}
 	},
 	groups: {
