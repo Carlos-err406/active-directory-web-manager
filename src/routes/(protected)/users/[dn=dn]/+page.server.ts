@@ -1,6 +1,9 @@
 import { getEntryByDn } from '$lib/ldap';
+import { changePasswordSchema } from '$lib/schemas/user/change-password-schema';
 import type { User } from '$lib/types/user';
 import { error, redirect } from '@sveltejs/kit';
+import { superValidate } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
 import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ params, locals }) => {
 	const auth = await locals.auth();
@@ -16,6 +19,9 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		const base64String = Buffer.from(user.jpegPhoto, 'base64').toString('base64');
 		user.jpegPhoto = `data:image/jpeg;base64,${base64String}`;
 	}
-
-	return { user, showSearch: false };
+	return {
+		user,
+		showSearch: false,
+		changePasswordForm: await superValidate(zod(changePasswordSchema))
+	};
 };

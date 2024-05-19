@@ -13,8 +13,10 @@
 	import { readable } from 'svelte/store';
 	import { slide } from 'svelte/transition';
 	import type { PageData } from './$types';
-
+	import { breadcrumbs } from '$lib/stores';
 	export let data: PageData;
+	breadcrumbs.set([{ name: 'Users' }]);
+
 	const hidableCols: (keyof User)[] = [
 		'sAMAccountName',
 		'dn',

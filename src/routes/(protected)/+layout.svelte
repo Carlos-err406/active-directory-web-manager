@@ -1,34 +1,6 @@
 <script lang="ts">
-	import { afterNavigate } from '$app/navigation';
-	import { page } from '$app/stores';
-	import { paths } from '$lib';
 	import Header from '$lib/components/layout/header.svelte';
 	import Navigation from '$lib/components/layout/navigation.svelte';
-	import { breadcrumbs } from '$lib/stores';
-	afterNavigate(() => {
-		switch ($page.url.pathname) {
-			case paths.groups.list:
-				breadcrumbs.set([{ name: 'Groups' }]);
-				break;
-			case paths.users.list:
-				breadcrumbs.set([{ name: 'Users' }]);
-				break;
-			case paths.users.me:
-				breadcrumbs.set([{ name: 'Users', link: '/users' }, { name: 'Me' }]);
-				break;
-			case paths.ous.list:
-				breadcrumbs.set([{ name: 'Organizational Units' }]);
-				break;
-			case paths.logs.list:
-				breadcrumbs.set([{ name: 'Logs' }]);
-				break;
-			case paths.settings:
-				breadcrumbs.set([{ name: 'Settings' }]);
-				break;
-			default:
-				breadcrumbs.set([]);
-		}
-	});
 </script>
 
 <div class="absolute h-full max-h-svh w-full overflow-y-auto rounded bg-muted/40">

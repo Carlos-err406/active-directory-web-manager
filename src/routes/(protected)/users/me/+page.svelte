@@ -1,13 +1,16 @@
 <script lang="ts">
-	import './_page.pcss';
+	import { paths } from '$lib';
 	import { Avatar, AvatarFallback, AvatarImage } from '$lib/components/ui/avatar';
 	import { Button } from '$lib/components/ui/button';
 	import ChangePasswordDialog from '$lib/components/users/change-password-dialog.svelte';
+	import { breadcrumbs } from '$lib/stores';
 	import LockKeyhole from '$lucide/lock-keyhole.svelte';
 	import dayjs from 'dayjs';
 	import type { PageData } from './$types';
+
 	export let data: PageData;
 	$: ({ user } = data);
+	breadcrumbs.set([{ name: 'Users', link: paths.users.list }, { name: 'Me' }]);
 	let changePasswordDialogOpen = false;
 </script>
 
@@ -29,8 +32,20 @@
 				<h1 class="text-3xl font-bold tracking-tight md:text-4xl">{user.sAMAccountName}</h1>
 			</div>
 			<div class="user-info grid grid-cols-2 gap-y-3">
-				<span>description:</span>
-				<span class="user-info-value">{user.description}</span>
+				<span>sAMAccountName:</span>
+				<span class="user-info-value">{user.sAMAccountName}</span>
+				{#if user.displayName}
+					<span>displayName:</span>
+					<span class="user-info-value">{user.displayName}</span>
+				{/if}
+				{#if user.givenName}
+					<span>givenName:</span>
+					<span class="user-info-value">{user.givenName}</span>
+				{/if}
+				{#if user.sn}
+					<span>sn:</span>
+					<span class="user-info-value">{user.sn}</span>
+				{/if}
 				{#if user.description}
 					<span>description:</span>
 					<span class="user-info-value">{user.description}</span>
