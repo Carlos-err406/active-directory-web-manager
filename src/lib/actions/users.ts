@@ -42,7 +42,7 @@ export const createUser: Action = async (event) => {
 	if (!auth) throw redirect(302, '/');
 
 	const form = await superValidate(event, zod(createUserSchema));
-	if (!form.valid) return fail(400, { form });
+	if (!form.valid) return fail(400, withFiles({ form }));
 	const { ldap } = auth;
 	const { sAMAccountName, base, givenName, sn, mail, password, description, jpegPhotoBase64 } =
 		form.data;
@@ -116,8 +116,6 @@ export const deleteUser: Action = async (event) => {
 		throw error(500, 'Something unexpected happened while trying to delete ');
 	}
 	await ldap.unbind();
-	// console.log(params)
-	// if (params.dn === dn) throw redirect(302, paths.users.list);
 	return { form };
 };
 export const deleteManyUsers: Action = async (event) => {
@@ -213,7 +211,7 @@ export const updateUser: Action = async (event) => {
 	if (!access || !auth) throw redirect(302, '/'); //type narrowing
 
 	const form = await superValidate(event, zod(updateUserSchema));
-	if (!form.valid) return fail(400, { form });
+	if (!form.valid) return fail(400, withFiles({ form }));
 	const { ldap, session } = auth;
 
 	const { sAMAccountName, givenName, sn, mail, description, jpegPhotoBase64, dn } = form.data;
@@ -242,6 +240,8 @@ export const updateUser: Action = async (event) => {
 		console.log(e);
 		if (e instanceof AlreadyExistsError) {
 			return setError(form, 'sAMAccountName', 'sAMAccountName already in use!');
+		} else if (e instanceof InsufficientAccessError) {
+			throw error(403, "You don't have permission to edit this user!");
 		}
 		throw error(500, 'Something unexpected happened while updating the user');
 	}
