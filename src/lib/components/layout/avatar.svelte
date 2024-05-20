@@ -23,7 +23,9 @@
 		>
 			<Avatar class="flex size-10 items-center justify-center">
 				<AvatarImage class="size-full" src={jpegPhoto} />
-				<AvatarFallback class="text-xl capitalize">
+				<AvatarFallback
+					class="flex h-full w-full items-center justify-center rounded-full bg-gray-800 text-xl font-bold text-gray-100 dark:bg-gray-100 dark:text-gray-800"
+				>
 					{session.sAMAccountName.slice(0, 2).toUpperCase()}
 				</AvatarFallback>
 			</Avatar>
