@@ -3,15 +3,24 @@
 	import { Avatar, AvatarFallback, AvatarWithPreview } from '$lib/components/ui/avatar';
 	import { Button } from '$lib/components/ui/button';
 	import ChangePasswordDialog from '$lib/components/users/change-password-dialog.svelte';
+	import UpdateUserDialog from '$lib/components/users/update-user-dialog.svelte';
 	import { breadcrumbs } from '$lib/stores';
 	import LockKeyhole from '$lucide/lock-keyhole.svelte';
+	import PencilLine from '$lucide/pen-line.svelte';
 	import dayjs from 'dayjs';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-	$: ({ user } = data);
+	$: ({ user, updateUserForm } = data);
 	breadcrumbs.set([{ name: 'Users', link: paths.users.list }, { name: 'Me' }]);
-	let changePasswordDialogOpen = false;
+	let isChangePasswordDialogOpen = false;
+	let isUpdateUserDialogOpen = false;
+	$: ({ jpegPhoto, ...rest } = user);
+	$: updateUserForm.data = {
+		...updateUserForm.data,
+		...rest,
+		jpegPhotoBase64: jpegPhoto
+	};
 </script>
 
 <div class="flex h-full w-full flex-col py-12 md:py-16">
@@ -72,11 +81,20 @@
 			</div>
 		</div>
 	</div>
-	<div class="flex h-full w-full items-center justify-center">
-		<Button class="flex items-center gap-2" on:click={() => (changePasswordDialogOpen = true)}>
+	<div class="flex h-full w-full items-center justify-center gap-3">
+		<Button class="flex items-center gap-2" on:click={() => (isUpdateUserDialogOpen = true)}>
+			<PencilLine class="size-4 flex-none" />
+			Edit
+		</Button>
+		<Button class="flex items-center gap-2" on:click={() => (isChangePasswordDialogOpen = true)}>
 			<LockKeyhole class="size-4 flex-none" />
 			Change password
 		</Button>
 	</div>
 </div>
-<ChangePasswordDialog dn={user.distinguishedName} bind:open={changePasswordDialogOpen} />
+<UpdateUserDialog
+	dn={user.distinguishedName}
+	bind:open={isUpdateUserDialogOpen}
+	bind:form={updateUserForm}
+/>
+<ChangePasswordDialog dn={user.distinguishedName} bind:open={isChangePasswordDialogOpen} />
