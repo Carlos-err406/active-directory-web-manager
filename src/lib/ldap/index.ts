@@ -1,5 +1,5 @@
-import { ADMIN_GROUP } from '$env/static/private';
-import { PUBLIC_BASE_DN } from '$env/static/public';
+import { ADMIN_GROUP, SAMBA_DC_ADMIN_PASSWD } from '$env/static/private';
+import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
 import {
 	AndFilter,
 	Attribute,
@@ -11,6 +11,7 @@ import {
 	type Filter,
 	type SearchOptions
 } from 'ldapts';
+import { getLDAPClient } from './client';
 /**
  * Encodes password for ldap unicodePwd attribute
  * @param password
@@ -85,3 +86,10 @@ export const extractBase = (dn: string) => {
 };
 
 export const isAdmin = (ldap: Client, dn: string) => entryBelongsToGroup(ldap, dn, ADMIN_GROUP);
+
+export const sudo = async (sudoOperation: (ldap: Client) => Promise<void>) => {
+	const ldap = getLDAPClient();
+	await ldap.bind(`administrator@${PUBLIC_LDAP_DOMAIN}`, SAMBA_DC_ADMIN_PASSWD);
+	await sudoOperation(ldap);
+	await ldap.unbind();
+};

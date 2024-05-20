@@ -113,19 +113,22 @@
 			accessor: 'description',
 			header: 'description',
 			cell: ({ value }) => value ?? '-'
-		}),
-		table.column({
-			accessor: ({ dn }) => dn,
-			header: 'Actions',
-			plugins: {
-				sort: { disable: true }
-			},
-			cell: ({ value }) => {
-				return createRender(UserTableActions, { id: value });
-			}
 		})
 	]);
-
+	$: data.session.isAdmin &&
+		(columns = [
+			...columns,
+			table.column({
+				accessor: ({ dn }) => dn,
+				header: 'Actions',
+				plugins: {
+					sort: { disable: true }
+				},
+				cell: ({ value }) => {
+					return createRender(UserTableActions, { id: value });
+				}
+			})
+		]);
 	$: ({ flatColumns, pluginStates, rows, ...viewModel } = table.createViewModel(columns));
 	$: ({ selectedDataIds } = pluginStates.select);
 

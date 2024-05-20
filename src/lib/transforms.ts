@@ -1,4 +1,4 @@
-import type { User } from './types/user';
+import type { Entry } from 'ldapts';
 
 export const blobToBase64 = (file: Blob) => {
 	return new Promise<string>((resolve, reject) => {
@@ -28,10 +28,10 @@ export const b64ToObjectURL = (b64String: string, mimeType = 'image/jpeg'): stri
 	return objectURL;
 };
 
-export const jpegPhotoToB64 = (user: User) => {
-	if ('jpegPhoto' in user) {
-		const base64String = Buffer.from(user.jpegPhoto as string, 'base64').toString('base64');
-		user.jpegPhoto = `data:image/jpeg;base64,${base64String}`;
+export const jpegPhotoToB64 = <T = Entry>(entry?: T) => {
+	if (entry && typeof entry === 'object' && 'jpegPhoto' in entry) {
+		const base64String = Buffer.from(entry.jpegPhoto as string, 'base64').toString('base64');
+		entry.jpegPhoto = `data:image/jpeg;base64,${base64String}`;
 	}
-	return user;
+	return entry as T;
 };

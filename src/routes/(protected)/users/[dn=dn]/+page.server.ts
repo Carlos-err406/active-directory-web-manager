@@ -1,5 +1,8 @@
+import { deleteUser, updateUser } from '$lib/actions/users';
 import { getEntryByDn } from '$lib/ldap';
 import { changePasswordSchema } from '$lib/schemas/user/change-password-schema';
+import { deleteUserSchema } from '$lib/schemas/user/delete-user-schema';
+import { updateUserSchema } from '$lib/schemas/user/update-user-schema';
 import { jpegPhotoToB64 } from '$lib/transforms';
 import type { User } from '$lib/types/user';
 import { error, redirect } from '@sveltejs/kit';
@@ -13,12 +16,22 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	const { ldap, session } = auth;
 	if (!session.isAdmin) throw error(403, 'You dont have access to this resource');
 	const { dn } = params;
-	const user: User = await getEntryByDn<User>(ldap, dn).then(jpegPhotoToB64);
+	const user = await getEntryByDn<User>(ldap, dn).then(jpegPhotoToB64);
 	await ldap.unbind();
 	if (!user) throw error(404, 'User not found');
+
+	const [changePasswordForm, updateUserForm, deleteUserForm] = await Promise.all([
+		superValidate(zod(changePasswordSchema)),
+		superValidate(zod(updateUserSchema)),
+		superValidate(zod(deleteUserSchema))
+	]);
 	return {
 		user,
 		searchForm: null,
-		changePasswordForm: await superValidate(zod(changePasswordSchema))
+		changePasswordForm,
+		updateUserForm,
+		deleteUserForm
 	};
 };
+
+export const actions = { deleteUser, updateUser };

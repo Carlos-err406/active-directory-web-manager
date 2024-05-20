@@ -11,48 +11,47 @@
 	import Image from '$lucide/image.svelte';
 	import Trash from '$lucide/trash-2.svelte';
 	import type { ClassValue } from 'clsx';
-	import { toast } from 'svelte-sonner';
-	import { scale, slide } from 'svelte/transition';
+	import { onMount } from 'svelte';
+	import { slide } from 'svelte/transition';
 	import { v4 } from 'uuid';
+	import { Avatar, AvatarWithPreview } from '../ui/avatar';
 	import { Button } from '../ui/button';
-	import { browser } from '$app/environment';
 
 	export let methods: Methods;
-	const { form } = methods;
-
 	export let b64Name: keyof typeof $form;
 	export let name: keyof typeof $form;
 	export let inputProps: InputProps = {};
-
 	export let imgClasses: ClassValue = '';
 	export let addornmentClasses: ClassValue = '';
 	export let addornmentRightClasses: ClassValue = '';
 	export let addornmentLeftClasses: ClassValue = '';
 
+	const { form } = methods;
 	let fileList: FileList;
+	let fileInput: HTMLInputElement;
 
 	$: file = fileList?.[0];
-	let fileInput: HTMLInputElement;
-	$: src = ($form[b64Name] as string) || null;
+	let src = ($form[b64Name] as string) || null;
 
-	{
+	onMount(async () => {
 		const url = $form[b64Name] as string;
-		if (url && browser) {
-			fetch(url)
-				.then((r) => r.blob())
-				.then((blob) => {
-					const f = new File([blob], v4(), { type: 'image/jpeg' });
-					const dataTransfer = new DataTransfer();
-					dataTransfer.items.add(f);
-					fileList = dataTransfer.files;
-					fileInput.files = fileList;
-				});
+		if (url) {
+			const blob = await fetch(url).then((r) => r.blob());
+			const f = new File([blob], v4(), { type: 'image/jpeg' });
+			const dataTransfer = new DataTransfer();
+			dataTransfer.items.add(f);
+			fileList = dataTransfer.files;
+			fileInput.files = fileList;
 		}
-	}
+	});
 
 	const reset = () => {
 		src = null;
-		fileInput && (fileInput.value = '');
+		if (fileInput) {
+			const dataTransfer = new DataTransfer();
+			fileList = dataTransfer.files;
+			fileInput.files = fileList;
+		}
 	};
 
 	$: if (file) {
@@ -75,6 +74,7 @@
 				bind:files={fileList}
 				{...attrs}
 				{...inputProps}
+				{name}
 			/>
 		</slot>
 		<input hidden type="text" name={b64Name} value={src} />
@@ -84,26 +84,14 @@
 			</div>
 			<div>
 				{#if src}
-					<button
-						type="button"
-						class="size-fit cursor-zoom-in"
-						on:click={async () => {
-							if (!src) {
-								toast.error('Error loading the photo');
-								return;
-							}
-							const blob = await fetch(src).then((r) => r.blob());
-							const url = URL.createObjectURL(blob);
-							window.open(url, '_blank');
-						}}
-					>
-						<img
-							transition:scale={{ duration: 200 }}
-							{src}
-							class={cn('size-28 rounded object-fill', imgClasses)}
-							alt="jpeg"
-						/>
-					</button>
+					<div class="relative" in:slide={{ axis: 'y' }}>
+						<Avatar class="size-32 rounded uppercase">
+							<AvatarWithPreview alt="jpgPhoto" {src} class={cn(imgClasses)} />
+							<div
+								class="pointer-events-none absolute z-50 size-32 rounded-full border-2 border-dashed border-white"
+							/>
+						</Avatar>
+					</div>
 				{:else}
 					<div in:slide={{ axis: 'y', duration: 200, delay: 200 }}>
 						<Button on:click={() => fileInput.click()}>
@@ -115,7 +103,7 @@
 			<div class={cn('addornment', addornmentClasses, addornmentRightClasses)}>
 				{#if src}
 					<slot name="addornment-right">
-						<div in:slide={{ axis: 'x' }} class="ml-2 flex flex-col gap-3">
+						<div in:slide={{ axis: 'y' }} class="ml-2 flex flex-col gap-3">
 							<Button on:click={() => fileInput.click()} class="w-fit">
 								<Image />
 							</Button>

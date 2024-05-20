@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { paths } from '$lib';
-	import { Avatar, AvatarFallback, AvatarImage } from '$lib/components/ui/avatar';
+	import { Avatar, AvatarFallback, AvatarWithPreview } from '$lib/components/ui/avatar';
 	import { Button } from '$lib/components/ui/button';
 	import ChangePasswordDialog from '$lib/components/users/change-password-dialog.svelte';
 	import { breadcrumbs } from '$lib/stores';
@@ -19,9 +19,8 @@
 		<div class="mx-auto max-w-3xl space-y-6">
 			<div class="flex w-full items-center justify-center gap-10">
 				<Avatar class="size-40 overflow-clip uppercase">
-					{#if user.jpegPhoto?.length}
-						{@const [, photoContent] = user.jpegPhoto.split('base64,')}
-						<AvatarImage alt="jpgPhoto" src={photoContent} />
+					{#if user.jpegPhoto}
+						<AvatarWithPreview alt="jpgPhoto" src={user.jpegPhoto} />
 					{/if}
 					<AvatarFallback
 						class="flex h-full w-full items-center justify-center rounded-full bg-gray-800 text-6xl font-bold text-gray-100 dark:bg-gray-100 dark:text-gray-800"

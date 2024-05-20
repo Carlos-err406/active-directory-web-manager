@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { PUBLIC_BASE_DN } from '$env/static/public';
+	import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
 	import { paths } from '$lib';
-	import Form from '$lib/components/form/form.svelte';
+	import Form, { type FormOptions } from '$lib/components/form/form.svelte';
 	import Input from '$lib/components/form/input.svelte';
 	import PasswordInput from '$lib/components/form/password-input.svelte';
 	import { Button } from '$lib/components/ui/button';
@@ -11,7 +11,8 @@
 	import {
 		ALLOWED_FILE_TYPES,
 		MAX_FILE_SIZE_MB,
-		createUserSchema
+		createUserSchema,
+		type CreateUserSchema
 	} from '$lib/schemas/user/create-user-schema';
 	import { cn } from '$lib/utils';
 	import Captions from '$lucide/captions.svelte';
@@ -21,6 +22,14 @@
 	let open: boolean;
 	export let base = PUBLIC_BASE_DN;
 	$: form = $page.data.createUserForm;
+
+	const onChange: FormOptions<CreateUserSchema>['onChange'] = ({ get, set, target }) => {
+		if (target?.name === 'sAMAccountName') {
+			const sAMAccountName = get('sAMAccountName');
+			if (sAMAccountName) set('mail', `${sAMAccountName}@${PUBLIC_LDAP_DOMAIN}`);
+			else set('mail', '');
+		}
+	};
 </script>
 
 <Dialog.Root bind:open>
@@ -50,7 +59,8 @@
 						toast.success('User created successfully');
 						invalidate('protected:users');
 					}
-				}
+				},
+				onChange
 			}}
 		>
 			<input hidden name="base" value={base} />

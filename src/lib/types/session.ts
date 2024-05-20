@@ -1,7 +1,6 @@
 export type Session = {
 	isAdmin: boolean;
 	memberOf: string[];
-	jpegPhoto: string;
 	dn: string;
 	distinguishedName: string;
 	cn: string;
@@ -34,7 +33,6 @@ export type SessionEntryAttribute =
 	| 'userAccountControl'
 	| 'email'
 	| 'isCriticalSystemObject'
-	| 'jpegPhoto'
 	| 'description';
 
 export const SESSION_ENTRY_ATTRIBUTES: SessionEntryAttribute[] = [
@@ -53,6 +51,5 @@ export const SESSION_ENTRY_ATTRIBUTES: SessionEntryAttribute[] = [
 	'userAccountControl',
 	'email',
 	'isCriticalSystemObject',
-	'jpegPhoto',
 	'description'
 ];

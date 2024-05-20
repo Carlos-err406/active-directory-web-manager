@@ -5,7 +5,7 @@
 	import Form from '$lib/components/form/form.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
-	import { deleteManyUsersSchema } from '$lib/schemas/user/delete-user.schema';
+	import { deleteManyUsersSchema } from '$lib/schemas/user/delete-user-schema';
 	import { toast } from 'svelte-sonner';
 	let open: boolean;
 	export let dns: string[] = [];

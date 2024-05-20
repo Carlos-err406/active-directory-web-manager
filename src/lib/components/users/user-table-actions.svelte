@@ -1,16 +1,18 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { paths } from '$lib';
 	import { Button } from '$lib/components/ui/button';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import type { User } from '$lib/types/user';
 	import Ellipsis from '$lucide/ellipsis.svelte';
 	import Eye from '$lucide/eye.svelte';
 	import LockKeyholeOpen from '$lucide/lock-keyhole-open.svelte';
-	import Edit from '$lucide/pencil-line.svelte';
+	import PencilLine from '$lucide/pencil-line.svelte';
 	import Trash from '$lucide/trash-2.svelte';
 	import Users from '$lucide/users.svelte';
 	import ChangePasswordDialog from './change-password-dialog.svelte';
 	import DeleteUserDialog from './delete-user-dialog.svelte';
-	import ManageUserMembership from './manage-user-membership.svelte';
+	import ManageUserMembershipDialog from './manage-user-membership-dialog.svelte';
 	import UpdateUserDialog from './update-user-dialog.svelte';
 	export let id: string;
 	let open = false;
@@ -18,6 +20,18 @@
 	let isDeleteUserDialogOpen = false;
 	let isUpdateUserDialogOpen = false;
 	let isManageMembershipDialogOpen = false;
+	$: ({ updateUserForm } = $page.data);
+	const onOpenEditClick = () => {
+		const paginationData: User[] = $page.data.pagination.data;
+		const user = paginationData.find(({ distinguishedName }) => distinguishedName === id);
+		updateUserForm.data = {
+			...updateUserForm.data,
+			...user,
+			dn: id,
+			jpegPhotoBase64: user?.jpegPhoto
+		};
+		isUpdateUserDialogOpen = true;
+	};
 </script>
 
 <DropdownMenu.Root bind:open>
@@ -42,11 +56,8 @@
 				<Users class="size-5" />
 				Manage groups
 			</DropdownMenu.Item>
-			<DropdownMenu.Item
-				class="flex flex-nowrap gap-2"
-				on:click={() => (isUpdateUserDialogOpen = true)}
-			>
-				<Edit class="size-5" />
+			<DropdownMenu.Item class="flex flex-nowrap gap-2" on:click={onOpenEditClick}>
+				<PencilLine class="size-5" />
 				Edit
 			</DropdownMenu.Item>
 			<DropdownMenu.Item
@@ -69,5 +80,5 @@
 
 <DeleteUserDialog dn={id} bind:open={isDeleteUserDialogOpen} />
 <ChangePasswordDialog dn={id} bind:open={isChangePasswordDialogOpen} />
-<UpdateUserDialog dn={id} bind:open={isUpdateUserDialogOpen} />
-<ManageUserMembership dn={id} bind:open={isManageMembershipDialogOpen} />
+<UpdateUserDialog dn={id} bind:open={isUpdateUserDialogOpen} bind:form={updateUserForm} />
+<ManageUserMembershipDialog dn={id} bind:open={isManageMembershipDialogOpen} />

@@ -1,11 +1,13 @@
 import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
+// import { paths } from '$lib';
 import {
 	encodePassword,
 	extractBase,
 	getEntryByDn,
 	getEntryBySAMAccountName,
 	inferChange,
-	replaceAttribute
+	replaceAttribute,
+	sudo
 } from '$lib/ldap';
 import { changePasswordSchema } from '$lib/schemas/user/change-password-schema';
 import { createUserSchema } from '$lib/schemas/user/create-user-schema';
@@ -27,6 +29,7 @@ import {
 	Attribute,
 	Change,
 	EqualityFilter,
+	InsufficientAccessError,
 	InvalidCredentialsError,
 	OrFilter
 } from 'ldapts';
@@ -77,7 +80,11 @@ export const createUser: Action = async (event) => {
 		await ldap.modify(dn, passwordChange);
 	} catch (e) {
 		console.log(e);
-		console.log('deleting created user');
+		if (e instanceof InsufficientAccessError) {
+			console.log('deleting created user');
+			await sudo((sudoLdap) => sudoLdap.del(dn));
+			throw error(403, 'You dont have permission to perform this opperation!');
+		}
 		await ldap.del(dn);
 		throw error(500, "Something unexpected happened while creating setting the user's password");
 	}
@@ -86,7 +93,10 @@ export const createUser: Action = async (event) => {
 	return withFiles({ form });
 };
 export const deleteUser: Action = async (event) => {
-	const { locals } = event;
+	const {
+		locals
+		// , params
+	} = event;
 	const auth = await locals.auth();
 	if (!auth) throw redirect(302, '/');
 	const form = await superValidate(event, zod(deleteUserSchema));
@@ -94,21 +104,21 @@ export const deleteUser: Action = async (event) => {
 	const { ldap } = auth;
 	const { dn } = form.data;
 
-	const filter = new EqualityFilter({ attribute: 'distinguishedName', value: dn });
-	const { searchEntries } = await ldap.search(PUBLIC_BASE_DN, {
-		filter: filter.toString()
-	});
-	const [entry] = searchEntries;
-	if (!entry) {
-		throw error(404, 'User not found');
-	} else if (entry['isCriticalSystemObject'] === 'TRUE') {
-		throw error(403, 'This entry can not be deleted!');
+	const user = await getEntryByDn<User>(ldap, dn);
+	if (!user) throw error(404, 'User not found!');
+	else if (user.isCriticalSystemObject === 'TRUE') {
+		throw error(403, `User ${user.sAMAccountName} can not be deleted!`);
 	}
-	await ldap.del(dn);
+	try {
+		await ldap.del(dn);
+	} catch (e) {
+		console.log(e);
+		throw error(500, 'Something unexpected happened while trying to delete ');
+	}
 	await ldap.unbind();
-	return {
-		success: true
-	};
+	// console.log(params)
+	// if (params.dn === dn) throw redirect(302, paths.users.list);
+	return { form };
 };
 export const deleteManyUsers: Action = async (event) => {
 	const { locals } = event;
@@ -211,7 +221,7 @@ export const updateUser: Action = async (event) => {
 	const user = await getEntryByDn<User>(ldap, dn);
 	if (!user) throw error(404, 'User not found');
 
-	const displayName = `${givenName} ${sn}`;
+	const displayName = `${givenName}` + (sn ? ` ${sn}` : '');
 
 	const [, content] = jpegPhotoBase64?.split('base64,') || [];
 	const jpegPhoto = content ? Buffer.from(content, 'base64').toString('base64') : undefined;

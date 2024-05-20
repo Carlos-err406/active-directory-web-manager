@@ -1,44 +1,31 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
-	import { page } from '$app/stores';
-	import { PUBLIC_BASE_DN } from '$env/static/public';
+	import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
 	import { paths } from '$lib';
-	import Form from '$lib/components/form/form.svelte';
+	import Form, { type Data, type FormOptions } from '$lib/components/form/form.svelte';
 	import Input from '$lib/components/form/input.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { ALLOWED_FILE_TYPES, MAX_FILE_SIZE_MB } from '$lib/schemas/user/create-user-schema';
-	import { updateUserSchema } from '$lib/schemas/user/update-user.schema';
-	import type { User } from '$lib/types/user';
+	import { updateUserSchema, type UpdateUserSchema } from '$lib/schemas/user/update-user-schema';
 	import { cn } from '$lib/utils';
 	import Captions from '$lucide/captions.svelte';
 	import Mail from '$lucide/mail.svelte';
 	import { toast } from 'svelte-sonner';
+	import type { SuperValidated } from 'sveltekit-superforms';
 	import ImageInput from '../form/image-input.svelte';
 	export let open = false;
 	export let base = PUBLIC_BASE_DN;
 	export let dn: string;
-	$: form = $page.data.updateUserForm;
-	const onOpen = () => {
-		const paginationData: User[] = $page.data.pagination.data;
-		const user = paginationData.find(({ distinguishedName }) => distinguishedName === dn);
-		console.log(user);
-		form.data = {
-			...form.data,
-			dn,
-			base,
-			sAMAccountName: user?.sAMAccountName,
-			givenName: user?.givenName,
-			mail: user?.mail,
-			description: user?.description,
-			// jpegPhoto?: File | undefined,
-			jpegPhotoBase64: user?.jpegPhoto,
-			sn: user?.sn
-		};
-	};
-	const onClose = () => {};
+	export let form: SuperValidated<Data>;
 
-	$: open ? onOpen() : onClose();
+	const onChange: FormOptions<UpdateUserSchema>['onChange'] = ({ get, set, target }) => {
+		if (target?.name === 'sAMAccountName') {
+			const sAMAccountName = get('sAMAccountName');
+			if (sAMAccountName) set('mail', `${sAMAccountName}@${PUBLIC_LDAP_DOMAIN}`);
+			else set('mail', '');
+		}
+	};
 </script>
 
 <Dialog.Root bind:open>
@@ -50,12 +37,14 @@
 		<Form
 			let:methods
 			let:loading
+			let:changed
 			bind:form
 			schema={updateUserSchema}
 			loadingText="Updatting user..."
 			formProps={{ action: paths.users.actions.update, enctype: 'multipart/form-data' }}
 			formOptions={{
 				resetForm: true,
+				onChange,
 				onError: ({ result }) => {
 					toast.error(result.error.message);
 				},
@@ -112,7 +101,7 @@
 			</div>
 			<Dialog.Footer>
 				<Button type="button" variant="outline" on:click={() => (open = false)}>Cancel</Button>
-				<Button type="submit" disabled={loading}>Save</Button>
+				<Button type="submit" disabled={loading || !changed}>Save</Button>
 			</Dialog.Footer>
 		</Form>
 	</Dialog.Content>

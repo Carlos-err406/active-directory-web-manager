@@ -20,7 +20,7 @@
 	$: ({ selectedDataIds } = pluginStates.select);
 	const getSortAndOrderParams = (id: string) => {
 		const params = new URLSearchParams(searchParams);
-		params.set('order', searchParams.get('order') === 'asc' ? 'desc' : 'asc');
+		params.set('order', searchParams.get('order') === 'desc' ? 'asc' : 'desc');
 		params.set('sort', id);
 		return params.toString();
 	};
@@ -49,9 +49,9 @@
 												<Render of={cell.render()} />
 												{#if searchParams.get('sort') === cell.id}
 													{#if searchParams.get('order') === 'desc'}
-														<ChevronUp class="ml-2 size-4" />
-													{:else}
 														<ChevronDown class="ml-2 size-4" />
+													{:else}
+														<ChevronUp class="ml-2 size-4" />
 													{/if}
 												{:else}
 													<Chevrons class="ml-2 size-4" />

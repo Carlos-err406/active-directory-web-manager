@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { invalidate } from '$app/navigation';
+	import { goto, invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { paths } from '$lib';
 	import Form from '$lib/components/form/form.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
-	import { deleteUserSchema } from '$lib/schemas/user/delete-user.schema';
+	import { deleteUserSchema } from '$lib/schemas/user/delete-user-schema';
 	import { toast } from 'svelte-sonner';
 	export let open = false;
 	export let dn: string;
@@ -30,11 +30,22 @@
 					toast.error(result.error.message);
 					open = false;
 				},
-				onResult: ({ result }) => {
-					invalidate('protected:users');
+				onResult: async ({ result }) => {
+					toast('asd', {});
+					toast.success('User deleted successfully');
+					if ($page.params.dn !== dn) await invalidate('protected:users');
 					if (result.type === 'success') {
 						open = false;
-						toast.success('User deleted successfully');
+						if ($page.params.dn === dn) {
+							await goto(paths.users.list, {
+								state: {
+									toast: {
+										type: 'success',
+										message: 'User deleted successfully'
+									}
+								}
+							});
+						}
 					}
 				}
 			}}

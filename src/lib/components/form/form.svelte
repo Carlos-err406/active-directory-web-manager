@@ -24,12 +24,19 @@
 		formElement: HTMLFormElement;
 		cancel: () => void;
 	};
-	export type ChangeType<T extends ZodSchema, K extends Data = Infer<T>> = ChangeEvent<K>;
+	export type ChangeType<T extends ZodSchema, K extends Data = Infer<T>> = Omit<
+		ChangeEvent<K>,
+		'target'
+	> & {
+		target?: HTMLInputElement;
+	};
+
 	export type SubmitType = SubmitFunctionEventArg;
 	export type FormOptions<T extends ZodSchema> = Partial<
-		Omit<_FormOptions, 'validators' | 'onResult'>
+		Omit<_FormOptions, 'validators' | 'onResult' | 'onChange'>
 	> & {
 		onResult?: (event: ResultType<T>) => void;
+		onChange?: (event: ChangeType<T>) => void;
 	};
 </script>
 
@@ -47,6 +54,7 @@
 	export let form: Data | SuperValidated<Data>;
 	export let formElement: HTMLFormElement | undefined = undefined;
 	export let loadingText = 'Submitting...';
+
 	let toastId: string | number | undefined = undefined;
 	const killToast = () => {
 		toast.dismiss(toastId);
@@ -64,17 +72,38 @@
 		onSubmit: (input) => {
 			triggerToast();
 			if (formOptions?.onSubmit) formOptions.onSubmit(input);
+		},
+		onChange: (event) => {
+			if (formOptions.onChange) formOptions.onChange(event as ChangeType<typeof schema>);
 		}
 	});
-	const { enhance, submitting, delayed, timeout } = methods;
+	const { enhance, submitting, delayed, timeout, form: methodsForm } = methods;
+
 	const loading = derived(
 		[submitting, delayed, timeout],
 		([$submitting, $delayed, $timeout]) => $submitting || $delayed || $timeout
 	);
 
+	const changed = derived(methodsForm, ($methodsForm) => {
+		let diff = false;
+		const formData = Object(form.data);
+		const formEntries = Object.entries(formData);
+		for (let i = 0; i < formEntries.length; i++) {
+			const [key, value] = formEntries[i];
+			diff = JSON.stringify($methodsForm[key]) !== JSON.stringify(value);
+			if (diff) return true;
+		}
+		const methodEntries = Object.entries($methodsForm);
+		for (let i = 0; i < methodEntries.length; i++) {
+			const [key, value] = methodEntries[i];
+			diff = JSON.stringify(formData[key]) !== JSON.stringify(value);
+			if (diff) return true;
+		}
+		return false;
+	});
 	$: if (!$loading) killToast();
 </script>
 
 <form bind:this={formElement} novalidate method="post" {...formProps} use:enhance>
-	<slot {methods} loading={$loading} />
+	<slot {methods} loading={$loading} changed={$changed} />
 </form>

@@ -46,8 +46,16 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 		});
 
 		searchEntries.sort((a, b) => {
-			if ((a[sortAttribute] || '-') < (b[sortAttribute] || '-')) return order === 'asc' ? -1 : 1;
-			if ((a[sortAttribute] || '-') > (b[sortAttribute] || '-')) return order === 'asc' ? 1 : -1;
+			if (
+				(a[sortAttribute] || '-').toString().toLowerCase() <
+				(b[sortAttribute] || '-').toString().toLowerCase()
+			)
+				return order === 'asc' ? -1 : 1;
+			if (
+				(a[sortAttribute] || '-').toString().toLowerCase() >
+				(b[sortAttribute] || '-').toString().toLowerCase()
+			)
+				return order === 'asc' ? 1 : -1;
 			return 0;
 		});
 		const pagination = extractPagination<User>(searchEntries as User[], page, pageSize);

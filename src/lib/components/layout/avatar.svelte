@@ -6,7 +6,11 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import type { Session } from '$lib/types/session';
 	import LogOut from '$lucide/log-out.svelte';
-	$: ({ jpegPhoto } = $page.data.session as Session);
+	import { Avatar } from '../ui/avatar';
+	import AvatarFallback from '../ui/avatar/avatar-fallback.svelte';
+	import AvatarImage from '../ui/avatar/avatar-image.svelte';
+	$: ({ jpegPhoto } = $page.data);
+	$: session = $page.data.session as Session;
 </script>
 
 <DropdownMenu.Root>
@@ -15,15 +19,14 @@
 			builders={[builder]}
 			variant="outline"
 			size="icon"
-			class="h-fit overflow-hidden rounded-full"
+			class="h-fit w-fit overflow-hidden rounded-full"
 		>
-			<img
-				src={jpegPhoto.length ? jpegPhoto : '/user-placeholder.jpg'}
-				width={36}
-				height={36}
-				alt="Avatar"
-				class="overflow-hidden"
-			/>
+			<Avatar class="flex size-10 items-center justify-center">
+				<AvatarImage class="size-full" src={jpegPhoto} />
+				<AvatarFallback class="text-xl capitalize">
+					{session.sAMAccountName.slice(0, 2).toUpperCase()}
+				</AvatarFallback>
+			</Avatar>
 		</Button>
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content align="end">

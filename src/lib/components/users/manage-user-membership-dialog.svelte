@@ -6,7 +6,7 @@
 	import Form from '$lib/components/form/form.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
-	import { updateUserSchema } from '$lib/schemas/user/update-user.schema';
+	import { updateUserSchema } from '$lib/schemas/user/update-user-schema';
 	import type { User } from '$lib/types/user';
 	import { toast } from 'svelte-sonner';
 	import Input from '../form/input.svelte';

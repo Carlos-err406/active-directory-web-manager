@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { Button } from '$lib/components/ui/button';
+	import { breadcrumbs } from '$lib/stores';
 	import TriangleAlert from '$lucide/triangle-alert.svelte';
+	breadcrumbs.set([{ name: `Error (${$page.status})` }]);
 </script>
 
 <div class="flex h-full w-full flex-col items-center justify-center bg-gray-100 dark:bg-gray-800">
