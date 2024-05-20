@@ -1,9 +1,19 @@
 <script>
-	import '../app.pcss';
-	import { Toaster } from '$lib/components/ui/sonner';
-	import { ModeWatcher } from 'mode-watcher';
+	import { afterNavigate } from '$app/navigation';
+	import { page } from '$app/stores';
 	import Loader from '$lib/components/ui/loader.svelte';
+	import { Toaster } from '$lib/components/ui/sonner';
 	import { globalLoader } from '$lib/stores';
+	import { ModeWatcher } from 'mode-watcher';
+	import { toast } from 'svelte-sonner';
+	import '../app.pcss';
+
+	afterNavigate(() => {
+		const toastState = $page.state.toast;
+		if (toastState) {
+			toast[toastState.type](toastState.message, toastState.data);
+		}
+	});
 </script>
 
 <ModeWatcher defaultMode="light" />

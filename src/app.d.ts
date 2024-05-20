@@ -3,6 +3,7 @@
 import type { Context } from '$lib/types/context';
 import type { Session } from '$lib/types/session';
 import type { Client, FilterParser } from 'ldapts';
+import type { ExternalToast } from 'svelte-sonner';
 // for information about these interfaces
 declare global {
 	namespace App {
@@ -14,7 +15,13 @@ declare global {
 			auth: () => Promise<{ ldap: Client; session: Session } | null>;
 		}
 		// interface PageData {}
-		// interface PageState {}
+		interface PageState {
+			toast?: {
+				type: 'success' | 'error' | 'info' | 'message' | 'warning';
+				message: string;
+				data?: ExternalToast;
+			};
+		}
 		// interface Platform {}
 	}
 }
