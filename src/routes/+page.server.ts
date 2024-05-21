@@ -63,7 +63,6 @@ export const actions: Actions = {
 		try {
 			await ldap.bind(`${sAMAccountName}@${PUBLIC_LDAP_DOMAIN}`, password);
 		} catch (e) {
-			await ldap.unbind();
 			console.log(e);
 			if (e instanceof InvalidCredentialsError) throw error(401, 'Invalid Credentials');
 			else {
@@ -76,7 +75,6 @@ export const actions: Actions = {
 		});
 
 		if (!user) {
-			await ldap.unbind();
 			throw error(401, 'Invalid Credentials');
 		}
 		try {
@@ -87,7 +85,6 @@ export const actions: Actions = {
 			setAccessCookie(cookies, access);
 		} catch (e) {
 			console.log(e);
-			await ldap.unbind();
 			throw error(500, 'Something unexpected happened, try again later');
 		}
 		return redirect(302, paths.users.me);
@@ -97,8 +94,6 @@ export const actions: Actions = {
 		cookies.delete('ad-session', { path: '/' });
 		cookies.delete('ad-access', { path: '/' });
 		if (!auth) return redirect(302, '/');
-		const { ldap } = auth;
-		await ldap.unbind();
 		return redirect(302, '/');
 	}
 };

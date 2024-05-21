@@ -89,7 +89,6 @@ export const createUser: Action = async (event) => {
 		throw error(500, "Something unexpected happened while creating setting the user's password");
 	}
 
-	await ldap.unbind();
 	return withFiles({ form });
 };
 export const deleteUser: Action = async (event) => {
@@ -115,7 +114,7 @@ export const deleteUser: Action = async (event) => {
 		console.log(e);
 		throw error(500, 'Something unexpected happened while trying to delete ');
 	}
-	await ldap.unbind();
+
 	return { form };
 };
 export const deleteManyUsers: Action = async (event) => {
@@ -148,7 +147,6 @@ export const deleteManyUsers: Action = async (event) => {
 
 	await Promise.all(promises);
 
-	await ldap.unbind();
 	return {
 		form,
 		success: true
@@ -201,7 +199,7 @@ export const changeUserPassword: Action = async (event) => {
 		const newAccess = generateAccessToken({ email, password });
 		setAccessCookie(cookies, newAccess);
 	}
-	await ldap.unbind();
+
 	return { form };
 };
 export const updateUser: Action = async (event) => {
@@ -270,6 +268,5 @@ export const updateUser: Action = async (event) => {
 		setAccessCookie(cookies, newAccess);
 	}
 
-	await ldap.unbind();
 	return withFiles({ form });
 };

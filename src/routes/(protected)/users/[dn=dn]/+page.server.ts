@@ -17,7 +17,6 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	if (!session.isAdmin) throw error(403, 'You dont have access to this resource');
 	const { dn } = params;
 	const user = await getEntryByDn<User>(ldap, dn).then(jpegPhotoToB64);
-	await ldap.unbind();
 	if (!user) throw error(404, 'User not found');
 
 	const [changePasswordForm, updateUserForm, deleteUserForm] = await Promise.all([

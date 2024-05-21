@@ -14,6 +14,5 @@ export const load: LayoutServerLoad = async ({ locals }) => {
 		searchOpts: { attributes: ['jpegPhoto'] }
 	}).then(jpegPhotoToB64);
 	if (!user) throw redirect(302, '/');
-	await ldap.unbind();
 	return { session, jpegPhoto: user.jpegPhoto, searchForm: await superValidate(zod(searchSchema)) };
 };

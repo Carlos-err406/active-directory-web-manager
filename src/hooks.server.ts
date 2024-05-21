@@ -37,6 +37,20 @@ const authenticationSetter: Handle = async ({ event, resolve }) => {
 	return resolve(event);
 };
 
+const tryLdapUnbind: Handle = async ({ event, resolve }) => {
+	const response = await resolve(event);
+	const { locals } = event;
+	const auth = await locals.auth();
+	if (!auth) return response;
+	const { ldap } = auth;
+	try {
+		await ldap.unbind();
+	} catch (e) {
+		console.log('error at tryLdapUnbindHook', e);
+	}
+	return response;
+};
+
 const getSequence = () => {
 	const seq = [];
 	if (LOGGER && LOGGER === '1') {
@@ -56,7 +70,7 @@ const getSequence = () => {
 	} else {
 		console.log('LOGGING is disabled, set LOGGER .env variable to 1 to enable');
 	}
-	seq.push(authenticationSetter);
+	seq.push(authenticationSetter, tryLdapUnbind);
 	return seq;
 };
 

@@ -104,8 +104,6 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 			message: 'Something unexpected happened while retrieving the users, try again later',
 			errorId
 		});
-	} finally {
-		await ldap.unbind();
 	}
 };
 
