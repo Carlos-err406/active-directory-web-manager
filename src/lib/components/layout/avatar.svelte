@@ -34,9 +34,9 @@
 	<DropdownMenu.Content align="end">
 		<DropdownMenu.Label>My Account</DropdownMenu.Label>
 		<DropdownMenu.Separator />
-		<DropdownMenu.Item disabled={$page.url.pathname === paths.users.me}>
-			<a data-sveltekit-preload-data href={paths.users.me}> See profile </a>
-		</DropdownMenu.Item>
+		<DropdownMenu.LinkItem href={paths.users.me} disabled={$page.url.pathname === paths.users.me}>
+			See profile
+		</DropdownMenu.LinkItem>
 		<DropdownMenu.Separator class="my-2" />
 		<DropdownMenu.Item class="justify-center p-0">
 			<form method="post" action={paths.auth.actions.signOut} class="w-full" use:enhance>
