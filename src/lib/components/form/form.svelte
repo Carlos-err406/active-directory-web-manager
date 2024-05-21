@@ -77,33 +77,16 @@
 			if (formOptions.onChange) formOptions.onChange(event as ChangeType<typeof schema>);
 		}
 	});
-	const { enhance, submitting, delayed, timeout, form: methodsForm } = methods;
+	const { enhance, submitting, delayed, timeout } = methods;
 
 	const loading = derived(
 		[submitting, delayed, timeout],
 		([$submitting, $delayed, $timeout]) => $submitting || $delayed || $timeout
 	);
 
-	const changed = derived(methodsForm, ($methodsForm) => {
-		let diff = false;
-		const formData = Object(form.data);
-		const formEntries = Object.entries(formData);
-		for (let i = 0; i < formEntries.length; i++) {
-			const [key, value] = formEntries[i];
-			diff = JSON.stringify($methodsForm[key]) !== JSON.stringify(value);
-			if (diff) return true;
-		}
-		const methodEntries = Object.entries($methodsForm);
-		for (let i = 0; i < methodEntries.length; i++) {
-			const [key, value] = methodEntries[i];
-			diff = JSON.stringify(formData[key]) !== JSON.stringify(value);
-			if (diff) return true;
-		}
-		return false;
-	});
 	$: if (!$loading) killToast();
 </script>
 
 <form bind:this={formElement} novalidate method="post" {...formProps} use:enhance>
-	<slot {methods} loading={$loading} changed={$changed} />
+	<slot {methods} loading={$loading} />
 </form>

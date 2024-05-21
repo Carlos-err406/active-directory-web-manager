@@ -37,7 +37,6 @@
 		<Form
 			let:methods
 			let:loading
-			let:changed
 			bind:form
 			schema={updateUserSchema}
 			loadingText="Updatting user..."
@@ -49,10 +48,10 @@
 					toast.error(result.error.message);
 				},
 				onResult: ({ result }) => {
+					invalidate('protected:users');
 					if (result.type === 'success') {
 						open = false;
 						toast.success('User updated successfully');
-						invalidate('protected:users');
 					}
 				}
 			}}
@@ -101,7 +100,7 @@
 			</div>
 			<Dialog.Footer>
 				<Button type="button" variant="outline" on:click={() => (open = false)}>Cancel</Button>
-				<Button type="submit" disabled={loading || !changed}>Save</Button>
+				<Button type="submit" disabled={loading}>Save</Button>
 			</Dialog.Footer>
 		</Form>
 	</Dialog.Content>

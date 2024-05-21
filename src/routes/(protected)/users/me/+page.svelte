@@ -12,14 +12,17 @@
 
 	export let data: PageData;
 	$: ({ user, updateUserForm } = data);
+	$: ({ jpegPhoto, ...rest } = user);
 	breadcrumbs.set([{ name: 'Users', link: paths.users.list }, { name: 'Me' }]);
 	let isChangePasswordDialogOpen = false;
 	let isUpdateUserDialogOpen = false;
-	$: ({ jpegPhoto, ...rest } = user);
-	$: updateUserForm.data = {
-		...updateUserForm.data,
-		...rest,
-		jpegPhotoBase64: jpegPhoto
+	const handleEditButtonClicked = () => {
+		updateUserForm.data = {
+			...updateUserForm.data,
+			...rest,
+			jpegPhotoBase64: jpegPhoto
+		};
+		isUpdateUserDialogOpen = true;
 	};
 </script>
 
@@ -28,9 +31,7 @@
 		<div class="mx-auto max-w-3xl space-y-6">
 			<div class="flex w-full items-center justify-center gap-10">
 				<Avatar class="size-40 overflow-clip uppercase">
-					{#if user.jpegPhoto}
-						<AvatarWithPreview alt="jpgPhoto" src={user.jpegPhoto} />
-					{/if}
+					<AvatarWithPreview alt="jpgPhoto" src={jpegPhoto} />
 					<AvatarFallback
 						class="flex h-full w-full items-center justify-center rounded-full bg-gray-800 text-6xl font-bold text-gray-100 dark:bg-gray-100 dark:text-gray-800"
 					>
@@ -81,8 +82,8 @@
 			</div>
 		</div>
 	</div>
-	<div class="flex h-full w-full items-center justify-center gap-3">
-		<Button class="flex items-center gap-2" on:click={() => (isUpdateUserDialogOpen = true)}>
+	<div class="flex h-full w-full items-center justify-center gap-3 py-3">
+		<Button class="flex items-center gap-2" on:click={handleEditButtonClicked}>
 			<PencilLine class="size-4 flex-none" />
 			Edit
 		</Button>

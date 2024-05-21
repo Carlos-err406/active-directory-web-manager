@@ -232,6 +232,8 @@ export const updateUser: Action = async (event) => {
 		inferChange(user, 'jpegPhoto', jpegPhoto)
 	].filter(Boolean) as Change[];
 
+	if (!changes.length) throw error(400, 'No changes to apply');
+
 	try {
 		await ldap.modify(dn, changes);
 	} catch (e) {
