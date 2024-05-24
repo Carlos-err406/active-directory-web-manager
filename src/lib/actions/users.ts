@@ -1,5 +1,4 @@
 import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
-// import { paths } from '$lib';
 import {
 	encodePassword,
 	extractBase,
@@ -9,9 +8,10 @@ import {
 	replaceAttribute,
 	sudo
 } from '$lib/ldap';
+import { deleteManySchema } from '$lib/schemas/delete-many-schema';
 import { changePasswordSchema } from '$lib/schemas/user/change-password-schema';
 import { createUserSchema } from '$lib/schemas/user/create-user-schema';
-import { deleteManyUsersSchema, deleteUserSchema } from '$lib/schemas/user/delete-user-schema';
+import { deleteUserSchema } from '$lib/schemas/user/delete-user-schema';
 import { updateUserSchema } from '$lib/schemas/user/update-user-schema';
 import {
 	generateAccessToken,
@@ -92,10 +92,7 @@ export const createUser: Action = async (event) => {
 	return withFiles({ form });
 };
 export const deleteUser: Action = async (event) => {
-	const {
-		locals
-		// , params
-	} = event;
+	const { locals } = event;
 	const auth = await locals.auth();
 	if (!auth) throw redirect(302, '/');
 	const form = await superValidate(event, zod(deleteUserSchema));
@@ -121,7 +118,7 @@ export const deleteManyUsers: Action = async (event) => {
 	const { locals } = event;
 	const auth = await locals.auth();
 	if (!auth) throw redirect(302, '/');
-	const form = await superValidate(event, zod(deleteManyUsersSchema));
+	const form = await superValidate(event, zod(deleteManySchema));
 	if (!form.valid) return fail(400, { form });
 	const { ldap } = auth;
 	const { dns } = form.data;

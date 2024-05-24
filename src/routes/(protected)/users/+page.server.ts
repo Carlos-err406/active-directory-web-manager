@@ -2,9 +2,10 @@ import { PUBLIC_BASE_DN } from '$env/static/public';
 import { search } from '$lib/actions';
 import * as userActions from '$lib/actions/users';
 import { extractPagination, type PaginationWithUrls } from '$lib/pagination';
+import { deleteManySchema } from '$lib/schemas/delete-many-schema';
 import { changePasswordSchema } from '$lib/schemas/user/change-password-schema';
 import { createUserSchema } from '$lib/schemas/user/create-user-schema';
-import { deleteManyUsersSchema, deleteUserSchema } from '$lib/schemas/user/delete-user-schema';
+import { deleteUserSchema } from '$lib/schemas/user/delete-user-schema';
 import { updateUserSchema } from '$lib/schemas/user/update-user-schema';
 import { jpegPhotoToB64 } from '$lib/transforms';
 import type { User } from '$lib/types/user';
@@ -82,7 +83,7 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 			updateUserForm,
 			changePasswordForm
 		] = await Promise.all([
-			superValidate(zod(deleteManyUsersSchema)),
+			superValidate(zod(deleteManySchema)),
 			superValidate(zod(deleteUserSchema)),
 			superValidate(zod(createUserSchema)),
 			superValidate(zod(updateUserSchema)),

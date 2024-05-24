@@ -18,7 +18,13 @@ export const paths = {
 	},
 	groups: {
 		list: '/groups',
-		dn: (dn: string) => `/groups/${dn}`
+		dn: (dn: string) => `/groups/${dn}`,
+		actions: {
+			create: '/groups?/createGroup',
+			update: '/groups?/updateGroup',
+			delete: '/groups?/deleteGroup',
+			deleteMany: '/groups?/deleteManyGroups'
+		}
 	},
 	ous: {
 		list: '/ous',
