@@ -8,8 +8,8 @@
 	import { breadcrumbs } from '$lib/stores';
 	import LockKeyhole from '$lucide/lock-keyhole.svelte';
 	import PencilLine from '$lucide/pencil-line.svelte';
+	import Trash2 from '$lucide/trash-2.svelte';
 	import dayjs from 'dayjs';
-	import { Trash2 } from 'lucide-svelte';
 	import type { PageData } from './$types';
 	export let data: PageData;
 
