@@ -31,10 +31,9 @@
 					open = false;
 				},
 				onResult: async ({ result }) => {
-					toast('asd', {});
-					toast.success('User deleted successfully');
 					if ($page.params.dn !== dn) await invalidate('protected:users');
 					if (result.type === 'success') {
+						toast.success('User deleted successfully');
 						open = false;
 						if ($page.params.dn === dn) {
 							await goto(paths.users.list, {
