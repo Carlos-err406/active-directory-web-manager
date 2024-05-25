@@ -26,6 +26,7 @@
 	const hidableCols: (keyof Group)[] = [
 		'dn',
 		'sAMAccountName',
+		'mail',
 		'groupType',
 		'description',
 		'whenCreated'
@@ -69,6 +70,11 @@
 		table.column({
 			accessor: 'sAMAccountName',
 			header: 'sAMAccountName'
+		}),
+		table.column({
+			accessor: 'mail',
+			header: 'mail',
+			cell: ({ value }) => value ?? '-'
 		}),
 		table.column({
 			accessor: 'dn',

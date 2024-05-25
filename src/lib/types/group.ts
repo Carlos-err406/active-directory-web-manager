@@ -11,6 +11,7 @@ export type Group = {
 	uSNCreated: string;
 	uSNChanged: string;
 	name: string;
+	mail: string;
 	objectGUID: string;
 	objectSid: string;
 	adminCount: string;
