@@ -18,6 +18,7 @@
 	import { toast } from 'svelte-sonner';
 	import AddMembersDialog from './add-members-dialog.svelte';
 	import AddMembersSurveyDialog from './add-members-survey-dialog.svelte';
+	import { slide } from 'svelte/transition';
 
 	let open: boolean;
 	let isManageMembersSurveyDialogOpen = false;
@@ -47,6 +48,7 @@
 		<Form
 			let:methods
 			let:loading
+			let:values
 			bind:form
 			schema={createGroupSchema}
 			loadingText="Creating group..."
@@ -72,12 +74,6 @@
 				<Input name="sAMAccountName" inputProps={{ required: true }} {methods}>
 					<svelte:fragment slot="label">sAMAccountName</svelte:fragment>
 				</Input>
-				<Input name="mail" inputProps={{ required: true }} {methods}>
-					<svelte:fragment slot="label">mail</svelte:fragment>
-					<svelte:fragment slot="addornment-left">
-						<Mail />
-					</svelte:fragment>
-				</Input>
 				<SelectInput
 					name="groupType"
 					selectProps={{ required: true, placeholder: 'Select group type' }}
@@ -86,6 +82,17 @@
 				>
 					<svelte:fragment slot="label">groupType</svelte:fragment>
 				</SelectInput>
+				{#if values['groupType'] == 0}
+					<div transition:slide={{ axis: 'y' }}>
+						<Input name="mail" inputProps={{ required: true }} {methods}>
+							<svelte:fragment slot="label">mail</svelte:fragment>
+							<svelte:fragment slot="addornment-left">
+								<Mail />
+							</svelte:fragment>
+							<svelte:fragment slot="description">Distribution list email</svelte:fragment>
+						</Input>
+					</div>
+				{/if}
 				<Input name="description" {methods}>
 					<svelte:fragment slot="label">description</svelte:fragment>
 					<svelte:fragment slot="addornment-left">

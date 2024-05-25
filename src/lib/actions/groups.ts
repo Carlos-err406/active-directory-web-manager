@@ -20,10 +20,10 @@ export const createGroup: Action = async (event) => {
 	const { base, groupType, mail, sAMAccountName, description } = form.data;
 	const attributes: Record<string, string[] | string> = {
 		objectClass: ['group'],
-		sAMAccountName,
-		mail
+		sAMAccountName
 	};
 	if (description) attributes['description'] = description;
+	if (mail) attributes['mail'] = mail;
 
 	//add global scope to group (+2)
 	const withGlobalScope = groupType + 2;

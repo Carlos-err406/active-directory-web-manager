@@ -20,7 +20,7 @@ export const createGroupSchema = z.object({
 		.trim()
 		.max(100, 'description can not be longer than 100 characters')
 		.optional(),
-	mail: z.string().email().trim().min(1, 'mail is required')
+	mail: z.string().email().trim().optional()
 });
 
 export type CreateGroupSchema = typeof createGroupSchema;

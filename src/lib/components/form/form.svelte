@@ -77,7 +77,7 @@
 			if (formOptions.onChange) formOptions.onChange(event as ChangeType<typeof schema>);
 		}
 	});
-	const { enhance, submitting, delayed, timeout } = methods;
+	const { enhance, submitting, delayed, timeout, form: values } = methods;
 
 	const loading = derived(
 		[submitting, delayed, timeout],
@@ -88,5 +88,5 @@
 </script>
 
 <form bind:this={formElement} novalidate method="post" {...formProps} use:enhance>
-	<slot {methods} loading={$loading} />
+	<slot {methods} loading={$loading} values={$values} />
 </form>
