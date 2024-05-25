@@ -5,7 +5,7 @@
 	import Form from '$lib/components/form/form.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
-	import { deleteManyUsersSchema } from '$lib/schemas/user/delete-user-schema';
+	import { deleteManySchema } from '$lib/schemas/delete-many-schema';
 	import { toast } from 'svelte-sonner';
 	let open: boolean;
 	export let dns: string[] = [];
@@ -29,7 +29,7 @@
 		<Form
 			let:loading
 			bind:form
-			schema={deleteManyUsersSchema}
+			schema={deleteManySchema}
 			loadingText="Deleting users..."
 			formProps={{ action: paths.users.actions.deleteMany }}
 			formOptions={{

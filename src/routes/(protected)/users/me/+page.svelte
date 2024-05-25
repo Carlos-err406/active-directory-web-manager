@@ -2,8 +2,7 @@
 	import { paths } from '$lib';
 	import { Avatar, AvatarFallback, AvatarWithPreview } from '$lib/components/ui/avatar';
 	import { Button } from '$lib/components/ui/button';
-	import ChangePasswordDialog from '$lib/components/users/change-password-dialog.svelte';
-	import UpdateUserDialog from '$lib/components/users/update-user-dialog.svelte';
+	import { ChangePasswordDialog, UpdateUserDialog } from '$lib/components/users';
 	import { breadcrumbs } from '$lib/stores';
 	import LockKeyhole from '$lucide/lock-keyhole.svelte';
 	import PencilLine from '$lucide/pen-line.svelte';

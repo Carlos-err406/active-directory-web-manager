@@ -1,13 +1,18 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import ColumnsDropdown from '$lib/components/table/columns-dropdown.svelte';
-	import DataTableCheckbox from '$lib/components/table/data-table-checkbox.svelte';
-	import DataTable from '$lib/components/table/data-table.svelte';
-	import ResetFiltersButton from '$lib/components/table/reset-filters-dropdown.svelte';
-	import CreateUserDialog from '$lib/components/users/create-user-dialog.svelte';
-	import DeleteManyUsersDialog from '$lib/components/users/delete-many-users-dialog.svelte';
-	import UserPhotoCell from '$lib/components/users/user-photo-cell.svelte';
-	import UserTableActions from '$lib/components/users/user-table-actions.svelte';
+	import {
+		ColumnsDropdown,
+		CreatedAtCell,
+		DataTable,
+		DataTableCheckbox,
+		ResetFiltersDropdown
+	} from '$lib/components/table';
+	import {
+		CreateUserDialog,
+		DeleteManyUsersDialog,
+		UserPhotoCell,
+		UserTableActions
+	} from '$lib/components/users';
 	import { breadcrumbs } from '$lib/stores';
 	import type { User } from '$lib/types/user';
 	import { DataBodyCell, createRender, createTable } from 'svelte-headless-table';
@@ -15,6 +20,7 @@
 	import { readable } from 'svelte/store';
 	import { slide } from 'svelte/transition';
 	import type { PageData } from './$types';
+	import UserAccountControlCell from '$lib/components/users/user-account-control-cell.svelte';
 	export let data: PageData;
 	breadcrumbs.set([{ name: 'Users' }]);
 
@@ -26,7 +32,9 @@
 		'mail',
 		'sn',
 		'givenName',
-		'description'
+		'description',
+		'userAccountControl',
+		'whenCreated'
 	];
 
 	$: ({ pagination } = data);
@@ -113,6 +121,24 @@
 			accessor: 'description',
 			header: 'description',
 			cell: ({ value }) => value ?? '-'
+		}),
+		table.column({
+			accessor: 'userAccountControl',
+			header: 'userAccountControl',
+			cell: ({ value }) => {
+				return createRender(UserAccountControlCell, {
+					userAccountControl: Number(value)
+				});
+			}
+		}),
+		table.column({
+			accessor: 'whenCreated',
+			header: 'whenCreated',
+			cell: ({ value }) => {
+				return createRender(CreatedAtCell, {
+					whenCreated: value
+				});
+			}
 		})
 	]);
 	$: data.session.isAdmin &&
@@ -140,7 +166,7 @@
 
 <div class="w-full">
 	<div class="my-2 flex w-full justify-end gap-4">
-		<ResetFiltersButton />
+		<ResetFiltersDropdown />
 		<ColumnsDropdown {hidableCols} {flatColumns} />
 		<CreateUserDialog />
 	</div>

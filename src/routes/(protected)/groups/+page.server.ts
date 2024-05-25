@@ -72,6 +72,7 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 				superValidate(zod(createGroupSchema)),
 				superValidate(zod(updateGroupSchema))
 			]);
+
 		return {
 			pagination: paginationWithURLs,
 			deleteManyGroupsForm,
