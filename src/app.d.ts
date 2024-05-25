@@ -12,6 +12,11 @@ declare global {
 			errorId?: string;
 		}
 		interface Locals {
+			/**
+			 * authorization function setted by the authenticationSetterHandler hook
+			 *
+			 * @returns a Promise with the session object and the binded ldap client, or null if session is invalid
+			 */
 			auth: () => Promise<{ ldap: Client; session: Session } | null>;
 		}
 		// interface PageData {}

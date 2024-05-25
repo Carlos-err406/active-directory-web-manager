@@ -11,6 +11,9 @@ import type { Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 import { getLoggerHook } from 'sveltekit-logger-hook';
 
+/**
+ * sets the auth function in the locals, wich returns the session and a binded ldap client instance
+ */
 const authenticationSetterHandler: Handle = async ({ event, resolve }) => {
 	const auth = async ({ cookies }: typeof event) => {
 		const access = getAccessToken(cookies);
@@ -37,6 +40,9 @@ const authenticationSetterHandler: Handle = async ({ event, resolve }) => {
 	return resolve(event);
 };
 
+/**
+ * Runs ldap.unbind() after resolve
+ */
 const ldapUnbindHandler: Handle = async ({ event, resolve }) => {
 	const response = await resolve(event);
 	const { locals } = event;
@@ -51,6 +57,11 @@ const ldapUnbindHandler: Handle = async ({ event, resolve }) => {
 	return response;
 };
 
+/** hander hook for logging all requests
+ *
+ * if LOGGER enviroment variable is 1 the `logHandler` hook is included on the sequence
+ * else `logHadler` is not included
+ */
 const logHandler = getLoggerHook({
 	template: '[{date}] {url}{urlSearchParams} {method} {status}',
 	decodeSearchParams: true,
@@ -63,6 +74,9 @@ const logHandler = getLoggerHook({
 	}
 });
 
+/** returns the sequence of handlers
+ *
+ *  depending on the LOGGER enviroment variable, the `logHandler` hook is included on the sequence or not */
 const getSequence = () => {
 	const seq = [];
 	if (LOGGER && LOGGER === '1') {
