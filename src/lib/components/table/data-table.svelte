@@ -27,7 +27,7 @@
 </script>
 
 <div>
-	<div class="flex h-full max-h-[calc(100svh-220px)] min-h-48 w-full rounded-md border">
+	<div class="flex h-full max-h-[calc(100svh-230px)] min-h-48 w-full rounded-md border">
 		<Table.Root {...$tableAttrs} class="h-full">
 			<Table.Header>
 				{#each $headerRows as headerRow}
