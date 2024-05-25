@@ -60,7 +60,7 @@
 		"vitest": "^1.2.0"
 	},
 	"dependencies": {
-		"bits-ui": "^0.21.7",
+		"bits-ui": "^0.21.9",
 		"clsx": "^2.1.0",
 		"cmdk-sv": "^0.0.17",
 		"dotenv": "^16.4.5",
