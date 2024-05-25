@@ -46,9 +46,7 @@ export const createUser: Action = async (event) => {
 	const { ldap } = auth;
 	const { sAMAccountName, base, givenName, sn, mail, password, description, jpegPhotoBase64 } =
 		form.data;
-	const entry = await getEntryBySAMAccountName(ldap, sAMAccountName);
 
-	if (entry) return setError(form, 'sAMAccountName', 'User already exists');
 	const attributes: Record<string, string[] | string> = {
 		objectClass: ['top', 'person', 'organizationalPerson', 'user'],
 		userAccountControl: ['512'],
@@ -67,8 +65,16 @@ export const createUser: Action = async (event) => {
 		attributes['jpegPhoto'] = Buffer.from(content, 'base64').toString('base64');
 	}
 	const dn = `CN=${sAMAccountName},${base}`;
-
-	await ldap.add(dn, attributes);
+	try {
+		await ldap.add(dn, attributes);
+	} catch (e) {
+		if (e instanceof AlreadyExistsError) {
+			return setError(form, 'sAMAccountName', 'sAMAccountName already in use!');
+		} else if (e instanceof InsufficientAccessError) {
+			throw error(403, "You don't have permission to create users!");
+		}
+		throw error(500, 'Something unexpected happened while creating the user');
+	}
 
 	const encodedPassword = encodePassword(password);
 	const passwordChange: Change = new Change({
@@ -144,10 +150,7 @@ export const deleteManyUsers: Action = async (event) => {
 
 	await Promise.all(promises);
 
-	return {
-		form,
-		success: true
-	};
+	return { form };
 };
 export const changeUserPassword: Action = async (event) => {
 	const { locals, cookies } = event;
