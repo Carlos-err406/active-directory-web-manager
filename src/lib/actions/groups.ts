@@ -1,5 +1,5 @@
 import { PUBLIC_BASE_DN } from '$env/static/public';
-import { encodeUnitAttribute, getEntryByDn } from '$lib/ldap';
+import { getEntryByDn } from '$lib/ldap';
 import { deleteManySchema } from '$lib/schemas/delete-many-schema';
 import { createGroupSchema } from '$lib/schemas/group/create-group-schema';
 import { deleteGroupSchema } from '$lib/schemas/group/delete-group-schema';
@@ -26,9 +26,9 @@ export const createGroup: Action = async (event) => {
 	if (description) attributes['description'] = description;
 
 	//add global scope to group (+2)
-	const withGlobalScope = BigInt(groupType) + BigInt(2);
+	const withGlobalScope = groupType + 2;
 
-	attributes['groupType'] = encodeUnitAttribute(withGlobalScope); //[encodeUnitAttribute(groupType)];
+	attributes['groupType'] = withGlobalScope.toString();
 
 	const dn = `CN=${sAMAccountName},${base}`;
 	try {
