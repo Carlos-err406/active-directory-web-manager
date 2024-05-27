@@ -2,6 +2,7 @@ import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { cubicOut } from 'svelte/easing';
 import type { TransitionConfig } from 'svelte/transition';
+import type { Action } from 'svelte/action';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -54,3 +55,26 @@ export const flyAndScale = (
 		easing: cubicOut
 	};
 };
+
+export const arrowNavigation: Action = (
+	node: HTMLElement,
+	selectors: keyof HTMLElementTagNameMap = 'button'
+) => {
+	const handleNavigation = (e: KeyboardEvent) => {
+		const navigableElements = Array.from(node.querySelectorAll(selectors));
+		const currentlyFocused = document.activeElement;
+		const indexOfFocused = navigableElements.findIndex((element) =>
+			element.isSameNode(currentlyFocused)
+		);
+
+		const next = navigableElements[indexOfFocused + 1];
+		const prev = navigableElements[indexOfFocused - 1];
+		if (e.key === 'ArrowDown') next?.focus();
+		else if (e.key === 'ArrowUp') prev?.focus();
+	};
+
+	node.addEventListener('keydown', handleNavigation);
+	return { destroy: () => node.removeEventListener('keydown', handleNavigation) };
+};
+
+export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
