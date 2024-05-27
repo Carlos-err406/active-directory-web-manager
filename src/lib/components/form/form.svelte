@@ -18,8 +18,9 @@
 		| false
 		| 'clear';
 
-	export type ResultType<T extends ZodSchema> = {
-		result: ActionResult<{ form: SuperValidated<Infer<T>> }>;
+	//eslint-disable-next-line @typescript-eslint/no-explicit-any
+	export type ResultType<T extends ZodSchema, K = Record<any, any>> = {
+		result: ActionResult<{ form: SuperValidated<Infer<T>> } & K>;
 		formEl: HTMLFormElement;
 		formElement: HTMLFormElement;
 		cancel: () => void;
@@ -32,10 +33,11 @@
 	};
 
 	export type SubmitType = SubmitFunctionEventArg;
-	export type FormOptions<T extends ZodSchema> = Partial<
+	//eslint-disable-next-line @typescript-eslint/no-explicit-any
+	export type FormOptions<T extends ZodSchema, K = any> = Partial<
 		Omit<_FormOptions, 'validators' | 'onResult' | 'onChange'>
 	> & {
-		onResult?: (event: ResultType<T>) => void;
+		onResult?: (event: ResultType<T, K>) => void;
 		onChange?: (event: ChangeType<T>) => void;
 	};
 </script>
@@ -44,7 +46,6 @@
 	import type { ActionResult, SubmitFunction } from '@sveltejs/kit';
 	import { toast } from 'svelte-sonner';
 	import type { HTMLFormAttributes } from 'svelte/elements';
-	import { derived } from 'svelte/store';
 	import { superForm, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient, type ValidationAdapter } from 'sveltekit-superforms/adapters';
 
@@ -56,37 +57,27 @@
 	export let loadingText = 'Submitting...';
 
 	let toastId: string | number | undefined = undefined;
-	const killToast = () => {
-		toast.dismiss(toastId);
-		toastId = undefined;
-	};
-	const triggerToast = () => {
-		toastId = toast.loading(loadingText, {
-			dismissable: true,
-			important: false
-		});
-	};
 	const methods = superForm(form, {
 		validators: zodClient(schema),
 		...(formOptions as _FormOptions),
 		onSubmit: (input) => {
-			triggerToast();
+			toastId = toast.loading(loadingText, {
+				dismissable: true,
+				important: false
+			});
 			if (formOptions?.onSubmit) formOptions.onSubmit(input);
+		},
+		onResult: (event) => {
+			toast.dismiss(toastId);
+			if (formOptions.onResult) formOptions.onResult(event);
 		},
 		onChange: (event) => {
 			if (formOptions.onChange) formOptions.onChange(event as ChangeType<typeof schema>);
 		}
 	});
 	const { enhance, submitting, delayed, timeout, form: values } = methods;
-
-	const loading = derived(
-		[submitting, delayed, timeout],
-		([$submitting, $delayed, $timeout]) => $submitting || $delayed || $timeout
-	);
-
-	$: if (!$loading) killToast();
 </script>
 
 <form bind:this={formElement} novalidate method="post" {...formProps} use:enhance>
-	<slot {methods} loading={$loading} values={$values} />
+	<slot {methods} loading={$submitting || $delayed || $timeout} values={$values} />
 </form>
