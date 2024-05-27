@@ -1,13 +1,14 @@
 import { PUBLIC_BASE_DN } from '$env/static/public';
-import { getEntryByDn } from '$lib/ldap';
+import { getEntryByDn, inferChange } from '$lib/ldap';
 import { deleteManySchema } from '$lib/schemas/delete-many-schema';
 import { createGroupSchema } from '$lib/schemas/group/create-group-schema';
 import { deleteGroupSchema } from '$lib/schemas/group/delete-group-schema';
+import { setMembersSchema } from '$lib/schemas/group/set-members-schema';
 import { updateGroupSchema } from '$lib/schemas/group/update-group-schema';
 import type { Group } from '$lib/types/group';
 import { error, fail, redirect, type Action } from '@sveltejs/kit';
 import { AlreadyExistsError, EqualityFilter, InsufficientAccessError, OrFilter } from 'ldapts';
-import { setError, superValidate, withFiles } from 'sveltekit-superforms';
+import { setError, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 
 export const createGroup: Action = async (event) => {
@@ -42,8 +43,9 @@ export const createGroup: Action = async (event) => {
 		}
 		throw error(500, 'Something unexpected happened while creating the group');
 	}
+	const group = await getEntryByDn<Group>(ldap, dn);
 
-	return { form };
+	return { form, group };
 };
 
 export const deleteGroup: Action = async (event) => {
@@ -110,7 +112,30 @@ export const updateGroup: Action = async (event) => {
 	const auth = await locals.auth();
 	if (!auth) throw redirect(302, '/'); //type narrowing
 	const form = await superValidate(event, zod(updateGroupSchema));
-	if (!form.valid) return fail(400, withFiles({ form }));
+	if (!form.valid) return fail(400, { form });
+
+	return { form };
+};
+
+export const setMembers: Action = async (event) => {
+	const { locals } = event;
+	const auth = await locals.auth();
+	if (!auth) throw redirect(302, '/'); //type narrowing
+	const form = await superValidate(event, zod(setMembersSchema));
+	if (!form.valid) return fail(400, { form });
+	const { ldap } = auth;
+	const { dns, groupDn } = form.data;
+
+	const group = await getEntryByDn(ldap, groupDn);
+	const change = inferChange(group, 'member', dns);
+	if (!change) return { form };
+
+	try {
+		await ldap.modify(groupDn, change);
+	} catch (e) {
+		console.log(e);
+		throw error(500, "Something went wrong setting the group's members");
+	}
 
 	return { form };
 };

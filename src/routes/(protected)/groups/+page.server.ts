@@ -5,6 +5,7 @@ import { extractPagination, type PaginationWithUrls } from '$lib/pagination';
 import { deleteManySchema } from '$lib/schemas/delete-many-schema';
 import { createGroupSchema } from '$lib/schemas/group/create-group-schema';
 import { deleteGroupSchema } from '$lib/schemas/group/delete-group-schema';
+import { setMembersSchema } from '$lib/schemas/group/set-members-schema';
 import { updateGroupSchema } from '$lib/schemas/group/update-group-schema';
 import type { Group } from '$lib/types/group';
 import { error, redirect } from '@sveltejs/kit';
@@ -20,7 +21,6 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 	if (!auth) throw redirect(302, '/');
 	const { ldap } = auth;
 	const { searchParams, pathname } = url;
-
 	const sAMAccountNameQuery = searchParams.get('q');
 	const page = Number(searchParams.get('page') || 1);
 	const pageSize = Number(searchParams.get('pageSize') || 10);
@@ -64,21 +64,27 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 				page >= pagination.totalPages ? null : `${pathname}?${nextPageSearchParams.toString()}`,
 			previousPage: page <= 1 ? null : `${pathname}?${previousPageSearchParams.toString()}`
 		};
-
-		const [deleteManyGroupsForm, deleteGroupForm, createGroupForm, updateGroupForm] =
-			await Promise.all([
-				superValidate(zod(deleteManySchema)),
-				superValidate(zod(deleteGroupSchema)),
-				superValidate(zod(createGroupSchema)),
-				superValidate(zod(updateGroupSchema))
-			]);
+		const [
+			deleteManyGroupsForm,
+			deleteGroupForm,
+			createGroupForm,
+			updateGroupForm,
+			setMembersForm
+		] = await Promise.all([
+			superValidate(zod(deleteManySchema)),
+			superValidate(zod(deleteGroupSchema)),
+			superValidate(zod(createGroupSchema)),
+			superValidate(zod(updateGroupSchema)),
+			superValidate(zod(setMembersSchema))
+		]);
 
 		return {
 			pagination: paginationWithURLs,
 			deleteManyGroupsForm,
 			deleteGroupForm,
 			createGroupForm,
-			updateGroupForm
+			updateGroupForm,
+			setMembersForm
 		};
 	} catch (e) {
 		const errorId = v4();

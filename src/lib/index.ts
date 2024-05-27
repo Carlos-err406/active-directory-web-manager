@@ -23,6 +23,7 @@ export const paths = {
 			create: '/groups?/createGroup',
 			update: '/groups?/updateGroup',
 			delete: '/groups?/deleteGroup',
+			setMembers: '/groups?/setMembers',
 			deleteMany: '/groups?/deleteManyGroups'
 		}
 	},

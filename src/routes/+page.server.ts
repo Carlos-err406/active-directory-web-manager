@@ -25,7 +25,7 @@ import generate from 'vanilla-captcha';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ cookies, depends }) => {
-	depends(paths.auth.dependencies.captcha);
+	depends('auth:captcha');
 	const { answer, captcha } = await generate(Number(CAPTCHA_LENGTH) || 5);
 	try {
 		const captchaToken = generateCaptchaToken(answer);

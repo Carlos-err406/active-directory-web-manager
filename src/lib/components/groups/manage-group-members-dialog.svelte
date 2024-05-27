@@ -5,28 +5,55 @@
 	import Form from '$lib/components/form/form.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
-	import { createGroupSchema } from '$lib/schemas/group/create-group-schema';
+	import { setMembersSchema } from '$lib/schemas/group/set-members-schema';
+	import type { Group } from '$lib/types/group';
+	import type { User } from '$lib/types/user';
+	import { Loader } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
+	import { slide } from 'svelte/transition';
+	import { UsersSelect } from '../users';
+	import UserChipList from '../users/chip/user-chip-list.svelte';
 	export let open: boolean;
-	$: form = $page.data.createGroupForm;
+	export let dn: string;
+	const paginationData: Group[] = $page.data.pagination.data;
+	const group = paginationData.find(({ distinguishedName }) => distinguishedName === dn)!;
+	$: form = $page.data.setMembersForm;
+	let users: User[] = [];
+	let initializing = false;
+	const onOpen = async () => {
+		const params = new URLSearchParams({ dn });
+		initializing = true;
+		users = await fetch(`/api/group-members?${params}`).then((r) => r.json());
+		initializing = false;
+	};
+	$: open && onOpen();
 </script>
 
 <Dialog.Root bind:open>
-	<Dialog.Trigger asChild let:builder>
-		<Button builders={[builder]}><slot>Manage group members</slot></Button>
-	</Dialog.Trigger>
 	<Dialog.Content>
 		<Dialog.Header>
-			<Dialog.Title>Create Group</Dialog.Title>
-			<Dialog.Description>Fill in the following data to update group members</Dialog.Description>
+			<Dialog.Title>Manage group members</Dialog.Title>
+			<Dialog.Description>Add or remove members in this group ({group.cn})</Dialog.Description>
 		</Dialog.Header>
-		<!-- let:methods -->
+		<UsersSelect selected={users} on:select={({ detail }) => (users = [...users, detail])} />
+		<UserChipList bind:users>
+			<svelte:fragment slot="empty-list">
+				{#if !initializing}
+					--- No members ---
+				{/if}
+			</svelte:fragment>
+		</UserChipList>
+		{#if initializing && !users.length}
+			<div class="flex w-full justify-center" transition:slide={{ axis: 'y', duration: 200 }}>
+				<Loader class="size-5 animate-spin" />
+			</div>
+		{/if}
 		<Form
 			let:loading
 			bind:form
-			schema={createGroupSchema}
+			schema={setMembersSchema}
 			loadingText="Updating group members..."
-			formProps={{ action: paths.groups.actions.create }}
+			formProps={{ action: paths.groups.actions.setMembers }}
 			formOptions={{
 				resetForm: true,
 				onError: ({ result }) => {
@@ -41,7 +68,10 @@
 				}
 			}}
 		>
-			hello
+			<input type="text" hidden value={dn} name="groupDn" />
+			{#each users as user}
+				<input hidden type="text" name="dns" value={user.dn} />
+			{/each}
 			<Dialog.Footer>
 				<Button type="button" variant="outline" on:click={() => (open = false)}>Cancel</Button>
 				<Button type="submit" disabled={loading}>Save</Button>

@@ -12,7 +12,7 @@
 		createGroupSchema,
 		type CreateGroupSchema
 	} from '$lib/schemas/group/create-group-schema';
-	import { GroupTypeSelect } from '$lib/types/group';
+	import { GroupTypeSelect, type Group } from '$lib/types/group';
 	import Captions from '$lucide/captions.svelte';
 	import Mail from '$lucide/mail.svelte';
 	import { toast } from 'svelte-sonner';
@@ -23,6 +23,7 @@
 	let open: boolean;
 	let isManageMembersSurveyDialogOpen = false;
 	let isAddMembersDialogOpen = false;
+	let createdGroup: Group;
 	export let base = PUBLIC_BASE_DN;
 	$: form = $page.data.createGroupForm;
 
@@ -32,6 +33,16 @@
 			if (sAMAccountName)
 				set('mail', `${sAMAccountName.split(' ').join('.').toLowerCase()}@${PUBLIC_LDAP_DOMAIN}`);
 			else set('mail', '');
+		}
+	};
+
+	const onResult: FormOptions<CreateGroupSchema, { group: Group }>['onResult'] = ({ result }) => {
+		if (result.type === 'success') {
+			createdGroup = result.data!.group;
+			open = false;
+			isManageMembersSurveyDialogOpen = true;
+			toast.success('Group created successfully');
+			invalidate('protected:groups');
 		}
 	};
 </script>
@@ -56,16 +67,9 @@
 			formOptions={{
 				resetForm: true,
 				onChange,
+				onResult,
 				onError: ({ result }) => {
 					toast.error(result.error.message);
-				},
-				onResult: ({ result }) => {
-					if (result.type === 'success') {
-						open = false;
-						isManageMembersSurveyDialogOpen = true;
-						toast.success('Group created successfully');
-						invalidate('protected:groups');
-					}
 				}
 			}}
 		>
@@ -113,4 +117,4 @@
 	on:open-add-members={() => (isAddMembersDialogOpen = true)}
 />
 
-<AddMembersDialog bind:open={isAddMembersDialogOpen} bind:form />
+<AddMembersDialog bind:open={isAddMembersDialogOpen} groupDn={createdGroup?.dn} />

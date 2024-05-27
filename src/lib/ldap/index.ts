@@ -60,6 +60,15 @@ export const entryBelongsToGroup = async (ldap: Client, entryDn: string, groupNa
 	return (memberOf as string[]).includes(groupDn as string);
 };
 
+export const getGroupMembers = async (ldap: Client, groupDn: string) => {
+	const group = await getEntryByDn<{ dn: string; member: string[] }>(ldap, groupDn, {
+		searchOpts: { attributes: ['member'] }
+	});
+	if (!group?.member?.length) return [];
+
+	return Array.isArray(group.member) ? group.member : [group.member];
+};
+
 export const replaceAttribute = (opts: AttributeOptions) =>
 	new Change({ modification: new Attribute(opts), operation: 'replace' });
 
@@ -77,6 +86,7 @@ export const inferChange = <T>(entry: T, attribute: keyof T, value?: string | st
 	//if no value is passed but the entry has the attribute
 	else if (!value && entry[attribute]) return deleteAttribute(att);
 	//if a value is passed but is different from the one pressent on the entrie's attribute
+	//BUG: this doesnt work properly with array values
 	else if (value && value !== entry[attribute]) return replaceAttribute({ type: att, values });
 };
 

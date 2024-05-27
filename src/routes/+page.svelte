@@ -14,7 +14,7 @@
 	import { toast } from 'svelte-sonner';
 	import type { PageData } from './$types';
 	export let data: PageData;
-	const refreshCaptcha = async () => await invalidate(paths.auth.dependencies.captcha);
+	const refreshCaptcha = async () => await invalidate('protected:captcha');
 </script>
 
 <main class="flex h-screen w-full items-center justify-center">
