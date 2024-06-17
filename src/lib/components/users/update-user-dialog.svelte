@@ -25,6 +25,7 @@
 			else set('mail', '');
 		}
 	};
+	// TODO: UAC flags!
 </script>
 
 <Dialog.Root bind:open>
@@ -38,7 +39,7 @@
 			let:loading
 			bind:form
 			schema={updateUserSchema}
-			loadingText="Updatting user..."
+			loadingText="Updating user..."
 			formProps={{ action, enctype: 'multipart/form-data' }}
 			formOptions={{
 				resetForm: true,

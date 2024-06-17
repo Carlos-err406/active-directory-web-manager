@@ -5,9 +5,15 @@ import { createGroupSchema } from '$lib/schemas/group/create-group-schema';
 import { deleteGroupSchema } from '$lib/schemas/group/delete-group-schema';
 import { setMembersSchema } from '$lib/schemas/group/set-members-schema';
 import { updateGroupSchema } from '$lib/schemas/group/update-group-schema';
-import type { Group } from '$lib/types/group';
+import { GroupFlags, type Group } from '$lib/types/group';
 import { error, fail, redirect, type Action } from '@sveltejs/kit';
-import { AlreadyExistsError, EqualityFilter, InsufficientAccessError, OrFilter } from 'ldapts';
+import {
+	AlreadyExistsError,
+	Change,
+	EqualityFilter,
+	InsufficientAccessError,
+	OrFilter
+} from 'ldapts';
 import { setError, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 
@@ -116,7 +122,35 @@ export const updateGroup: Action = async (event) => {
 	if (!auth) throw redirect(302, '/'); //type narrowing
 	const form = await superValidate(event, zod(updateGroupSchema));
 	if (!form.valid) return fail(400, { form });
+	const { ldap } = auth;
+	const { groupType, mail, sAMAccountName, description, dn } = form.data;
 
+	const group = await getEntryByDn<Group>(ldap, dn);
+	if (!group) throw error(404, 'Group not found');
+
+	//add global scope to group (+2)
+	const withGlobalScope = groupType + GroupFlags['Global Scope'];
+
+	const changes = [
+		inferChange(group, 'sAMAccountName', sAMAccountName),
+		inferChange(group, 'groupType', withGlobalScope.toString()),
+		inferChange(group, 'mail', mail),
+		inferChange(group, 'description', description)
+	].filter(Boolean) as Change[];
+
+	if (!changes.length) throw error(400, 'No changes to apply');
+
+	try {
+		await ldap.modify(dn, changes);
+	} catch (e) {
+		console.log(e);
+		if (e instanceof AlreadyExistsError) {
+			return setError(form, 'sAMAccountName', 'sAMAccountName already in use!');
+		} else if (e instanceof InsufficientAccessError) {
+			throw error(403, "You don't have permission to create groups!");
+		}
+		throw error(500, 'Something unexpected happened while creating the group');
+	}
 	return { form };
 };
 

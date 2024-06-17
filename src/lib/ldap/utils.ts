@@ -8,7 +8,7 @@ export const getGroupTypes = (groupType: number | string) => {
 	//according to
 	/**@link https://learn.microsoft.com/en-us/windows/win32/adschema/a-grouptype#remarks*/
 	// if is not a security group (2147483648) then is a distribution list (0)
-	!match.includes(2147483648) && (match = [0, ...match]);
+	!match.includes(2147483648) && (match = [...match, 0]);
 	return match;
 };
 

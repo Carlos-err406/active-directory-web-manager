@@ -22,6 +22,7 @@
 	export let options: SelectOption[] = [];
 
 	$: ({ placeholder, required } = selectProps);
+	$: selected = options.find((o) => o.value == $form[name]);
 </script>
 
 <Form.Field form={methods} {name}>
@@ -31,10 +32,7 @@
 			<div class="addornment absolute left-2 top-2.5">
 				<slot name="addornment-left" />
 			</div>
-			<Select.Root
-				selected={options.find((o) => o.value === $form[name])}
-				onSelectedChange={(v) => v && ($form[name] = v.value)}
-			>
+			<Select.Root bind:selected onSelectedChange={(v) => v && ($form[name] = v.value)}>
 				<Select.Trigger
 					class={cn(
 						!!$$slots['addornment-left'] && 'pl-10',

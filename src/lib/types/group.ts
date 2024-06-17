@@ -25,6 +25,17 @@ export type Group = {
 	distinguishedName: string;
 };
 
+export enum GroupFlags {
+	'Distribution List' = 0,
+	'Created by the System' = 1,
+	'Global Scope' = 2,
+	'Domain Local Scope' = 4,
+	'Universal Scope' = 8,
+	'APP_BASIC Group for Windows Server Authorization Manager' = 16,
+	'APP_QUERY Group for Windows Server Authorization Manager' = 32,
+	'Security Group' = 2147483648
+}
+
 /**
  * @link https://learn.microsoft.com/en-us/windows/win32/adschema/a-grouptype#remarks
  */

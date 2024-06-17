@@ -46,7 +46,7 @@
 			let:loading
 			bind:form
 			schema={updateUserSchema}
-			loadingText="Updatting user membership..."
+			loadingText="Updating user membership..."
 			formProps={{ action, enctype: 'multipart/form-data' }}
 			formOptions={{
 				resetForm: true,
