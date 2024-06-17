@@ -33,8 +33,10 @@ import {
 	InvalidCredentialsError,
 	OrFilter
 } from 'ldapts';
+import { log } from 'sveltekit-logger-hook';
 import { setError, superValidate, withFiles } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
+import { v4 } from 'uuid';
 
 export const createUser: Action = async (event) => {
 	const { locals } = event;
@@ -85,14 +87,21 @@ export const createUser: Action = async (event) => {
 	try {
 		await ldap.modify(dn, passwordChange);
 	} catch (e) {
-		console.log(e);
+		const errorId = v4();
+		log({ errorId, e });
 		if (e instanceof InsufficientAccessError) {
-			console.log('deleting created user');
+			log('deleting created user');
 			await sudo((sudoLdap) => sudoLdap.del(dn));
-			throw error(403, 'You dont have permission to perform this opperation!');
+			throw error(403, {
+				message: 'You dont have permission to perform this opperation!',
+				errorId
+			});
 		}
 		await ldap.del(dn);
-		throw error(500, "Something unexpected happened while creating setting the user's password");
+		throw error(500, {
+			message: "Something unexpected happened while creating setting the user's password",
+			errorId
+		});
 	}
 
 	return withFiles({ form });
@@ -114,8 +123,12 @@ export const deleteUser: Action = async (event) => {
 	try {
 		await ldap.del(dn);
 	} catch (e) {
-		console.log(e);
-		throw error(500, 'Something unexpected happened while trying to delete ');
+		const errorId = v4();
+		log({ errorId, e });
+		throw error(500, {
+			message: `Something unexpected happened while trying to delete ${user.sAMAccountName}`,
+			errorId
+		});
 	}
 	if (params.dn === dn) {
 		throw redirect(302, '/users');
@@ -142,11 +155,12 @@ export const deleteManyUsers: Action = async (event) => {
 			throw error(403, `Entry ${entry.sAMAccountName} can not be deleted!`);
 		}
 		return ldap.del(entry.dn).catch((e) => {
-			console.log(e);
-			throw error(
-				500,
-				`Something unexpected happened while deleting the user ${entry.sAMAccountName}`
-			);
+			const errorId = v4();
+			log({ errorId, e });
+			throw error(500, {
+				message: `Something unexpected happened while deleting the group ${entry.sAMAccountName}`,
+				errorId
+			});
 		});
 	});
 
@@ -169,17 +183,20 @@ export const changeUserPassword: Action = async (event) => {
 
 	const user = await getEntryByDn(ldap, dn);
 	if (!user) throw error(404, 'User not found');
-	console.log({ session });
 	if (!session.isAdmin) {
 		try {
 			const { sAMAccountName } = user;
 			await ldap.bind(`${sAMAccountName}@${PUBLIC_LDAP_DOMAIN}`, oldPassword);
 		} catch (e) {
-			console.log('Update password failed', { e });
 			if (e instanceof InvalidCredentialsError) {
 				return setError(form, 'oldPassword', 'Incorrect password');
 			} else {
-				throw error(500, 'Something unexpected happened while validating your password');
+				const errorId = v4();
+				log({ errorId, e, message: 'Update password failed' });
+				throw error(500, {
+					message: 'Something unexpected happened while validating your password',
+					errorId
+				});
 			}
 		}
 	}
@@ -192,8 +209,12 @@ export const changeUserPassword: Action = async (event) => {
 	try {
 		await ldap.modify(dn, passwordChange);
 	} catch (e) {
-		console.log(e);
-		throw error(500, 'Something unexpected happened while changing the password');
+		const errorId = v4();
+		log({ errorId, e });
+		throw error(500, {
+			message: 'Something unexpected happened while changing the password',
+			errorId
+		});
 	}
 	if (isUpdatingSelfPassword) {
 		//update access token
@@ -239,13 +260,18 @@ export const updateUser: Action = async (event) => {
 	try {
 		await ldap.modify(dn, changes);
 	} catch (e) {
-		console.log(e);
+		const errorId = v4();
+		log({ errorId, e });
+
 		if (e instanceof AlreadyExistsError) {
 			return setError(form, 'sAMAccountName', 'sAMAccountName already in use!');
 		} else if (e instanceof InsufficientAccessError) {
-			throw error(403, "You don't have permission to edit this user!");
+			throw error(403, { message: "You don't have permission to edit this user!", errorId });
 		}
-		throw error(500, 'Something unexpected happened while updating the user');
+		throw error(500, {
+			message: 'Something unexpected happened while updating the user',
+			errorId
+		});
 	}
 	if (sAMAccountName && sAMAccountName !== user.sAMAccountName) {
 		const base = extractBase(user.dn);
@@ -253,8 +279,12 @@ export const updateUser: Action = async (event) => {
 		try {
 			await ldap.modifyDN(dn, newDN);
 		} catch (e) {
-			console.log(e);
-			throw error(500, 'Something unexpected happened while updating the distinguishedName');
+			const errorId = v4();
+			log({ errorId, e });
+			throw error(500, {
+				message: 'Something unexpected happened while updating the distinguishedName',
+				errorId
+			});
 		}
 	}
 	const isSelfUpdating = session.distinguishedName === dn;

@@ -10,6 +10,7 @@ import { jpegPhotoToB64 } from '$lib/transforms';
 import type { User } from '$lib/types/user';
 import { error, redirect } from '@sveltejs/kit';
 import { AndFilter, EqualityFilter, NotFilter, SubstringFilter, type Filter } from 'ldapts';
+import { log } from 'sveltekit-logger-hook';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { v4 } from 'uuid';
@@ -98,7 +99,7 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 		};
 	} catch (e) {
 		const errorId = v4();
-		console.log({ errorId, e });
+		log({ errorId, e });
 		throw error(500, {
 			message: 'Something unexpected happened while retrieving the users, try again later',
 			errorId

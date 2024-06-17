@@ -14,8 +14,10 @@ import {
 	InsufficientAccessError,
 	OrFilter
 } from 'ldapts';
+import { log } from 'sveltekit-logger-hook';
 import { setError, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
+import { v4 } from 'uuid';
 
 export const createGroup: Action = async (event) => {
 	const { locals } = event;
@@ -41,13 +43,17 @@ export const createGroup: Action = async (event) => {
 	try {
 		await ldap.add(dn, attributes);
 	} catch (e) {
-		console.log(e);
+		const errorId = v4();
+		log(JSON.stringify({ errorId, e }));
 		if (e instanceof AlreadyExistsError) {
 			return setError(form, 'sAMAccountName', 'sAMAccountName already in use!');
 		} else if (e instanceof InsufficientAccessError) {
-			throw error(403, "You don't have permission to create groups!");
+			throw error(403, { message: "You don't have permission to create groups!", errorId });
 		}
-		throw error(500, 'Something unexpected happened while creating the group');
+		throw error(500, {
+			message: 'Something unexpected happened while creating the group',
+			errorId
+		});
 	}
 	const group = await getEntryByDn<Group>(ldap, dn);
 
@@ -71,11 +77,12 @@ export const deleteGroup: Action = async (event) => {
 	try {
 		await ldap.del(dn);
 	} catch (e) {
-		console.log(e);
-		throw error(
-			500,
-			`Something unexpected happened while trying to delete ${group.sAMAccountName}`
-		);
+		const errorId = v4();
+		log({ errorId, e });
+		throw error(500, {
+			message: `Something unexpected happened while trying to delete ${group.sAMAccountName}`,
+			errorId
+		});
 	}
 	if (params.dn === dn) {
 		throw redirect(302, '/groups');
@@ -103,11 +110,12 @@ export const deleteManyGroups: Action = async (event) => {
 			throw error(403, `Entry ${entry.sAMAccountName} can not be deleted!`);
 		}
 		return ldap.del(entry.dn).catch((e) => {
-			console.log(e);
-			throw error(
-				500,
-				`Something unexpected happened while deleting the group ${entry.sAMAccountName}`
-			);
+			const errorId = v4();
+			log({ errorId, e });
+			throw error(500, {
+				message: `Something unexpected happened while deleting the group ${entry.sAMAccountName}`,
+				errorId
+			});
 		});
 	});
 
@@ -143,13 +151,17 @@ export const updateGroup: Action = async (event) => {
 	try {
 		await ldap.modify(dn, changes);
 	} catch (e) {
-		console.log(e);
+		const errorId = v4();
+		log({ errorId, e });
 		if (e instanceof AlreadyExistsError) {
 			return setError(form, 'sAMAccountName', 'sAMAccountName already in use!');
 		} else if (e instanceof InsufficientAccessError) {
-			throw error(403, "You don't have permission to create groups!");
+			throw error(403, { message: "You don't have permission to create groups!", errorId });
 		}
-		throw error(500, 'Something unexpected happened while creating the group');
+		throw error(500, {
+			message: 'Something unexpected happened while creating the group',
+			errorId
+		});
 	}
 	return { form };
 };
@@ -170,8 +182,9 @@ export const setMembers: Action = async (event) => {
 	try {
 		await ldap.modify(groupDn, change);
 	} catch (e) {
-		console.log(e);
-		throw error(500, "Something went wrong setting the group's members");
+		const errorId = v4();
+		log({ errorId, e });
+		throw error(500, { message: "Something went wrong setting the group's members", errorId });
 	}
 
 	return { form };

@@ -17,6 +17,7 @@ import { SESSION_ENTRY_ATTRIBUTES } from '$lib/types/session';
 import type { User } from '$lib/types/user';
 import { error, redirect } from '@sveltejs/kit';
 import { InvalidCredentialsError } from 'ldapts';
+import { log } from 'sveltekit-logger-hook';
 import { fail, setError, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { v4 } from 'uuid';
@@ -31,7 +32,7 @@ export const load: PageServerLoad = async ({ cookies, depends }) => {
 		setCaptchaCookie(cookies, captchaToken);
 	} catch (e) {
 		const errorId = v4();
-		console.log({ errorId, e });
+		log({ errorId, e });
 		throw error(500, {
 			message: 'Something went wrong while generating the captcha, please try refreshing the page',
 			errorId
@@ -62,10 +63,11 @@ export const actions: Actions = {
 		try {
 			await ldap.bind(`${sAMAccountName}@${PUBLIC_LDAP_DOMAIN}`, password);
 		} catch (e) {
-			console.log(e);
+			const errorId = v4();
+			log({ errorId, e });
 			if (e instanceof InvalidCredentialsError) throw error(401, 'Invalid Credentials');
 			else {
-				throw error(500, 'Something unexpected happened, try again later');
+				throw error(500, { message: 'Something unexpected happened, try again later', errorId });
 			}
 		}
 		const user = await getEntryBySAMAccountName<User>(ldap, sAMAccountName, {
@@ -83,8 +85,9 @@ export const actions: Actions = {
 			setSessionCookie(cookies, session);
 			setAccessCookie(cookies, access);
 		} catch (e) {
-			console.log(e);
-			throw error(500, 'Something unexpected happened, try again later');
+			const errorId = v4();
+			log({ errorId, e });
+			throw error(500, { message: 'Something unexpected happened, try again later', errorId });
 		}
 		return redirect(302, '/users/me');
 	},

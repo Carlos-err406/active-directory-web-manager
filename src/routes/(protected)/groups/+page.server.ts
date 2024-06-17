@@ -8,6 +8,7 @@ import { updateGroupSchema } from '$lib/schemas/group/update-group-schema';
 import type { Group } from '$lib/types/group';
 import { error, redirect } from '@sveltejs/kit';
 import { AndFilter, EqualityFilter, SubstringFilter, type Filter } from 'ldapts';
+import { log } from 'sveltekit-logger-hook';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { v4 } from 'uuid';
@@ -85,7 +86,7 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 		};
 	} catch (e) {
 		const errorId = v4();
-		console.log({ errorId, e });
+		log({ errorId, e });
 		throw error(500, {
 			message: 'Something unexpected happened while retrieving the groups, try again later',
 			errorId

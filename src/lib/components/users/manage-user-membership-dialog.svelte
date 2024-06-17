@@ -17,7 +17,6 @@
 	const onOpen = () => {
 		const paginationData: User[] = $page.data.pagination.data;
 		const user = paginationData.find(({ distinguishedName }) => distinguishedName === dn);
-		console.log(user);
 		form.data = {
 			...form.data,
 			dn,
