@@ -1,4 +1,4 @@
-import { deleteUser, updateUser } from '$lib/actions/users';
+export * as actions from '$lib/actions/users';
 import { getEntryByDn } from '$lib/ldap';
 import { changePasswordSchema } from '$lib/schemas/user/change-password-schema';
 import { deleteUserSchema } from '$lib/schemas/user/delete-user-schema';
@@ -24,7 +24,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		superValidate(zod(updateUserSchema)),
 		superValidate(zod(deleteUserSchema))
 	]);
-	console.log({ uac: user.userAccountControl });
+	if (!Array.isArray(user.memberOf) && user.memberOf !== undefined) user.memberOf = [user.memberOf];
 	return {
 		user,
 		searchForm: null,
@@ -34,4 +34,4 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	};
 };
 
-export const actions = { deleteUser, updateUser };
+// export const actions = { deleteUser, updateUser };

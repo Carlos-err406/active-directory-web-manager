@@ -16,12 +16,17 @@
 	});
 </script>
 
-<ModeWatcher defaultMode="light" />
+<svelte:head>
+	<title>Open Active Directory Manager</title>
+</svelte:head>
 
+<ModeWatcher defaultMode="light" />
 <Toaster richColors theme="light" />
 
 {#if $globalLoader}
-	<div class="fixed z-50 flex h-screen w-full items-center justify-center backdrop-blur-sm">
+	<div
+		class="fixed z-50 flex size-full items-center justify-center backdrop-blur-[2px] transition-all duration-200"
+	>
 		<Loader size="xl" />
 	</div>
 {/if}

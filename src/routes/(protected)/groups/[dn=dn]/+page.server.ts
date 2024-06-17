@@ -1,4 +1,4 @@
-import { deleteGroup, updateGroup } from '$lib/actions/groups';
+export * as actions from '$lib/actions/groups';
 import { getEntryByDn } from '$lib/ldap';
 import { deleteGroupSchema } from '$lib/schemas/group/delete-group-schema';
 import { setMembersSchema } from '$lib/schemas/group/set-members-schema';
@@ -28,9 +28,4 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 	if (!Array.isArray(group.member) && group.member !== undefined) group.member = [group.member];
 
 	return { group, setMembersForm, updateGroupForm, deleteGroupForm };
-};
-
-export const actions = {
-	deleteGroup,
-	updateGroup
 };

@@ -1,6 +1,5 @@
 import { PUBLIC_BASE_DN } from '$env/static/public';
-import { search } from '$lib/actions';
-import * as userActions from '$lib/actions/users';
+// import * as userActions from '$lib/actions/users';
 import { extractPagination, type PaginationWithUrls } from '$lib/pagination';
 import { deleteManySchema } from '$lib/schemas/delete-many-schema';
 import { changePasswordSchema } from '$lib/schemas/user/change-password-schema';
@@ -14,7 +13,8 @@ import { AndFilter, EqualityFilter, NotFilter, SubstringFilter, type Filter } fr
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { v4 } from 'uuid';
-import type { Actions, PageServerLoad } from './$types';
+import type { PageServerLoad } from './$types';
+export * as actions from '$lib/actions/users';
 
 export const load: PageServerLoad = async ({ url, locals, depends }) => {
 	depends('protected:users');
@@ -40,11 +40,9 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 	sAMAccountNameQuery &&
 		filters.push(new SubstringFilter({ attribute: 'sAMAccountName', any: [sAMAccountNameQuery] }));
 
-	const filter = new AndFilter({ filters });
+	const filter = new AndFilter({ filters }).toString();
 	try {
-		const { searchEntries } = await ldap.search(PUBLIC_BASE_DN, {
-			filter: filter.toString()
-		});
+		const { searchEntries } = await ldap.search(PUBLIC_BASE_DN, { filter });
 
 		searchEntries.sort((a, b) => {
 			if (
@@ -108,7 +106,6 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 	}
 };
 
-export const actions: Actions = {
-	search,
-	...userActions
-};
+// export const actions: Actions = {
+// 	...userActions
+// };

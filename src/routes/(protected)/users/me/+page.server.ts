@@ -18,6 +18,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 		superValidate(zod(changePasswordSchema)),
 		superValidate(zod(updateUserSchema))
 	]);
+	if (!Array.isArray(user.memberOf) && user.memberOf !== undefined) user.memberOf = [user.memberOf];
+
 	return {
 		user: user as User,
 		searchForm: null,

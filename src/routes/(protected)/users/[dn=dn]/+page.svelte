@@ -107,15 +107,10 @@
 		</Button>
 	</div>
 </div>
-<DeleteUserDialog
-	dn={user.distinguishedName}
-	action="/users/{user.distinguishedName}?/deleteUser"
-	bind:open={isDeleteUserDialogOpen}
-/>
+<DeleteUserDialog dn={user.distinguishedName} bind:open={isDeleteUserDialogOpen} />
 <ChangePasswordDialog dn={user.distinguishedName} bind:open={isChangePasswordDialogOpen} />
 <UpdateUserDialog
 	dn={user.distinguishedName}
 	bind:open={isUpdateUserDialogOpen}
-	action="/users/{user.distinguishedName}?/updateUser"
 	bind:form={updateUserForm}
 />

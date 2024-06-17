@@ -1,42 +1,30 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { searchSchema as schema, type SearchSchema } from '$lib/schemas/search-schema';
+	import { cn } from '$lib/utils';
 	import Search from '$lucide/search.svelte';
-	import { onDestroy } from 'svelte';
-	import { toast } from 'svelte-sonner';
+	import { onDestroy, tick } from 'svelte';
+	import { Input } from '../ui/input';
 	import Timer from '../ui/timer/timer.svelte';
-	import Form, { type Methods, type ResultType } from './form.svelte';
-	import Input from './input.svelte';
 
 	let timer: number;
 	let showTimer = false;
-	let formElement: HTMLFormElement;
-	$: ({ searchForm } = $page.data);
 	let q = $page.url.searchParams.get('q');
 
-	const onResult = async (event: ResultType<SearchSchema>) => {
-		const { result } = event;
-		if (result.type === 'success') {
-			const { data } = result;
-			if (!data) return;
-			q = data.form.data.q || null;
-			const { searchParams } = $page.url;
-			const search = new URLSearchParams(searchParams);
-			if (q) search.set('q', q);
-			else search.delete('q');
-			await goto(`${$page.url.pathname}?${search.toString()}`);
-		} else {
-			toast.error('Something went wrong', { description: `Status: ${result.status}` });
-		}
+	const submit = async () => {
+		const { searchParams: search } = $page.url;
+		if (q) search.set('q', q);
+		else search.delete('q');
+		await goto(`${$page.url.pathname}?${search}`, { invalidateAll: true });
 	};
 
-	const handleInput = (submit: Methods['submit']) => {
+	const handleInput = async () => {
 		clearTimeout(timer);
 
 		if (showTimer) {
 			showTimer = false;
-			window.setTimeout(() => (showTimer = true), 10);
+			await tick();
+			showTimer = true;
 		} else showTimer = true;
 
 		timer = window.setTimeout(() => {
@@ -51,40 +39,27 @@
 	});
 </script>
 
-<Form
-	bind:formElement
-	let:methods
-	bind:form={searchForm}
-	{schema}
-	loadingText="Searching..."
-	formProps={{ action: '?/search' }}
-	formOptions={{
-		delayMs: 4000,
-		resetForm: false,
-		validationMethod: 'oninput',
-		onResult
-	}}
->
+<div class="relative">
+	<div class="addornment absolute left-2 top-2.5">
+		<Search />
+	</div>
 	<Input
+		class={cn('pl-10', 'pr-10', 'w-full')}
 		name="q"
-		{methods}
-		inputProps={{ placeholder: 'Search' }}
-		on:input={() => handleInput(methods.submit)}
+		bind:value={q}
+		placeholder="Search"
+		on:input={() => handleInput()}
 		on:keydown={(event) => {
 			if (event.key === 'Enter') {
 				clearTimeout(timer);
 				showTimer = false;
-				methods.submit(formElement);
+				submit();
 			}
 		}}
-	>
-		<svelte:fragment slot="addornment-left">
-			<Search />
-		</svelte:fragment>
-		<svelte:fragment slot="addornment-right">
-			{#if showTimer}
-				<Timer timeout={1000} />
-			{/if}
-		</svelte:fragment>
-	</Input>
-</Form>
+	/>
+	<div class="addornment absolute right-2 top-2.5">
+		{#if showTimer}
+			<Timer timeout={1000} />
+		{/if}
+	</div>
+</div>

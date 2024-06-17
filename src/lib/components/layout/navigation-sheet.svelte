@@ -13,7 +13,7 @@
 	<Sheet.Trigger asChild let:builder>
 		<Button builders={[builder]} size="icon" variant="outline" class="sm:hidden">
 			{#if builder['aria-expanded'] === false}
-				<PanelLeft class="h-5 w-5" />
+				<PanelLeft class="size-5" />
 			{:else}
 				<PanelRight />
 			{/if}

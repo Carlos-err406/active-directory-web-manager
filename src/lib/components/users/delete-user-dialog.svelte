@@ -8,7 +8,7 @@
 	import { toast } from 'svelte-sonner';
 	export let open = false;
 	export let dn: string;
-	export let action = '/users?/deleteUser';
+	const action = `/users/${dn}?/deleteUser`;
 	$: form = $page.data.deleteUserForm;
 </script>
 
@@ -31,7 +31,7 @@
 					toast.error(result.error.message);
 					open = false;
 				},
-				onResult: async ({ result }) => {
+				onResult: ({ result }) => {
 					if (result.type === 'success') {
 						invalidate('protected:users');
 						toast.success('User deleted successfully');

@@ -25,7 +25,7 @@
 	const onChange: FormOptions<CreateUserSchema>['onChange'] = ({ get, set, target }) => {
 		if (target?.name === 'sAMAccountName') {
 			const sAMAccountName = get('sAMAccountName');
-			if (sAMAccountName) set('mail', `${sAMAccountName}@${PUBLIC_LDAP_DOMAIN}`);
+			if (sAMAccountName) set('mail', `${sAMAccountName.toLowerCase()}@${PUBLIC_LDAP_DOMAIN}`);
 			else set('mail', '');
 		}
 	};

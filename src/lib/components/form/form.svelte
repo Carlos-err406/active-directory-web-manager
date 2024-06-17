@@ -44,6 +44,7 @@
 
 <script lang="ts">
 	import type { ActionResult, SubmitFunction } from '@sveltejs/kit';
+	import { tick } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import type { HTMLFormAttributes } from 'svelte/elements';
 	import { superForm, type SuperValidated } from 'sveltekit-superforms';
@@ -60,15 +61,18 @@
 	const methods = superForm(form, {
 		validators: zodClient(schema),
 		...(formOptions as _FormOptions),
-		onSubmit: (input) => {
+		onSubmit: async (input) => {
 			toastId = toast.loading(loadingText, {
 				dismissable: true,
 				important: false
 			});
+			await tick();
 			if (formOptions?.onSubmit) formOptions.onSubmit(input);
 		},
-		onResult: (event) => {
+		onResult: async (event) => {
+			await tick();
 			toast.dismiss(toastId);
+			await tick();
 			if (formOptions.onResult) formOptions.onResult(event);
 		},
 		onChange: (event) => {

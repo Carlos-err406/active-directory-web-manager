@@ -17,11 +17,11 @@
 	export let base = PUBLIC_BASE_DN;
 	export let dn: string;
 	export let form: SuperValidated<Data>;
-	export let action = '/users?/updateUser';
+	const action = `/users/${dn}?/updateUser`;
 	const onChange: FormOptions<UpdateUserSchema>['onChange'] = ({ get, set, target }) => {
 		if (target?.name === 'sAMAccountName') {
 			const sAMAccountName = get('sAMAccountName');
-			if (sAMAccountName) set('mail', `${sAMAccountName}@${PUBLIC_LDAP_DOMAIN}`);
+			if (sAMAccountName) set('mail', `${sAMAccountName.toLowerCase()}@${PUBLIC_LDAP_DOMAIN}`);
 			else set('mail', '');
 		}
 	};
@@ -42,14 +42,14 @@
 			loadingText="Updating user..."
 			formProps={{ action, enctype: 'multipart/form-data' }}
 			formOptions={{
-				resetForm: true,
+				resetForm: false,
 				onChange,
 				onError: ({ result }) => {
 					toast.error(result.error.message);
 				},
 				onResult: ({ result }) => {
-					invalidate('protected:users');
 					if (result.type === 'success') {
+						invalidate('protected:users');
 						open = false;
 						toast.success('User updated successfully');
 					}
