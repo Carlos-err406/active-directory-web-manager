@@ -1,23 +1,33 @@
 <script lang="ts">
-	import { DeleteGroupDialog } from '$lib/components/groups';
+	import { DeleteGroupDialog, UpdateGroupDialog } from '$lib/components/groups';
 	import ManageGroupMembersDialog from '$lib/components/groups/manage-group-members-dialog.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { getGroupTypes } from '$lib/ldap/utils';
 	import { breadcrumbs } from '$lib/stores';
-	import { GroupTypes } from '$lib/types/group';
+	import { GroupFlags, GroupTypes } from '$lib/types/group';
 	import PencilLine from '$lucide/pencil-line.svelte';
 	import Trash2 from '$lucide/trash-2.svelte';
 	import Users from '$lucide/users.svelte';
 	import dayjs from 'dayjs';
 	import type { PageData } from './$types';
 	export let data: PageData;
+	$: breadcrumbs.set([{ name: 'Groups', link: '/groups' }, { name: group.cn }]);
 
-	// let _isUpdateGroupDialogOpen = false;
+	let isUpdateGroupDialogOpen = false;
 	let isManageMembersDialogOpen = false;
 	let isDeleteGroupDialogOpen = false;
-	$: ({ group } = data);
-
-	$: breadcrumbs.set([{ name: 'Groups', link: '/groups' }, { name: group.cn }]);
+	$: ({ group, updateGroupForm } = data);
+	const onOpenEditClick = () => {
+		const [match] = getGroupTypes(group.groupType).filter(
+			(gt) => gt !== GroupFlags['Global Scope']
+		);
+		updateGroupForm.data = {
+			...updateGroupForm.data,
+			...group,
+			groupType: match
+		};
+		isUpdateGroupDialogOpen = true;
+	};
 </script>
 
 <div class="flex h-full w-full flex-col py-12 md:py-16">
@@ -79,8 +89,7 @@
 		</div>
 	</div>
 	<div class="flex h-full w-full items-center justify-center gap-3">
-		<!-- on:click={() => (_isUpdateGroupDialogOpen = true)} -->
-		<Button class="flex items-center gap-2">
+		<Button class="flex items-center gap-2" on:click={onOpenEditClick}>
 			<PencilLine class="size-4 flex-none" />
 			Edit
 		</Button>
@@ -105,9 +114,9 @@
 	action="/groups/{group.distinguishedName}?/deleteGroup"
 	bind:open={isDeleteGroupDialogOpen}
 />
-<!-- form={data.updateGroupForm} -->
-<!-- <UpdateGroupDialog
+<UpdateGroupDialog
 	dn={group.distinguishedName}
-	bind:open={_isUpdateGroupDialogOpen}
+	bind:open={isUpdateGroupDialogOpen}
+	bind:form={updateGroupForm}
 	action="/groups/{group.distinguishedName}?/updateGroup"
-/> -->
+/>

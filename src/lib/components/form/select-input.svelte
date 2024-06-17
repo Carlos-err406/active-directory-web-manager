@@ -32,14 +32,14 @@
 			<div class="addornment absolute left-2 top-2.5">
 				<slot name="addornment-left" />
 			</div>
-			<Select.Root bind:selected onSelectedChange={(v) => v && ($form[name] = v.value)}>
+			<Select.Root {name} bind:selected onSelectedChange={(v) => v && ($form[name] = v.value)}>
 				<Select.Trigger
+					{...attrs}
 					class={cn(
 						!!$$slots['addornment-left'] && 'pl-10',
 						!!$$slots['addornment-right'] && 'pr-10',
 						'w-full'
 					)}
-					{...attrs}
 				>
 					<Select.Value {placeholder} />
 				</Select.Trigger>
