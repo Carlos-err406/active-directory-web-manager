@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
-	import { paths } from '$lib';
 	import { Button } from '$lib/components/ui/button';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import type { Session } from '$lib/types/session';
@@ -34,12 +33,12 @@
 	<DropdownMenu.Content align="end">
 		<DropdownMenu.Label>My Account</DropdownMenu.Label>
 		<DropdownMenu.Separator />
-		<DropdownMenu.LinkItem href={paths.users.me} disabled={$page.url.pathname === paths.users.me}>
+		<DropdownMenu.LinkItem href={'/users/me'} disabled={$page.url.pathname === '/users/me'}>
 			See profile
 		</DropdownMenu.LinkItem>
 		<DropdownMenu.Separator class="my-2" />
 		<DropdownMenu.Item class="justify-center p-0">
-			<form method="post" action={paths.auth.actions.signOut} class="w-full" use:enhance>
+			<form method="post" action={'/?/signOut'} class="w-full" use:enhance>
 				<Button type="submit" variant="destructive" class="w-full space-x-3">
 					<span>Sign Out</span>
 					<LogOut />

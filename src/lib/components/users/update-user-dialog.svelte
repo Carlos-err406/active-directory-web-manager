@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
 	import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
-	import { paths } from '$lib';
 	import Form, { type Data, type FormOptions } from '$lib/components/form/form.svelte';
 	import Input from '$lib/components/form/input.svelte';
 	import { Button } from '$lib/components/ui/button';
@@ -18,7 +17,7 @@
 	export let base = PUBLIC_BASE_DN;
 	export let dn: string;
 	export let form: SuperValidated<Data>;
-
+	export let action = '/users?/updateUser';
 	const onChange: FormOptions<UpdateUserSchema>['onChange'] = ({ get, set, target }) => {
 		if (target?.name === 'sAMAccountName') {
 			const sAMAccountName = get('sAMAccountName');
@@ -40,7 +39,7 @@
 			bind:form
 			schema={updateUserSchema}
 			loadingText="Updatting user..."
-			formProps={{ action: paths.users.actions.update, enctype: 'multipart/form-data' }}
+			formProps={{ action, enctype: 'multipart/form-data' }}
 			formOptions={{
 				resetForm: true,
 				onChange,

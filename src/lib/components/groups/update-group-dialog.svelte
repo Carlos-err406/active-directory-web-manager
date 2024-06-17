@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
 	import { PUBLIC_BASE_DN } from '$env/static/public';
-	import { paths } from '$lib';
 	import Form, { type Data } from '$lib/components/form/form.svelte';
 	import Input from '$lib/components/form/input.svelte';
 	import { Button } from '$lib/components/ui/button';
@@ -17,6 +16,7 @@
 	export let open = false;
 	export let base = PUBLIC_BASE_DN;
 	export let dn: string;
+	export let action = '/groups?/updateGroup';
 	export let form: SuperValidated<Data>;
 </script>
 
@@ -32,7 +32,7 @@
 			bind:form
 			schema={updateGroupSchema}
 			loadingText="Updatting group..."
-			formProps={{ action: paths.groups.actions.update }}
+			formProps={{ action }}
 			formOptions={{
 				resetForm: true,
 				onError: ({ result }) => {

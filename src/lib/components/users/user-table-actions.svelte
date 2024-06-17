@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { paths } from '$lib';
 	import { Button } from '$lib/components/ui/button';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import type { User } from '$lib/types/user';
@@ -45,7 +44,7 @@
 		<DropdownMenu.Group>
 			<DropdownMenu.Label>Actions</DropdownMenu.Label>
 			<DropdownMenu.Separator />
-			<DropdownMenu.LinkItem href={paths.users.dn(id)} class="flex flex-nowrap gap-2">
+			<DropdownMenu.LinkItem href="/users/{id}" class="flex flex-nowrap gap-2">
 				<Eye class="size-5" />
 				View user details
 			</DropdownMenu.LinkItem>

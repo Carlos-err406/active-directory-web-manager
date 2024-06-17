@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { goto, invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { paths } from '$lib';
 	import Form from '$lib/components/form/form.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
@@ -9,6 +8,7 @@
 	import { toast } from 'svelte-sonner';
 	export let open = false;
 	export let dn: string;
+	export let action = '/users?/deleteUser';
 	$: form = $page.data.deleteUserForm;
 </script>
 
@@ -23,28 +23,28 @@
 			bind:form
 			schema={deleteUserSchema}
 			loadingText="Deleting user..."
-			formProps={{ action: paths.users.actions.delete }}
+			formProps={{ action }}
 			formOptions={{
 				resetForm: false,
+				applyAction: false,
 				onError: ({ result }) => {
 					toast.error(result.error.message);
 					open = false;
 				},
 				onResult: async ({ result }) => {
-					if ($page.params.dn !== dn) await invalidate('protected:users');
 					if (result.type === 'success') {
+						invalidate('protected:users');
 						toast.success('User deleted successfully');
 						open = false;
-						if ($page.params.dn === dn) {
-							await goto(paths.users.list, {
-								state: {
-									toast: {
-										type: 'success',
-										message: 'User deleted successfully'
-									}
+					} else if (result.type === 'redirect') {
+						goto(result.location, {
+							state: {
+								toast: {
+									type: 'success',
+									message: 'User deleted successfully'
 								}
-							});
-						}
+							}
+						});
 					}
 				}
 			}}

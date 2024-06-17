@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { paths } from '$lib';
 	import Form from '$lib/components/form/form.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
@@ -9,6 +8,7 @@
 	import { toast } from 'svelte-sonner';
 	let open: boolean;
 	export let dns: string[] = [];
+	export let action = '/groups?/deleteMany';
 	$: form = $page.data.deleteManyGroupsForm;
 </script>
 
@@ -32,7 +32,7 @@
 			bind:form
 			schema={deleteManySchema}
 			loadingText="Deleting groups..."
-			formProps={{ action: paths.groups.actions.deleteMany }}
+			formProps={{ action }}
 			formOptions={{
 				resetForm: false,
 				onError: ({ result }) => {

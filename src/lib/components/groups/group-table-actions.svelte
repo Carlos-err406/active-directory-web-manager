@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { paths } from '$lib';
 	import { Button } from '$lib/components/ui/button';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import Ellipsis from '$lucide/ellipsis.svelte';
@@ -28,7 +27,7 @@
 		<DropdownMenu.Group>
 			<DropdownMenu.Label>Actions</DropdownMenu.Label>
 			<DropdownMenu.Separator />
-			<DropdownMenu.LinkItem href={paths.groups.dn(id)} class="flex flex-nowrap gap-2">
+			<DropdownMenu.LinkItem href={`/groups/${id}`} class="flex flex-nowrap gap-2">
 				<Eye class="size-5" />
 				View group details
 			</DropdownMenu.LinkItem>

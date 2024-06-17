@@ -86,7 +86,7 @@ export const inferChange = <T>(entry: T, attribute: keyof T, value?: string | st
 	//if no value is passed but the entry has the attribute
 	else if (!value && entry[attribute]) return deleteAttribute(att);
 	//if a value is passed but is different from the one pressent on the entrie's attribute
-	//BUG: this doesnt work properly with array values
+	//BUG: this doesnt work properly with array values because it compares references instead of values
 	else if (value && value !== entry[attribute]) return replaceAttribute({ type: att, values });
 };
 

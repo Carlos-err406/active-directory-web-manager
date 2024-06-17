@@ -24,6 +24,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		superValidate(zod(updateUserSchema)),
 		superValidate(zod(deleteUserSchema))
 	]);
+	console.log({ uac: user.userAccountControl });
 	return {
 		user,
 		searchForm: null,

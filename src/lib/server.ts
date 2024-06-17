@@ -8,14 +8,15 @@ import { isAdmin } from './ldap';
 import type { Session } from './types/session';
 import type { User } from './types/user';
 
-const HOURS = 60 * 60 * 2; //2h for token and cookie expiration(max age)
-const CAPTCHA_EXPIRATION = 60 * 5; //5m for captcha expiration
-const PUBLIC_KEY_PATH = 'keypair.pem';
-const JWT_ALGORITHM = 'RS512';
+const HOURS = 7200 as const; //2h for token and cookie expiration(max age)
+const CAPTCHA_EXPIRATION = 300 as const; //5m for captcha expiration
+const PUBLIC_KEY_PATH = 'keypair.pem' as const;
+const JWT_ALGORITHM = 'RS512' as const;
 const TOKEN_EXPIRATION = HOURS;
-const SESSION_COOKIE_NAME = 'ad-session';
-const ACCESS_COOKIE_NAME = 'ad-access';
-const CAPTCHA_COOKIE_NAME = 'ad-captcha';
+const SESSION_COOKIE_NAME = 'ad-session' as const;
+const ACCESS_COOKIE_NAME = 'ad-access' as const;
+const CAPTCHA_COOKIE_NAME = 'ad-captcha' as const;
+
 const COOKIE_CONFIG = (
 	opts?: Partial<CookieSerializeOptions>
 ): CookieSerializeOptions & { path: string } => ({

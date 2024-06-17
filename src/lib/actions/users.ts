@@ -22,7 +22,7 @@ import {
 	verifyAccessToken
 } from '$lib/server';
 import { SESSION_ENTRY_ATTRIBUTES } from '$lib/types/session';
-import type { User } from '$lib/types/user';
+import { UAC, type User } from '$lib/types/user';
 import { error, fail, redirect, type Action } from '@sveltejs/kit';
 import {
 	AlreadyExistsError,
@@ -49,7 +49,7 @@ export const createUser: Action = async (event) => {
 
 	const attributes: Record<string, string[] | string> = {
 		objectClass: ['top', 'person', 'organizationalPerson', 'user'],
-		userAccountControl: ['512'],
+		userAccountControl: [UAC['Normal Account']],
 		displayName: givenName,
 		sAMAccountName,
 		givenName,
@@ -98,7 +98,7 @@ export const createUser: Action = async (event) => {
 	return withFiles({ form });
 };
 export const deleteUser: Action = async (event) => {
-	const { locals } = event;
+	const { locals, params } = event;
 	const auth = await locals.auth();
 	if (!auth) throw redirect(302, '/');
 	const form = await superValidate(event, zod(deleteUserSchema));
@@ -117,7 +117,9 @@ export const deleteUser: Action = async (event) => {
 		console.log(e);
 		throw error(500, 'Something unexpected happened while trying to delete ');
 	}
-
+	if (params.dn === dn) {
+		throw redirect(302, '/users');
+	}
 	return { form };
 };
 export const deleteManyUsers: Action = async (event) => {

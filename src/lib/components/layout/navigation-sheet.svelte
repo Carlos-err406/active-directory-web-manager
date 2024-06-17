@@ -1,5 +1,4 @@
 <script>
-	import { paths } from '$lib';
 	import { Button } from '$lib/components/ui/button';
 	import * as Sheet from '$lib/components/ui/sheet';
 	import Code from '$lucide/code.svelte';
@@ -35,7 +34,7 @@
 				</SheetNavigationItem>
 			{/each}
 			<hr class="mt-auto w-full bg-muted" />
-			<SheetNavigationItem href={paths.settings}>
+			<SheetNavigationItem href={'/settings'}>
 				<Settings class="size-5" />
 				Settings
 			</SheetNavigationItem>

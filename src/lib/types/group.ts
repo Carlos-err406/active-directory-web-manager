@@ -29,14 +29,14 @@ export type Group = {
  * @link https://learn.microsoft.com/en-us/windows/win32/adschema/a-grouptype#remarks
  */
 export const GroupTypes = {
-	0: 'Distribution List',
-	1: 'Created by the System',
-	2: 'Global Scope',
-	4: 'Domain Local Scope',
-	8: 'Universal Scope',
-	16: 'APP_BASIC Group for Windows Server Authorization Manager',
-	32: 'APP_QUERY Group for Windows Server Authorization Manager',
-	2147483648: 'Security Group'
+	0: 'Distribution List' as const,
+	1: 'Created by the System' as const,
+	2: 'Global Scope' as const,
+	4: 'Domain Local Scope' as const,
+	8: 'Universal Scope' as const,
+	16: 'APP_BASIC Group for Windows Server Authorization Manager' as const,
+	32: 'APP_QUERY Group for Windows Server Authorization Manager' as const,
+	2147483648: 'Security Group' as const
 };
 
 export const SelectableGroupTypes = {

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
-	import { paths } from '$lib';
 	import Form from '$lib/components/form/form.svelte';
 	import Input from '$lib/components/form/input.svelte';
 	import PasswordInput from '$lib/components/form/password-input.svelte';
@@ -24,7 +23,7 @@
 		bind:form={data.form}
 		schema={signUpSchema}
 		loadingText="Signing in..."
-		formProps={{ action: paths.auth.actions.signIn }}
+		formProps={{ action: '/?/signIn' }}
 		formOptions={{
 			resetForm: false,
 			onError: ({ result }) => {

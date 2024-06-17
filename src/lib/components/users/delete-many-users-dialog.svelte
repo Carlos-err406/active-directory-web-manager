@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { paths } from '$lib';
 	import Form from '$lib/components/form/form.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
@@ -31,7 +30,7 @@
 			bind:form
 			schema={deleteManySchema}
 			loadingText="Deleting users..."
-			formProps={{ action: paths.users.actions.deleteMany }}
+			formProps={{ action: '/users?/deleteMany' }}
 			formOptions={{
 				resetForm: false,
 				onError: ({ result }) => {

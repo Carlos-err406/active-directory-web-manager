@@ -1,5 +1,5 @@
 import { LOGGER } from '$env/static/private';
-import { PUBLIC_LDAP_DOMAIN } from '$env/static/public';
+import { PUBLIC_API_KEY, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
 import { getLDAPClient } from '$lib/ldap/client';
 import {
 	getAccessToken,
@@ -7,9 +7,21 @@ import {
 	verifyAccessToken,
 	verifySessionToken
 } from '$lib/server';
-import type { Handle } from '@sveltejs/kit';
+import { error, type Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 import { getLoggerHook } from 'sveltekit-logger-hook';
+
+const apiProtectionHandler: Handle = ({ event, resolve }) => {
+	const { url, request } = event;
+	if (!url.pathname.startsWith('/api')) {
+		return resolve(event);
+	}
+	const headerApiKey = request.headers.get('Authorization');
+	if (headerApiKey !== `Bearer ${PUBLIC_API_KEY}`) {
+		throw error(401, 'Invalid authorization header');
+	}
+	return resolve(event);
+};
 
 /**
  * sets the auth function in the locals, wich returns the session and a binded ldap client instance
@@ -85,7 +97,7 @@ const getSequence = () => {
 	} else {
 		console.log('LOGGING is disabled, set LOGGER .env variable to 1 to enable');
 	}
-	seq.push(authenticationSetterHandler, ldapUnbindHandler);
+	seq.push(apiProtectionHandler, authenticationSetterHandler, ldapUnbindHandler);
 	return seq;
 };
 

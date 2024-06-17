@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { paths } from '$lib';
+	import { PUBLIC_API_KEY } from '$env/static/public';
 	import Form from '$lib/components/form/form.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
+	import { getCNFromDN } from '$lib/ldap/utils';
 	import { setMembersSchema } from '$lib/schemas/group/set-members-schema';
-	import type { Group } from '$lib/types/group';
 	import type { User } from '$lib/types/user';
 	import { Loader } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
@@ -15,15 +15,17 @@
 	import UserChipList from '../users/chip/user-chip-list.svelte';
 	export let open: boolean;
 	export let dn: string;
-	const paginationData: Group[] = $page.data.pagination.data;
-	const group = paginationData.find(({ distinguishedName }) => distinguishedName === dn)!;
+	export let action = '/groups?/setMembers';
+	const cn = getCNFromDN(dn);
 	$: form = $page.data.setMembersForm;
 	let users: User[] = [];
 	let initializing = false;
 	const onOpen = async () => {
 		const params = new URLSearchParams({ dn });
 		initializing = true;
-		users = await fetch(`/api/group-members?${params}`).then((r) => r.json());
+		users = await fetch(`/api/group-members?${params}`, {
+			headers: { Authorization: `Bearer ${PUBLIC_API_KEY}` }
+		}).then((r) => r.json());
 		initializing = false;
 	};
 	$: open && onOpen();
@@ -33,7 +35,7 @@
 	<Dialog.Content>
 		<Dialog.Header>
 			<Dialog.Title>Manage group members</Dialog.Title>
-			<Dialog.Description>Add or remove members in this group ({group.cn})</Dialog.Description>
+			<Dialog.Description>Add or remove members in this group ({cn})</Dialog.Description>
 		</Dialog.Header>
 		<UsersSelect selected={users} on:select={({ detail }) => (users = [...users, detail])} />
 		<UserChipList bind:users>
@@ -53,7 +55,7 @@
 			bind:form
 			schema={setMembersSchema}
 			loadingText="Updating group members..."
-			formProps={{ action: paths.groups.actions.setMembers }}
+			formProps={{ action }}
 			formOptions={{
 				resetForm: true,
 				onError: ({ result }) => {

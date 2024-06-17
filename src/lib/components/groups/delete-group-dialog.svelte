@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { goto, invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { paths } from '$lib';
 	import Form from '$lib/components/form/form.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
@@ -9,6 +8,7 @@
 	import { toast } from 'svelte-sonner';
 	export let open = false;
 	export let dn: string;
+	export let action = '/groups?/deleteGroup';
 	$: form = $page.data.deleteGroupForm;
 </script>
 
@@ -23,28 +23,28 @@
 			bind:form
 			schema={deleteGroupSchema}
 			loadingText="Deleting group..."
-			formProps={{ action: paths.groups.actions.delete }}
+			formProps={{ action }}
 			formOptions={{
 				resetForm: false,
+				applyAction: false,
 				onError: ({ result }) => {
 					toast.error(result.error.message);
 					open = false;
 				},
 				onResult: async ({ result }) => {
-					if ($page.params.dn !== dn) await invalidate('protected:groups');
 					if (result.type === 'success') {
+						invalidate('protected:groups');
 						toast.success('Group deleted successfully');
 						open = false;
-						if ($page.params.dn === dn) {
-							await goto(paths.groups.list, {
-								state: {
-									toast: {
-										type: 'success',
-										message: 'Group deleted successfully'
-									}
+					} else if (result.type === 'redirect') {
+						goto(result.location, {
+							state: {
+								toast: {
+									type: 'success',
+									message: 'Group deleted successfully'
 								}
-							});
-						}
+							}
+						});
 					}
 				}
 			}}

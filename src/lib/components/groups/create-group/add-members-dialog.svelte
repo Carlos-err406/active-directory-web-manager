@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { paths } from '$lib';
 	import Form from '$lib/components/form/form.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
@@ -11,9 +10,10 @@
 	import { toast } from 'svelte-sonner';
 
 	export let open = false;
-	$: form = $page.data.setMembersForm;
-	export let groupDn: string;
+	export let dn: string;
+	export let action = '/groups?/setMembers';
 	let users: User[] = [];
+	$: form = $page.data.setMembersForm;
 </script>
 
 <Dialog.Root bind:open>
@@ -34,7 +34,7 @@
 			bind:form
 			schema={createGroupSchema}
 			loadingText="Adding members to group..."
-			formProps={{ action: paths.groups.actions.setMembers }}
+			formProps={{ action }}
 			formOptions={{
 				resetForm: true,
 				onError: ({ result }) => {
@@ -49,7 +49,7 @@
 				}
 			}}
 		>
-			<input hidden value={groupDn} name="groupDn" />
+			<input hidden value={dn} name="groupDn" />
 			{#each users as user}
 				<input hidden value={user.dn} name="dns" />
 			{/each}

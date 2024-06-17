@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { paths } from '$lib';
 	import { Avatar, AvatarFallback, AvatarWithPreview } from '$lib/components/ui/avatar';
 	import { Button } from '$lib/components/ui/button';
 	import { ChangePasswordDialog, DeleteUserDialog, UpdateUserDialog } from '$lib/components/users';
@@ -18,7 +17,7 @@
 	$: ({ user, updateUserForm } = data);
 	$: ({ jpegPhoto, sAMAccountName } = user);
 
-	$: breadcrumbs.set([{ name: 'Users', link: paths.users.list }, { name: sAMAccountName }]);
+	$: breadcrumbs.set([{ name: 'Users', link: '/users' }, { name: sAMAccountName }]);
 
 	const onOpenEditClick = () => {
 		const { jpegPhoto, ...restAttributes } = user;
@@ -49,35 +48,35 @@
 			</div>
 			<div class="user-info grid grid-cols-2 gap-y-3">
 				<span>sAMAccountName:</span>
-				<span class="user-info-value">{user.sAMAccountName}</span>
+				<span class="info-value">{user.sAMAccountName}</span>
 				{#if user.displayName}
 					<span>displayName:</span>
-					<span class="user-info-value">{user.displayName}</span>
+					<span class="info-value">{user.displayName}</span>
 				{/if}
 				{#if user.givenName}
 					<span>givenName:</span>
-					<span class="user-info-value">{user.givenName}</span>
+					<span class="info-value">{user.givenName}</span>
 				{/if}
 				{#if user.sn}
 					<span>sn:</span>
-					<span class="user-info-value">{user.sn}</span>
+					<span class="info-value">{user.sn}</span>
 				{/if}
 				{#if user.description}
 					<span>description:</span>
-					<span class="user-info-value">{user.description}</span>
+					<span class="info-value">{user.description}</span>
 				{/if}
 				<span>whenCreated:</span>
-				<span class="user-info-value">
+				<span class="info-value">
 					{dayjs(user.whenCreated.replace('Z', '')).format('MMMM D, YYYY. hh:mm:ss A')}
 				</span>
 				<span>whenChanged:</span>
-				<span class="user-info-value">
+				<span class="info-value">
 					{dayjs(user.whenChanged.replace('Z', '')).format('MMMM D, YYYY. hh:mm:ss A')}
 				</span>
 				<span>distinguishedName:</span>
-				<span class="user-info-value">{user.distinguishedName}</span>
+				<span class="info-value">{user.distinguishedName}</span>
 				<span>memberOf:</span>
-				<div class="user-info-value flex flex-wrap space-y-2">
+				<div class="info-value flex flex-wrap space-y-2">
 					{#each user.memberOf || [] as groupDn}
 						<span>
 							{groupDn}
@@ -108,10 +107,15 @@
 		</Button>
 	</div>
 </div>
-<DeleteUserDialog dn={user.distinguishedName} bind:open={isDeleteUserDialogOpen} />
+<DeleteUserDialog
+	dn={user.distinguishedName}
+	action="/users/{user.distinguishedName}?/deleteUser"
+	bind:open={isDeleteUserDialogOpen}
+/>
 <ChangePasswordDialog dn={user.distinguishedName} bind:open={isChangePasswordDialogOpen} />
 <UpdateUserDialog
 	dn={user.distinguishedName}
 	bind:open={isUpdateUserDialogOpen}
+	action="/users/{user.distinguishedName}?/updateUser"
 	bind:form={updateUserForm}
 />

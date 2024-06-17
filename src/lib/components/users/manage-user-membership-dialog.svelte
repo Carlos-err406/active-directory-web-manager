@@ -2,7 +2,6 @@
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { PUBLIC_BASE_DN } from '$env/static/public';
-	import { paths } from '$lib';
 	import Form from '$lib/components/form/form.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
@@ -13,6 +12,7 @@
 	export let open = false;
 	export let base = PUBLIC_BASE_DN;
 	export let dn: string;
+	export let action = '/users?/updateUser';
 	$: form = $page.data.updateUserForm;
 	const onOpen = () => {
 		const paginationData: User[] = $page.data.pagination.data;
@@ -47,7 +47,7 @@
 			bind:form
 			schema={updateUserSchema}
 			loadingText="Updatting user membership..."
-			formProps={{ action: paths.users.actions.update, enctype: 'multipart/form-data' }}
+			formProps={{ action, enctype: 'multipart/form-data' }}
 			formOptions={{
 				resetForm: true,
 				onError: ({ result }) => {

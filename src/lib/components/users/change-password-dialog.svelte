@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { PUBLIC_LDAP_DOMAIN } from '$env/static/public';
-	import { paths } from '$lib';
 	import Form from '$lib/components/form/form.svelte';
 	import PasswordInput from '$lib/components/form/password-input.svelte';
 	import { Button } from '$lib/components/ui/button';
@@ -10,6 +9,7 @@
 	import { toast } from 'svelte-sonner';
 	export let open = false;
 	export let dn: string;
+	export let action = '/users?/changePassword';
 	$: form = $page.data.changePasswordForm;
 	$: isSelf = $page.data.session.dn === dn;
 </script>
@@ -28,7 +28,7 @@
 			bind:form
 			schema={createUserSchema}
 			loadingText="Changing password..."
-			formProps={{ action: paths.users.actions.changePassword }}
+			formProps={{ action }}
 			formOptions={{
 				resetForm: false,
 				onError: ({ result }) => {

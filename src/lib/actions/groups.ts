@@ -49,7 +49,7 @@ export const createGroup: Action = async (event) => {
 };
 
 export const deleteGroup: Action = async (event) => {
-	const { locals } = event;
+	const { locals, params } = event;
 	const auth = await locals.auth();
 	if (!auth) throw redirect(302, '/');
 	const form = await superValidate(event, zod(deleteGroupSchema));
@@ -70,6 +70,9 @@ export const deleteGroup: Action = async (event) => {
 			500,
 			`Something unexpected happened while trying to delete ${group.sAMAccountName}`
 		);
+	}
+	if (params.dn === dn) {
+		throw redirect(302, '/groups');
 	}
 	return { form };
 };

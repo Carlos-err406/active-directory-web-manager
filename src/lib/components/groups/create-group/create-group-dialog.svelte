@@ -2,7 +2,6 @@
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
-	import { paths } from '$lib';
 	import Form, { type FormOptions } from '$lib/components/form/form.svelte';
 	import Input from '$lib/components/form/input.svelte';
 	import SelectInput from '$lib/components/form/select-input.svelte';
@@ -16,9 +15,9 @@
 	import Captions from '$lucide/captions.svelte';
 	import Mail from '$lucide/mail.svelte';
 	import { toast } from 'svelte-sonner';
+	import { slide } from 'svelte/transition';
 	import AddMembersDialog from './add-members-dialog.svelte';
 	import AddMembersSurveyDialog from './add-members-survey-dialog.svelte';
-	import { slide } from 'svelte/transition';
 
 	let open: boolean;
 	let isManageMembersSurveyDialogOpen = false;
@@ -63,7 +62,7 @@
 			bind:form
 			schema={createGroupSchema}
 			loadingText="Creating group..."
-			formProps={{ action: paths.groups.actions.create }}
+			formProps={{ action: '/groups?/createGroup' }}
 			formOptions={{
 				resetForm: true,
 				onChange,
@@ -117,4 +116,4 @@
 	on:open-add-members={() => (isAddMembersDialogOpen = true)}
 />
 
-<AddMembersDialog bind:open={isAddMembersDialogOpen} groupDn={createdGroup?.dn} />
+<AddMembersDialog bind:open={isAddMembersDialogOpen} dn={createdGroup?.dn} />

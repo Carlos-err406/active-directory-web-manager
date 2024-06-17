@@ -1,6 +1,5 @@
 import { CAPTCHA_LENGTH } from '$env/static/private';
 import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
-import { paths } from '$lib';
 import { getEntryBySAMAccountName } from '$lib/ldap';
 import { getLDAPClient } from '$lib/ldap/client';
 import { signUpSchema } from '$lib/schemas/signup-schema';
@@ -87,7 +86,7 @@ export const actions: Actions = {
 			console.log(e);
 			throw error(500, 'Something unexpected happened, try again later');
 		}
-		return redirect(302, paths.users.me);
+		return redirect(302, '/users/me');
 	},
 	signOut: async ({ cookies, locals }) => {
 		const auth = await locals.auth();

@@ -8,20 +8,19 @@
 	import Users from '$lucide/users.svelte';
 
 	export const items: NavigationItemType[] = [
-		{ href: paths.users.list, name: 'Users', icon: User },
-		{ href: paths.groups.list, name: 'Groups', icon: Users },
+		{ href: '/users', name: 'Users', icon: User },
+		{ href: '/groups', name: 'Groups', icon: Users },
 		{
-			href: paths.ous.list,
+			href: '/ous',
 			name: 'Organizational Units',
 			icon: Building2
 		},
-		{ href: paths.tree.list, name: 'Tree view', icon: FolderTree },
-		{ href: paths.logs.list, name: 'Logs', icon: FileTextIcon }
+		{ href: '/tree', name: 'Tree view', icon: FolderTree },
+		{ href: '/logs', name: 'Logs', icon: FileTextIcon }
 	];
 </script>
 
 <script lang="ts">
-	import { paths } from '$lib';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import NavigationItem, { type NavigationItemType } from './navigation-item.svelte';
 </script>
@@ -53,7 +52,7 @@
 		<nav class="flex flex-col items-center gap-4 px-2 py-4">
 			<Tooltip.Root>
 				<Tooltip.Trigger asChild let:builder>
-					<NavigationItem href={paths.settings} {builder}>
+					<NavigationItem href={'/settings'} {builder}>
 						<Settings class="size-5" />
 						<span class="sr-only">Settings</span>
 					</NavigationItem>
