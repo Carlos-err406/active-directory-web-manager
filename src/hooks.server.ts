@@ -82,6 +82,7 @@ const ldapUnbindHandler: Handle = async ({ event, resolve }) => {
  */
 const logHandler = getLoggerHook({
 	template: '[{date}] {url}{urlSearchParams} {method} {status}',
+	dateTemplate: 'YYYY-MM-DD HH:mm:ss A',
 	fileOptions: { basePath: './logs/' },
 	decodeSearchParams: true,
 	colorOptions: {
