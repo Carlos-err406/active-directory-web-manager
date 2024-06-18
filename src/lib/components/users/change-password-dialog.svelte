@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { PUBLIC_LDAP_DOMAIN } from '$env/static/public';
+	import { toastError } from '$lib';
 	import Form from '$lib/components/form/form.svelte';
 	import PasswordInput from '$lib/components/form/password-input.svelte';
 	import { Button } from '$lib/components/ui/button';
@@ -32,7 +33,7 @@
 			formOptions={{
 				resetForm: false,
 				onError: ({ result }) => {
-					toast.error(result.error.message);
+					toastError(result.error);
 				},
 				onResult: ({ result }) => {
 					if (result.type === 'success') {

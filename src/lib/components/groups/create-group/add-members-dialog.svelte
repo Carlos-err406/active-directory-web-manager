@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
+	import { toastError } from '$lib';
 	import Form from '$lib/components/form/form.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
@@ -11,7 +12,7 @@
 
 	export let open = false;
 	export let dn: string;
-	export let action = '/groups?/setMembers';
+	const action = `/groups/${dn}?/setMembers`;
 	let users: User[] = [];
 	$: form = $page.data.setMembersForm;
 </script>
@@ -38,7 +39,7 @@
 			formOptions={{
 				resetForm: true,
 				onError: ({ result }) => {
-					toast.error(result.error.message);
+					toastError(result.error);
 				},
 				onResult: ({ result }) => {
 					if (result.type === 'success') {

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
 	import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
+	import { toastError } from '$lib';
 	import Form, { type Data, type FormOptions } from '$lib/components/form/form.svelte';
 	import Input from '$lib/components/form/input.svelte';
 	import { Button } from '$lib/components/ui/button';
@@ -45,7 +46,7 @@
 				resetForm: false,
 				onChange,
 				onError: ({ result }) => {
-					toast.error(result.error.message);
+					toastError(result.error);
 				},
 				onResult: ({ result }) => {
 					if (result.type === 'success') {

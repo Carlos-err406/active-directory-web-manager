@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto, invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
+	import { toastError } from '$lib';
 	import Form from '$lib/components/form/form.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
@@ -28,7 +29,7 @@
 				resetForm: false,
 				applyAction: false,
 				onError: ({ result }) => {
-					toast.error(result.error.message);
+					toastError(result.error);
 					open = false;
 				},
 				onResult: ({ result }) => {

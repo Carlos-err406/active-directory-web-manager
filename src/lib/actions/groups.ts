@@ -78,7 +78,7 @@ export const deleteGroup: Action = async (event) => {
 		await ldap.del(dn);
 	} catch (e) {
 		const errorId = v4();
-		log({ errorId, e });
+		log({ errorId, error: `${e}` }, { basePath: './logs' });
 		throw error(500, {
 			message: `Something unexpected happened while trying to delete ${group.sAMAccountName}`,
 			errorId
@@ -111,7 +111,7 @@ export const deleteManyGroups: Action = async (event) => {
 		}
 		return ldap.del(entry.dn).catch((e) => {
 			const errorId = v4();
-			log({ errorId, e });
+			log({ errorId, error: `${e}` }, { basePath: './logs' });
 			throw error(500, {
 				message: `Something unexpected happened while deleting the group ${entry.sAMAccountName}`,
 				errorId
@@ -152,7 +152,7 @@ export const updateGroup: Action = async (event) => {
 		await ldap.modify(dn, changes);
 	} catch (e) {
 		const errorId = v4();
-		log({ errorId, e });
+		log({ errorId, error: `${e}` }, { basePath: './logs' });
 		if (e instanceof AlreadyExistsError) {
 			return setError(form, 'sAMAccountName', 'sAMAccountName already in use!');
 		} else if (e instanceof InsufficientAccessError) {
@@ -183,7 +183,7 @@ export const setMembers: Action = async (event) => {
 		await ldap.modify(groupDn, change);
 	} catch (e) {
 		const errorId = v4();
-		log({ errorId, e });
+		log({ errorId, error: `${e}` }, { basePath: './logs' });
 		throw error(500, { message: "Something went wrong setting the group's members", errorId });
 	}
 

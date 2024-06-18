@@ -1,15 +1,12 @@
-import { CAPTCHA_LENGTH } from '$env/static/private';
 import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
 import { getEntryBySAMAccountName } from '$lib/ldap';
 import { getLDAPClient } from '$lib/ldap/client';
 import { signUpSchema } from '$lib/schemas/signup-schema';
 import {
 	generateAccessToken,
-	generateCaptchaToken,
 	generateSessionToken,
 	getCaptchaToken,
 	setAccessCookie,
-	setCaptchaCookie,
 	setSessionCookie,
 	verifyCaptchaToken
 } from '$lib/server';
@@ -21,26 +18,11 @@ import { log } from 'sveltekit-logger-hook';
 import { fail, setError, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { v4 } from 'uuid';
-import generate from 'vanilla-captcha';
 import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ cookies, depends }) => {
-	depends('auth:captcha');
-	const { answer, captcha } = await generate(Number(CAPTCHA_LENGTH) || 5);
-	try {
-		const captchaToken = generateCaptchaToken(answer);
-		setCaptchaCookie(cookies, captchaToken);
-	} catch (e) {
-		const errorId = v4();
-		log({ errorId, e });
-		throw error(500, {
-			message: 'Something went wrong while generating the captcha, please try refreshing the page',
-			errorId
-		});
-	}
+export const load: PageServerLoad = async () => {
 	return {
-		form: await superValidate(zod(signUpSchema)),
-		captcha: 'data:image/png;charset=utf-8;base64,' + captcha.toString('base64')
+		form: await superValidate(zod(signUpSchema))
 	};
 };
 
@@ -64,8 +46,9 @@ export const actions: Actions = {
 			await ldap.bind(`${sAMAccountName}@${PUBLIC_LDAP_DOMAIN}`, password);
 		} catch (e) {
 			const errorId = v4();
-			log({ errorId, e });
-			if (e instanceof InvalidCredentialsError) throw error(401, 'Invalid Credentials');
+			log({ errorId, error: `${e}` }, { basePath: './logs' });
+			if (e instanceof InvalidCredentialsError)
+				throw error(401, { message: 'Invalid Credentials', errorId });
 			else {
 				throw error(500, { message: 'Something unexpected happened, try again later', errorId });
 			}
@@ -86,7 +69,7 @@ export const actions: Actions = {
 			setAccessCookie(cookies, access);
 		} catch (e) {
 			const errorId = v4();
-			log({ errorId, e });
+			log({ errorId, error: `${e}` }, { basePath: './logs' });
 			throw error(500, { message: 'Something unexpected happened, try again later', errorId });
 		}
 		return redirect(302, '/users/me');

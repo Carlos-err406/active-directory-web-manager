@@ -19,7 +19,7 @@
 		| 'clear';
 
 	//eslint-disable-next-line @typescript-eslint/no-explicit-any
-	export type ResultType<T extends ZodSchema, K = Record<any, any>> = {
+	export type ResultType<T extends ZodSchema = ZodSchema, K = Record<any, any>> = {
 		result: ActionResult<{ form: SuperValidated<Infer<T>> } & K>;
 		formEl: HTMLFormElement;
 		formElement: HTMLFormElement;
@@ -34,7 +34,7 @@
 
 	export type SubmitType = SubmitFunctionEventArg;
 	//eslint-disable-next-line @typescript-eslint/no-explicit-any
-	export type FormOptions<T extends ZodSchema, K = any> = Partial<
+	export type FormOptions<T extends ZodSchema = ZodSchema, K = any> = Partial<
 		Omit<_FormOptions, 'validators' | 'onResult' | 'onChange'>
 	> & {
 		onResult?: (event: ResultType<T, K>) => void;

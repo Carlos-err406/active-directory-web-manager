@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { invalidate } from '$app/navigation';
+	import { PUBLIC_API_KEY } from '$env/static/public';
+	import { toastError } from '$lib';
 	import Form from '$lib/components/form/form.svelte';
 	import Input from '$lib/components/form/input.svelte';
 	import PasswordInput from '$lib/components/form/password-input.svelte';
@@ -10,10 +11,25 @@
 	import Bot from '$lucide/bot.svelte';
 	import Mail from '$lucide/mail.svelte';
 	import RefreshCcw from '$lucide/refresh-ccw.svelte';
-	import { toast } from 'svelte-sonner';
+	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
 	export let data: PageData;
-	const refreshCaptcha = async () => await invalidate('protected:captcha');
+	let captcha: HTMLImageElement;
+	let loadingCaptcha = true;
+
+	const getCaptcha = async () => {
+		loadingCaptcha = true;
+		const blob = await fetch('/api/captcha', {
+			headers: { Authorization: `Bearer ${PUBLIC_API_KEY}` }
+		}).then((response) => response.blob());
+		loadingCaptcha = false;
+		return blob;
+	};
+
+	const refreshCaptcha = async () => {
+		captcha.src = await getCaptcha().then((b) => URL.createObjectURL(b));
+	};
+	onMount(refreshCaptcha);
 </script>
 
 <main class="flex h-screen w-full items-center justify-center">
@@ -27,11 +43,11 @@
 		formOptions={{
 			resetForm: false,
 			onError: ({ result }) => {
-				toast.error(result.error.message);
+				toastError(result.error);
 			}
 		}}
 	>
-		<Card.Root class="w-full max-w-sm">
+		<Card.Root class="w-full min-w-96 max-w-sm">
 			<Card.Header>
 				<Card.Title class="text-2xl">Sign in</Card.Title>
 				<Card.Description>Enter your email below to sign in to your account.</Card.Description>
@@ -52,23 +68,25 @@
 					</svelte:fragment>
 				</Input>
 				<PasswordInput inputProps={{ required: true }} {methods} />
-				{#if !data.captcha}
+				{#if loadingCaptcha}
 					<div class="my-10 flex w-full justify-center">
 						<Loader size={'md'} />
 					</div>
-				{:else}
-					<div class="relative flex w-full flex-row">
-						<img src={data.captcha} alt="captcha" />
-						<Button
-							variant="outline"
-							type="button"
-							class="absolute -bottom-3 -right-3 size-8 rounded-full p-0 transition-transform hover:-rotate-45"
-							on:click={() => refreshCaptcha()}
-						>
-							<RefreshCcw />
-						</Button>
-					</div>
 				{/if}
+				<div
+					data-loading={loadingCaptcha}
+					class="relative flex w-full flex-row data-[loading=true]:hidden"
+				>
+					<img bind:this={captcha} src="" alt="captcha" />
+					<Button
+						variant="outline"
+						type="button"
+						class="absolute -bottom-3 -right-3 size-8 rounded-full p-0 transition-transform hover:-rotate-45"
+						on:click={() => refreshCaptcha()}
+					>
+						<RefreshCcw />
+					</Button>
+				</div>
 				<Input
 					{methods}
 					name="captcha"

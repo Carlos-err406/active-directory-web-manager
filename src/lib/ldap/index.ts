@@ -60,6 +60,14 @@ export const entryBelongsToGroup = async (ldap: Client, entryDn: string, groupNa
 	return (memberOf as string[]).includes(groupDn as string);
 };
 
+export const getUserGroups = async (ldap: Client, dn: string) => {
+	const entry = await getEntryByDn(ldap, dn);
+	if (!entry) return [];
+	const { memberOf } = entry;
+	if (!memberOf || memberOf.length === 0) return [];
+	else return Array.isArray(memberOf) ? memberOf : [memberOf];
+};
+
 export const getGroupMembers = async (ldap: Client, groupDn: string) => {
 	const group = await getEntryByDn<{ dn: string; member: string[] }>(ldap, groupDn, {
 		searchOpts: { attributes: ['member'] }
@@ -87,7 +95,12 @@ export const inferChange = <T>(entry: T, attribute: keyof T, value?: string | st
 	else if (!value && entry[attribute]) return deleteAttribute(att);
 	//if a value is passed but is different from the one pressent on the entrie's attribute
 	//BUG: this doesnt work properly with array values because it compares references instead of values
-	else if (value && value !== entry[attribute]) return replaceAttribute({ type: att, values });
+	else if (value) {
+		if (typeof value === 'string' && value !== entry[attribute])
+			return replaceAttribute({ type: att, values });
+		else if (JSON.stringify(value) !== JSON.stringify(entry[attribute]))
+			return replaceAttribute({ type: att, values });
+	}
 };
 
 export const extractBase = (dn: string) => {

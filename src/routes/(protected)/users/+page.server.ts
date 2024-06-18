@@ -99,14 +99,10 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 		};
 	} catch (e) {
 		const errorId = v4();
-		log({ errorId, e });
+		log({ errorId, error: `${e}` }, { basePath: './logs' });
 		throw error(500, {
 			message: 'Something unexpected happened while retrieving the users, try again later',
 			errorId
 		});
 	}
 };
-
-// export const actions: Actions = {
-// 	...userActions
-// };

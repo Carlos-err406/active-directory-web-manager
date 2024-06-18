@@ -18,6 +18,7 @@
 	import { slide } from 'svelte/transition';
 	import AddMembersDialog from './add-members-dialog.svelte';
 	import AddMembersSurveyDialog from './add-members-survey-dialog.svelte';
+	import { toastError } from '$lib';
 
 	let open: boolean;
 	let isManageMembersSurveyDialogOpen = false;
@@ -68,7 +69,7 @@
 				onChange,
 				onResult,
 				onError: ({ result }) => {
-					toast.error(result.error.message);
+					toastError(result.error);
 				}
 			}}
 		>

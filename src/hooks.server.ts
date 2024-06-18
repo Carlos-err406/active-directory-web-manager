@@ -42,9 +42,9 @@ const authenticationSetterHandler: Handle = async ({ event, resolve }) => {
 				ldap,
 				session: verifySessionToken(session)
 			};
-		} catch (err) {
+		} catch (e) {
 			const errorId = v4();
-			log({ errorId, err });
+			log({ errorId, error: `${e}` }, { basePath: './logs' });
 			return null;
 		}
 	};
@@ -67,7 +67,10 @@ const ldapUnbindHandler: Handle = async ({ event, resolve }) => {
 		await ldap.unbind();
 	} catch (e) {
 		const errorId = v4();
-		log({ errorId, e, message: 'error at ldapUnbindHandler hook' });
+		log(
+			{ errorId, error: `${e}`, message: 'error at ldapUnbindHandler hook' },
+			{ basePath: './logs' }
+		);
 	}
 	return response;
 };

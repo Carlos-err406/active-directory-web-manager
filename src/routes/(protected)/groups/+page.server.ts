@@ -86,7 +86,7 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 		};
 	} catch (e) {
 		const errorId = v4();
-		log({ errorId, e });
+		log({ errorId, error: `${e}` }, { basePath: './logs' });
 		throw error(500, {
 			message: 'Something unexpected happened while retrieving the groups, try again later',
 			errorId

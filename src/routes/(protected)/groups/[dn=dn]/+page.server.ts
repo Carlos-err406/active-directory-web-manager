@@ -30,7 +30,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 		return { group, setMembersForm, updateGroupForm, deleteGroupForm };
 	} catch (e) {
 		const errorId = v4();
-		log({ errorId, e });
+		log({ errorId, error: `${e}` }, { basePath: './logs' });
 		throw error(500, { message: 'Something went wrong while loading the page', errorId });
 	}
 };

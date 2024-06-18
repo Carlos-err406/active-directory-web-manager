@@ -2,6 +2,7 @@
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { PUBLIC_API_KEY } from '$env/static/public';
+	import { toastError } from '$lib';
 	import Form from '$lib/components/form/form.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
@@ -15,8 +16,7 @@
 	import UserChipList from '../users/chip/user-chip-list.svelte';
 	export let open: boolean;
 	export let dn: string;
-	export let action = '/groups?/setMembers';
-	const cn = getCNFromDN(dn);
+	const action = `/groups/${dn}?/setMembers`;
 	$: form = $page.data.setMembersForm;
 	let users: User[] = [];
 	let initializing = false;
@@ -35,7 +35,9 @@
 	<Dialog.Content>
 		<Dialog.Header>
 			<Dialog.Title>Manage group members</Dialog.Title>
-			<Dialog.Description>Add or remove members in this group ({cn})</Dialog.Description>
+			<Dialog.Description
+				>Add or remove members in this group ({getCNFromDN(dn)})</Dialog.Description
+			>
 		</Dialog.Header>
 		<UsersSelect selected={users} on:select={({ detail }) => (users = [...users, detail])} />
 		<UserChipList bind:users>
@@ -59,13 +61,14 @@
 			formOptions={{
 				resetForm: true,
 				onError: ({ result }) => {
-					toast.error(result.error.message);
+					toastError(result.error);
 				},
 				onResult: ({ result }) => {
 					if (result.type === 'success') {
 						open = false;
 						toast.success('Group members updated');
 						invalidate('protected:groups');
+						invalidate('protected:users');
 					}
 				}
 			}}

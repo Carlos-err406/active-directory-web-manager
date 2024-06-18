@@ -93,7 +93,7 @@
 				id={entry.dn}
 				transition:slide={{ duration: 200, axis: 'y' }}
 				animate:flip={{ duration: 200 }}
-				class="relative flex cursor-default select-none items-center gap-3 rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent focus:bg-accent disabled:pointer-events-none disabled:opacity-50 data-[highlighted]:text-accent-foreground"
+				class="relative flex cursor-default select-none items-center gap-3 rounded-sm px-2 py-1.5 text-start text-sm outline-none hover:bg-accent focus:bg-accent disabled:pointer-events-none disabled:opacity-50 data-[highlighted]:text-accent-foreground"
 				type="button"
 				on:click={() => {
 					dispatch('select', entry);

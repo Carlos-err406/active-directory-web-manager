@@ -2,6 +2,7 @@
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
+	import { toastError } from '$lib';
 	import Form, { type FormOptions } from '$lib/components/form/form.svelte';
 	import Input from '$lib/components/form/input.svelte';
 	import PasswordInput from '$lib/components/form/password-input.svelte';
@@ -50,7 +51,7 @@
 			formOptions={{
 				resetForm: true,
 				onError: ({ result }) => {
-					toast.error(result.error.message);
+					toastError(result.error);
 				},
 				onResult: ({ result }) => {
 					if (result.type === 'success') {

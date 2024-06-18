@@ -12,6 +12,7 @@ import { deleteManySchema } from '$lib/schemas/delete-many-schema';
 import { changePasswordSchema } from '$lib/schemas/user/change-password-schema';
 import { createUserSchema } from '$lib/schemas/user/create-user-schema';
 import { deleteUserSchema } from '$lib/schemas/user/delete-user-schema';
+import { updateMembershipSchema } from '$lib/schemas/user/update-membership';
 import { updateUserSchema } from '$lib/schemas/user/update-user-schema';
 import {
 	generateAccessToken,
@@ -21,6 +22,7 @@ import {
 	setSessionCookie,
 	verifyAccessToken
 } from '$lib/server';
+import type { Group } from '$lib/types/group';
 import { SESSION_ENTRY_ATTRIBUTES } from '$lib/types/session';
 import { UAC, type User } from '$lib/types/user';
 import { error, fail, redirect, type Action } from '@sveltejs/kit';
@@ -88,7 +90,7 @@ export const createUser: Action = async (event) => {
 		await ldap.modify(dn, passwordChange);
 	} catch (e) {
 		const errorId = v4();
-		log({ errorId, e });
+		log({ errorId, error: `${e}` }, { basePath: './logs' });
 		if (e instanceof InsufficientAccessError) {
 			log('deleting created user');
 			await sudo((sudoLdap) => sudoLdap.del(dn));
@@ -124,7 +126,7 @@ export const deleteUser: Action = async (event) => {
 		await ldap.del(dn);
 	} catch (e) {
 		const errorId = v4();
-		log({ errorId, e });
+		log({ errorId, error: `${e}` }, { basePath: './logs' });
 		throw error(500, {
 			message: `Something unexpected happened while trying to delete ${user.sAMAccountName}`,
 			errorId
@@ -156,7 +158,7 @@ export const deleteManyUsers: Action = async (event) => {
 		}
 		return ldap.del(entry.dn).catch((e) => {
 			const errorId = v4();
-			log({ errorId, e });
+			log({ errorId, error: `${e}` }, { basePath: './logs' });
 			throw error(500, {
 				message: `Something unexpected happened while deleting the group ${entry.sAMAccountName}`,
 				errorId
@@ -192,7 +194,7 @@ export const changeUserPassword: Action = async (event) => {
 				return setError(form, 'oldPassword', 'Incorrect password');
 			} else {
 				const errorId = v4();
-				log({ errorId, e, message: 'Update password failed' });
+				log({ errorId, error: `${e}`, message: 'Update password failed' }, { basePath: './logs' });
 				throw error(500, {
 					message: 'Something unexpected happened while validating your password',
 					errorId
@@ -210,7 +212,7 @@ export const changeUserPassword: Action = async (event) => {
 		await ldap.modify(dn, passwordChange);
 	} catch (e) {
 		const errorId = v4();
-		log({ errorId, e });
+		log({ errorId, error: `${e}` }, { basePath: './logs' });
 		throw error(500, {
 			message: 'Something unexpected happened while changing the password',
 			errorId
@@ -261,7 +263,7 @@ export const updateUser: Action = async (event) => {
 		await ldap.modify(dn, changes);
 	} catch (e) {
 		const errorId = v4();
-		log({ errorId, e });
+		log({ errorId, error: `${e}` }, { basePath: './logs' });
 
 		if (e instanceof AlreadyExistsError) {
 			return setError(form, 'sAMAccountName', 'sAMAccountName already in use!');
@@ -280,7 +282,7 @@ export const updateUser: Action = async (event) => {
 			await ldap.modifyDN(dn, newDN);
 		} catch (e) {
 			const errorId = v4();
-			log({ errorId, e });
+			log({ errorId, error: `${e}` }, { basePath: './logs' });
 			throw error(500, {
 				message: 'Something unexpected happened while updating the distinguishedName',
 				errorId
@@ -303,4 +305,48 @@ export const updateUser: Action = async (event) => {
 	}
 
 	return withFiles({ form });
+};
+
+export const updateMembership: Action = async (event) => {
+	const { locals } = event;
+	const auth = await locals.auth();
+	if (!auth) throw redirect(302, '/'); //type narrowing
+	const form = await superValidate(event, zod(updateMembershipSchema));
+	if (!form.valid) return fail(400, { form });
+	const { ldap } = auth;
+	const { dns, userDn } = form.data;
+	const user = await getEntryByDn<User>(ldap, userDn);
+	const currentUserGroups = new Set(user.memberOf);
+	const newGroups = new Set(dns);
+	const groupsToAdd = Array.from(newGroups).filter((dn) => !currentUserGroups.has(dn));
+	const groupsToRemove = Array.from(currentUserGroups).filter((dn) => !newGroups.has(dn));
+	const filter = new OrFilter({
+		filters: [...groupsToAdd, ...groupsToRemove].map(
+			(dn) => new EqualityFilter({ attribute: 'distinguishedName', value: dn })
+		)
+	}).toString();
+
+	const { searchEntries } = await ldap.search(PUBLIC_BASE_DN, { filter });
+	const promises = searchEntries.map(async (group) => {
+		const { member, distinguishedName } = group as Group;
+		const members = new Set(!member ? [] : Array.isArray(member) ? member : [member]);
+		if (groupsToAdd.includes(distinguishedName)) {
+			members.add(user.dn);
+		} else if (groupsToRemove.includes(distinguishedName)) {
+			members.delete(user.dn);
+		}
+		const change = inferChange(group, 'member', Array.from(members));
+		if (!change) return;
+		return ldap.modify(distinguishedName, change);
+	});
+	try {
+		await Promise.all(promises);
+	} catch (e) {
+		console.log(e);
+		const errorId = v4();
+		log({ errorId, error: `${e}` }, { basePath: './logs' });
+		throw error(500, { message: "Something went wrong setting the group's members", errorId });
+	}
+
+	return { form };
 };

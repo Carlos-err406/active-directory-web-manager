@@ -16,6 +16,7 @@
 	import { slide } from 'svelte/transition';
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import SelectInput from '../form/select-input.svelte';
+	import { toastError } from '$lib';
 	export let open = false;
 	export let base = PUBLIC_BASE_DN;
 	export let dn: string;
@@ -49,7 +50,7 @@
 				resetForm: true,
 				onChange,
 				onError: ({ result }) => {
-					toast.error(result.error.message);
+					toastError(result.error);
 				},
 				onResult: ({ result }) => {
 					invalidate('protected:groups');
