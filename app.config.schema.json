@@ -1,0 +1,29 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"type": "object",
+	"properties": {
+		"app": {
+			"properties": {
+				"captcha_length": {
+					"type": "integer",
+					"minimum": 1,
+					"maximum": 9,
+					"default": 5,
+					"title": "Length of the captcha shown in the authentication page, recommended to use a low value for development, and around 5-6 for production should be enough",
+					"description": "@default 5"
+				}
+			}
+		},
+		"directory": {
+			"properties": {
+				"user_limit": {
+					"type": ["integer", "null"],
+					"minimum": 0,
+					"default": null,
+					"title": "The maximum amount of users allowed in the directory. If set to null the limit will be ignored.",
+					"description": "@default null"
+				}
+			}
+		}
+	}
+}
