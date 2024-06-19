@@ -18,25 +18,31 @@
 		const { searchParams } = $page.url;
 		const strValue = searchParams.get('fromDate');
 		if (!strValue) {
-			const fromDate = dayjs($page.data.defaults.fromDate);
-			return new CalendarDate(fromDate.year(), fromDate.month() + 1, fromDate.date());
+			const fromDate = $page.data.defaults.fromDate
+				? dayjs($page.data.defaults.fromDate)
+				: undefined;
+			return fromDate
+				? new CalendarDate(fromDate.year(), fromDate.month() + 1, fromDate.date())
+				: undefined;
+		} else {
+			const value = dayjs(strValue);
+			return new CalendarDate(value.year(), value.month() + 1, value.date());
 		}
-		const value = dayjs(strValue);
-		return new CalendarDate(value.year(), value.month() + 1, value.date());
 	});
 	const urlEndDate = derived(page, ($page) => {
 		const { searchParams } = $page.url;
 		const strValue = searchParams.get('toDate');
-
 		if (!strValue) {
-			const toDate = dayjs($page.data.defaults.toDate);
-			return new CalendarDate(toDate.year(), toDate.month() + 1, toDate.date());
+			const toDate = $page.data.defaults.toDate ? dayjs($page.data.defaults.toDate) : undefined;
+			return toDate
+				? new CalendarDate(toDate.year(), toDate.month() + 1, toDate.date())
+				: undefined;
+		} else {
+			const value = dayjs(strValue);
+			return new CalendarDate(value.year(), value.month() + 1, value.date());
 		}
-		const value = dayjs(strValue);
-		return new CalendarDate(value.year(), value.month() + 1, value.date());
 	});
-
-	let value = {
+	$: value = {
 		start: $urlStartDate,
 		end: $urlEndDate
 	} satisfies DateRange | undefined;

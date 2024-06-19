@@ -16,13 +16,18 @@
 			icon: Building2
 		},
 		{ href: '/tree', name: 'Tree view', icon: FolderTree },
-		{ href: '/logs', name: 'Logs', icon: FileTextIcon }
+		{
+			href: `/logs?fromDate=${dayjs().subtract(2, 'days').format('YYYY-MM-DD')}&toDate=${dayjs().format('YYYY-MM-DD')}`,
+			name: 'Logs',
+			icon: FileTextIcon
+		}
 	];
 </script>
 
 <script lang="ts">
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import NavigationItem, { type NavigationItemType } from './navigation-item.svelte';
+	import dayjs from 'dayjs';
 </script>
 
 <aside class="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">

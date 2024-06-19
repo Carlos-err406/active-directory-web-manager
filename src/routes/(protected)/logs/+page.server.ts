@@ -10,13 +10,13 @@ export const load: PageServerLoad = async ({ url, depends }) => {
 
 	const fromDate = url.searchParams.get('fromDate')
 		? dayjs(url.searchParams.get('fromDate'))
-		: dayjs().subtract(2, 'days');
-	const toDate = url.searchParams.get('toDate') ? dayjs(url.searchParams.get('toDate')) : dayjs();
+		: undefined;
+	const toDate = url.searchParams.get('toDate') ? dayjs(url.searchParams.get('toDate')) : undefined;
 
 	return {
 		defaults: {
-			fromDate: fromDate.format('YYYY-MM-DD'),
-			toDate: toDate.format('YYYY-MM-DD')
+			fromDate: fromDate?.format('YYYY-MM-DD'),
+			toDate: toDate?.format('YYYY-MM-DD')
 		},
 		minDate: await new Promise<string>((resolve, reject) => {
 			fs.readdir(APP_LOGS_DIR, (err, files) => {
@@ -41,13 +41,15 @@ export const load: PageServerLoad = async ({ url, depends }) => {
 				})
 				//filter by date
 				.then((logs) =>
-					logs.filter((log) => {
-						const logDate = getLogDate(log);
-						return (
-							(logDate.isAfter(fromDate, 'day') || logDate.isSame(fromDate, 'day')) &&
-							(logDate.isBefore(toDate) || logDate.isSame(toDate, 'day'))
-						);
-					})
+					fromDate && toDate
+						? logs.filter((log) => {
+								const logDate = getLogDate(log);
+								return (
+									(logDate.isAfter(fromDate, 'day') || logDate.isSame(fromDate, 'day')) &&
+									(logDate.isBefore(toDate) || logDate.isSame(toDate, 'day'))
+								);
+							})
+						: logs
 				)
 				//reverse so recent logs are on top
 				.then((logs) => logs.reverse())

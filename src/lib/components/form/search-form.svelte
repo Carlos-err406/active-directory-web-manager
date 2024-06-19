@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
+	import { afterNavigate, goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { cn } from '$lib/utils';
 	import Search from '$lucide/search.svelte';
@@ -10,6 +10,9 @@
 	let timer: number;
 	let showTimer = false;
 	let q = $page.url.searchParams.get('q');
+	afterNavigate(() => {
+		q = $page.url.searchParams.get('q');
+	});
 
 	const submit = async () => {
 		const { searchParams: search } = $page.url;
