@@ -38,7 +38,7 @@
 		</DropdownMenu.LinkItem>
 		<DropdownMenu.Separator class="my-2" />
 		<DropdownMenu.Item class="justify-center p-0">
-			<form method="post" action={'/?/signOut'} class="w-full" use:enhance>
+			<form method="post" action={'/auth?/signOut'} class="w-full" use:enhance>
 				<Button type="submit" variant="destructive" class="w-full space-x-3">
 					<span>Sign Out</span>
 					<LogOut />

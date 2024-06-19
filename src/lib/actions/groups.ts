@@ -6,6 +6,7 @@ import { deleteGroupSchema } from '$lib/schemas/group/delete-group-schema';
 import { setMembersSchema } from '$lib/schemas/group/set-members-schema';
 import { updateGroupSchema } from '$lib/schemas/group/update-group-schema';
 import { GroupFlags, type Group } from '$lib/types/group';
+import { errorLog } from '$lib/utils';
 import { error, fail, redirect, type Action } from '@sveltejs/kit';
 import {
 	AlreadyExistsError,
@@ -77,12 +78,9 @@ export const deleteGroup: Action = async (event) => {
 	try {
 		await ldap.del(dn);
 	} catch (e) {
-		const errorId = v4();
-		log({ errorId, error: `${e}` }, { basePath: './logs' });
-		throw error(500, {
-			message: `Something unexpected happened while trying to delete ${group.sAMAccountName}`,
-			errorId
-		});
+		const message = `Something unexpected happened while trying to delete ${group.sAMAccountName}`;
+		const errorId = errorLog(e, { message });
+		throw error(500, { message, errorId });
 	}
 	if (params.dn === dn) {
 		throw redirect(302, '/groups');
@@ -110,12 +108,9 @@ export const deleteManyGroups: Action = async (event) => {
 			throw error(403, `Entry ${entry.sAMAccountName} can not be deleted!`);
 		}
 		return ldap.del(entry.dn).catch((e) => {
-			const errorId = v4();
-			log({ errorId, error: `${e}` }, { basePath: './logs' });
-			throw error(500, {
-				message: `Something unexpected happened while deleting the group ${entry.sAMAccountName}`,
-				errorId
-			});
+			const message = `Something unexpected happened while deleting the group ${entry.sAMAccountName}`;
+			const errorId = errorLog(e, { message });
+			throw error(500, { message, errorId });
 		});
 	});
 
@@ -151,8 +146,7 @@ export const updateGroup: Action = async (event) => {
 	try {
 		await ldap.modify(dn, changes);
 	} catch (e) {
-		const errorId = v4();
-		log({ errorId, error: `${e}` }, { basePath: './logs' });
+		const errorId = errorLog(e);
 		if (e instanceof AlreadyExistsError) {
 			return setError(form, 'sAMAccountName', 'sAMAccountName already in use!');
 		} else if (e instanceof InsufficientAccessError) {
@@ -175,16 +169,16 @@ export const setMembers: Action = async (event) => {
 	const { ldap } = auth;
 	const { dns, groupDn } = form.data;
 
-	const group = await getEntryByDn(ldap, groupDn);
+	const group = await getEntryByDn<Group>(ldap, groupDn);
 	const change = inferChange(group, 'member', dns);
 	if (!change) return { form };
 
 	try {
 		await ldap.modify(groupDn, change);
 	} catch (e) {
-		const errorId = v4();
-		log({ errorId, error: `${e}` }, { basePath: './logs' });
-		throw error(500, { message: "Something went wrong setting the group's members", errorId });
+		const message = `Something went wrong setting the ${group.sAMAccountName} members`;
+		const errorId = errorLog(e, { message });
+		throw error(500, { message, errorId });
 	}
 
 	return { form };

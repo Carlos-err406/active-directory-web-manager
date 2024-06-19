@@ -4,11 +4,10 @@ import { deleteGroupSchema } from '$lib/schemas/group/delete-group-schema';
 import { setMembersSchema } from '$lib/schemas/group/set-members-schema';
 import { updateGroupSchema } from '$lib/schemas/group/update-group-schema';
 import type { Group } from '$lib/types/group';
+import { errorLog } from '$lib/utils';
 import { error, redirect } from '@sveltejs/kit';
-import { log } from 'sveltekit-logger-hook';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { v4 } from 'uuid';
 import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ locals, params }) => {
 	const auth = await locals.auth();
@@ -29,8 +28,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 
 		return { group, setMembersForm, updateGroupForm, deleteGroupForm };
 	} catch (e) {
-		const errorId = v4();
-		log({ errorId, error: `${e}` }, { basePath: './logs' });
+		const errorId = errorLog(e, { message: `Error loading group ${dn} page` });
 		throw error(500, { message: 'Something went wrong while loading the page', errorId });
 	}
 };

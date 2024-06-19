@@ -52,7 +52,7 @@
 		"svelte-check": "^3.6.0",
 		"svelte-headless-table": "^0.18.2",
 		"svelte-legos": "^0.2.2",
-		"sveltekit-logger-hook": "^2.1.0",
+		"sveltekit-logger-hook": "^2.2.1",
 		"tailwindcss": "^3.3.6",
 		"tslib": "^2.4.1",
 		"typescript": "^5.0.0",
@@ -60,7 +60,8 @@
 		"vitest": "^1.2.0"
 	},
 	"dependencies": {
-		"bits-ui": "^0.21.9",
+		"@internationalized/date": "^3.5.4",
+		"bits-ui": "^0.21.10",
 		"clsx": "^2.1.0",
 		"cmdk-sv": "^0.0.17",
 		"dotenv": "^16.4.5",

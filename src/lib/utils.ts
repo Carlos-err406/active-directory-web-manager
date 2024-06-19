@@ -1,8 +1,12 @@
+import { APP_LOGS_DIR, SYSTEM_LOGS_DIR } from '$lib';
 import { type ClassValue, clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import dayjs from 'dayjs';
+import type { Action } from 'svelte/action';
 import { cubicOut } from 'svelte/easing';
 import type { TransitionConfig } from 'svelte/transition';
-import type { Action } from 'svelte/action';
+import { log } from 'sveltekit-logger-hook';
+import { twMerge } from 'tailwind-merge';
+import { v4 } from 'uuid';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -78,3 +82,18 @@ export const arrowNavigation: Action = (
 };
 
 export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+export const errorLog = (e: unknown, extra?: object) => {
+	const errorId = v4();
+	log({ errorId, error: `${e}`, ...extra }, { basePath: SYSTEM_LOGS_DIR });
+	log(
+		`${dayjs().format('YYYY-MM-DD HH:mm:ss A')} -- [Error (${errorId})]: ${extra && 'message' in extra ? extra.message : 'No error description'}`,
+		{ basePath: APP_LOGS_DIR }
+	);
+
+	return errorId;
+};
+export const appLog = (line: string, type: 'Info' | 'Warning' = 'Info') =>
+	log(`${dayjs().format('YYYY-MM-DD HH:mm:ss A')} -- [${type}]: ${line}`, {
+		basePath: APP_LOGS_DIR
+	});

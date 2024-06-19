@@ -1,5 +1,5 @@
-import { LOGGER } from '$env/static/private';
 import { PUBLIC_API_KEY, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
+import { SYSTEM_LOGS_DIR } from '$lib';
 import { getLDAPClient } from '$lib/ldap/client';
 import {
 	getAccessToken,
@@ -7,10 +7,10 @@ import {
 	verifyAccessToken,
 	verifySessionToken
 } from '$lib/server';
+import { errorLog } from '$lib/utils';
 import { error, type Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
-import { getLoggerHook, log } from 'sveltekit-logger-hook';
-import { v4 } from 'uuid';
+import { getLoggerHook } from 'sveltekit-logger-hook';
 
 const apiProtectionHandler: Handle = ({ event, resolve }) => {
 	const { url, request } = event;
@@ -43,8 +43,7 @@ const authenticationSetterHandler: Handle = async ({ event, resolve }) => {
 				session: verifySessionToken(session)
 			};
 		} catch (e) {
-			const errorId = v4();
-			log({ errorId, error: `${e}` }, { basePath: './logs' });
+			errorLog(e);
 			return null;
 		}
 	};
@@ -66,11 +65,7 @@ const ldapUnbindHandler: Handle = async ({ event, resolve }) => {
 	try {
 		await ldap.unbind();
 	} catch (e) {
-		const errorId = v4();
-		log(
-			{ errorId, error: `${e}`, message: 'error at ldapUnbindHandler hook' },
-			{ basePath: './logs' }
-		);
+		errorLog(e, { message: 'error at ldapUnbindHandler hook' });
 	}
 	return response;
 };
@@ -83,7 +78,7 @@ const ldapUnbindHandler: Handle = async ({ event, resolve }) => {
 const logHandler = getLoggerHook({
 	template: '[{date}] {url}{urlSearchParams} {method} {status}',
 	dateTemplate: 'YYYY-MM-DD HH:mm:ss A',
-	fileOptions: { basePath: './logs/' },
+	fileOptions: { basePath: SYSTEM_LOGS_DIR },
 	decodeSearchParams: true,
 	colorOptions: {
 		date: ({ status }) => (status >= 400 ? 'redBold' : 'yellow'),
@@ -94,19 +89,9 @@ const logHandler = getLoggerHook({
 	}
 });
 
-/** returns the sequence of handlers
- *
- *  depending on the LOGGER enviroment variable, the `logHandler` hook is included on the sequence or not */
-const getSequence = () => {
-	const seq = [];
-	if (LOGGER && LOGGER === '1') {
-		log('LOGGING is enabled, set LOGGER .env variable to 0 to disable');
-		seq.push(logHandler);
-	} else {
-		log('LOGGING is disabled, set LOGGER .env variable to 1 to enable');
-	}
-	seq.push(apiProtectionHandler, authenticationSetterHandler, ldapUnbindHandler);
-	return seq;
-};
-
-export const handle = sequence(...getSequence());
+export const handle = sequence(
+	logHandler,
+	apiProtectionHandler,
+	authenticationSetterHandler,
+	ldapUnbindHandler
+);

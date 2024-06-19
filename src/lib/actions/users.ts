@@ -8,6 +8,8 @@ import {
 	replaceAttribute,
 	sudo
 } from '$lib/ldap';
+import { getLDAPClient } from '$lib/ldap/client';
+import { getCNFromDN } from '$lib/ldap/utils';
 import { deleteManySchema } from '$lib/schemas/delete-many-schema';
 import { changePasswordSchema } from '$lib/schemas/user/change-password-schema';
 import { createUserSchema } from '$lib/schemas/user/create-user-schema';
@@ -25,6 +27,7 @@ import {
 import type { Group } from '$lib/types/group';
 import { SESSION_ENTRY_ATTRIBUTES } from '$lib/types/session';
 import { UAC, type User } from '$lib/types/user';
+import { appLog, errorLog } from '$lib/utils';
 import { error, fail, redirect, type Action } from '@sveltejs/kit';
 import {
 	AlreadyExistsError,
@@ -35,10 +38,8 @@ import {
 	InvalidCredentialsError,
 	OrFilter
 } from 'ldapts';
-import { log } from 'sveltekit-logger-hook';
 import { setError, superValidate, withFiles } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { v4 } from 'uuid';
 
 export const createUser: Action = async (event) => {
 	const { locals } = event;
@@ -75,9 +76,14 @@ export const createUser: Action = async (event) => {
 		if (e instanceof AlreadyExistsError) {
 			return setError(form, 'sAMAccountName', 'sAMAccountName already in use!');
 		} else if (e instanceof InsufficientAccessError) {
+			appLog(
+				`[Error: InsufficientAccessError] User ${auth.session.sAMAccountName} tried creating a user without having enough access`
+			);
 			throw error(403, "You don't have permission to create users!");
 		}
-		throw error(500, 'Something unexpected happened while creating the user');
+		const message = 'Something unexpected happened while creating the user';
+		const errorId = errorLog(e, { message });
+		throw error(500, { message, errorId });
 	}
 
 	const encodedPassword = encodePassword(password);
@@ -89,23 +95,18 @@ export const createUser: Action = async (event) => {
 	try {
 		await ldap.modify(dn, passwordChange);
 	} catch (e) {
-		const errorId = v4();
-		log({ errorId, error: `${e}` }, { basePath: './logs' });
 		if (e instanceof InsufficientAccessError) {
-			log('deleting created user');
-			await sudo((sudoLdap) => sudoLdap.del(dn));
-			throw error(403, {
-				message: 'You dont have permission to perform this opperation!',
-				errorId
-			});
+			appLog(
+				`[Error: InsufficientAccessError] User ${auth.session.sAMAccountName} tried creating a user without having enough access`
+			);
+			throw error(403, { message: 'You dont have permission to perform this opperation!' });
 		}
-		await ldap.del(dn);
-		throw error(500, {
-			message: "Something unexpected happened while creating setting the user's password",
-			errorId
-		});
+		await sudo((sudoLdap) => sudoLdap.del(dn));
+		const message = `Something unexpected happened while setting ${sAMAccountName}'s password`;
+		const errorId = errorLog(e, { message });
+		throw error(500, { message, errorId });
 	}
-
+	appLog(`${auth.session.sAMAccountName} created user: ${dn}`);
 	return withFiles({ form });
 };
 export const deleteUser: Action = async (event) => {
@@ -120,21 +121,26 @@ export const deleteUser: Action = async (event) => {
 	const user = await getEntryByDn<User>(ldap, dn);
 	if (!user) throw error(404, 'User not found!');
 	else if (user.isCriticalSystemObject === 'TRUE') {
+		appLog(
+			`[Error: CriticalSystemObject] User ${auth.session.sAMAccountName} tried deleting ${dn} but is a critical system object and can not be deleted!`
+		);
 		throw error(403, `User ${user.sAMAccountName} can not be deleted!`);
 	}
 	try {
 		await ldap.del(dn);
 	} catch (e) {
-		const errorId = v4();
-		log({ errorId, error: `${e}` }, { basePath: './logs' });
-		throw error(500, {
-			message: `Something unexpected happened while trying to delete ${user.sAMAccountName}`,
-			errorId
-		});
+		if (e instanceof InsufficientAccessError) {
+			appLog(
+				`[Error: InsufficientAccessError] User ${auth.session.sAMAccountName} tried deleting a user (${dn}) but does not have enough access`
+			);
+			throw error(403, "You don't have permission to delete users!");
+		}
+		const message = `Something unexpected happened while trying to delete ${user.sAMAccountName}`;
+		const errorId = errorLog(e, { message });
+		throw error(500, { message, errorId });
 	}
-	if (params.dn === dn) {
-		throw redirect(302, '/users');
-	}
+	appLog(`User ${auth.session.sAMAccountName} deleted user ${dn}`);
+	if (params.dn === dn) throw redirect(302, '/users');
 	return { form };
 };
 export const deleteManyUsers: Action = async (event) => {
@@ -145,6 +151,7 @@ export const deleteManyUsers: Action = async (event) => {
 	if (!form.valid) return fail(400, { form });
 	const { ldap } = auth;
 	const { dns } = form.data;
+	if (!dns.length) throw error(400, 'No users selected!');
 	const filter = new OrFilter({
 		filters: dns.map((dn) => new EqualityFilter({ attribute: 'distinguishedName', value: dn }))
 	});
@@ -154,20 +161,24 @@ export const deleteManyUsers: Action = async (event) => {
 	});
 	const promises = searchEntries.map(async (entry) => {
 		if (entry['isCriticalSystemObject'] === 'TRUE') {
+			appLog(
+				`[Error: CriticalSystemObject] User ${auth.session.sAMAccountName} tried deleting ${entry.dn} but is a critical system object and can not be deleted!`
+			);
 			throw error(403, `Entry ${entry.sAMAccountName} can not be deleted!`);
 		}
 		return ldap.del(entry.dn).catch((e) => {
-			const errorId = v4();
-			log({ errorId, error: `${e}` }, { basePath: './logs' });
-			throw error(500, {
-				message: `Something unexpected happened while deleting the group ${entry.sAMAccountName}`,
-				errorId
-			});
+			const message = `Something unexpected happened while deleting the group ${entry.sAMAccountName}`;
+			const errorId = errorLog(e, { message });
+			throw error(500, { message, errorId });
 		});
 	});
 
 	await Promise.all(promises);
-
+	if (dns.length === 1) appLog(`User ${auth.session.sAMAccountName} deleted user ${dns[0]}`);
+	else
+		appLog(
+			`User ${auth.session.sAMAccountName} deleted several users: ${dns.map(getCNFromDN).join(', ')}`
+		);
 	return { form };
 };
 export const changeUserPassword: Action = async (event) => {
@@ -183,22 +194,30 @@ export const changeUserPassword: Action = async (event) => {
 
 	const isUpdatingSelfPassword = session.distinguishedName === dn;
 
-	const user = await getEntryByDn(ldap, dn);
+	const user = await getEntryByDn<User>(ldap, dn);
 	if (!user) throw error(404, 'User not found');
 	if (!session.isAdmin) {
 		try {
 			const { sAMAccountName } = user;
-			await ldap.bind(`${sAMAccountName}@${PUBLIC_LDAP_DOMAIN}`, oldPassword);
+			const testPasswordLdap = getLDAPClient();
+			await testPasswordLdap.bind(`${sAMAccountName}@${PUBLIC_LDAP_DOMAIN}`, oldPassword);
+			await testPasswordLdap.unbind();
 		} catch (e) {
 			if (e instanceof InvalidCredentialsError) {
+				if (isUpdatingSelfPassword)
+					appLog(
+						`[Error: InvalidCredentialsError] User ${auth.session.sAMAccountName} tried changing its own password but old password was incorrect`
+					);
+				else
+					appLog(
+						`[Error: InvalidCredentialsError] User ${auth.session.sAMAccountName} tried changing ${user.sAMAccountName}'s password but old password was incorrect`
+					);
+
 				return setError(form, 'oldPassword', 'Incorrect password');
 			} else {
-				const errorId = v4();
-				log({ errorId, error: `${e}`, message: 'Update password failed' }, { basePath: './logs' });
-				throw error(500, {
-					message: 'Something unexpected happened while validating your password',
-					errorId
-				});
+				const message = `Something unexpected happened while validating the password`;
+				const errorId = errorLog(e, { message });
+				throw error(500, { message, errorId });
 			}
 		}
 	}
@@ -211,20 +230,19 @@ export const changeUserPassword: Action = async (event) => {
 	try {
 		await ldap.modify(dn, passwordChange);
 	} catch (e) {
-		const errorId = v4();
-		log({ errorId, error: `${e}` }, { basePath: './logs' });
-		throw error(500, {
-			message: 'Something unexpected happened while changing the password',
-			errorId
-		});
+		const message = `Something unexpected happened while changing ${user.sAMAccountName}'s password`;
+		const errorId = errorLog(e, { message });
+		throw error(500, { message, errorId });
 	}
 	if (isUpdatingSelfPassword) {
+		appLog(`User ${auth.session.sAMAccountName} changed its own password`);
 		//update access token
 		const { email } = verifyAccessToken(access);
 		const newAccess = generateAccessToken({ email, password });
 		setAccessCookie(cookies, newAccess);
+	} else {
+		appLog(`User ${auth.session.sAMAccountName} changed ${user.sAMAccountName}'s password`);
 	}
-
 	return { form };
 };
 export const updateUser: Action = async (event) => {
@@ -262,18 +280,17 @@ export const updateUser: Action = async (event) => {
 	try {
 		await ldap.modify(dn, changes);
 	} catch (e) {
-		const errorId = v4();
-		log({ errorId, error: `${e}` }, { basePath: './logs' });
-
 		if (e instanceof AlreadyExistsError) {
 			return setError(form, 'sAMAccountName', 'sAMAccountName already in use!');
 		} else if (e instanceof InsufficientAccessError) {
-			throw error(403, { message: "You don't have permission to edit this user!", errorId });
+			appLog(
+				`[Error InsufficientAccessError] User ${auth.session.sAMAccountName} tried updating user ${dn} but does not have enough access`
+			);
+			throw error(403, { message: "You don't have permission to edit this user!" });
 		}
-		throw error(500, {
-			message: 'Something unexpected happened while updating the user',
-			errorId
-		});
+		const message = `Something unexpected happened while updating ${user.sAMAccountName}`;
+		const errorId = errorLog(e, { message });
+		throw error(500, { message, errorId });
 	}
 	if (sAMAccountName && sAMAccountName !== user.sAMAccountName) {
 		const base = extractBase(user.dn);
@@ -281,19 +298,18 @@ export const updateUser: Action = async (event) => {
 		try {
 			await ldap.modifyDN(dn, newDN);
 		} catch (e) {
-			const errorId = v4();
-			log({ errorId, error: `${e}` }, { basePath: './logs' });
-			throw error(500, {
-				message: 'Something unexpected happened while updating the distinguishedName',
-				errorId
-			});
+			const message = `Something unexpected happened while updating ${user.sAMAccountName}'s distinguishedName`;
+			const errorId = errorLog(e, { message });
+			throw error(500, { message, errorId });
 		}
 	}
 	const isSelfUpdating = session.distinguishedName === dn;
+	const updatedUser = await getEntryBySAMAccountName<User>(ldap, sAMAccountName, {
+		searchOpts: { attributes: SESSION_ENTRY_ATTRIBUTES }
+	});
 	if (isSelfUpdating) {
-		const updatedUser = await getEntryBySAMAccountName<User>(ldap, sAMAccountName, {
-			searchOpts: { attributes: SESSION_ENTRY_ATTRIBUTES }
-		});
+		appLog(`User ${auth.session.sAMAccountName} updated its own profile`);
+
 		const newSession = await generateSessionToken(ldap, updatedUser);
 		setSessionCookie(cookies, newSession);
 		const { password } = verifyAccessToken(access);
@@ -302,8 +318,9 @@ export const updateUser: Action = async (event) => {
 			password
 		});
 		setAccessCookie(cookies, newAccess);
+	} else {
+		appLog(`User ${auth.session.sAMAccountName} updated ${updatedUser.sAMAccountName}'s profile`);
 	}
-
 	return withFiles({ form });
 };
 
@@ -342,11 +359,12 @@ export const updateMembership: Action = async (event) => {
 	try {
 		await Promise.all(promises);
 	} catch (e) {
-		console.log(e);
-		const errorId = v4();
-		log({ errorId, error: `${e}` }, { basePath: './logs' });
-		throw error(500, { message: "Something went wrong setting the group's members", errorId });
+		const message = `Something went wrong updating ${user.sAMAccountName}'s groups`;
+		const errorId = errorLog(e, { message });
+		throw error(500, { message, errorId });
 	}
-
+	appLog(
+		`User ${auth.session.sAMAccountName} updated ${user.sAMAccountName}'s group membership: ${dns.map(getCNFromDN).join(', ')}`
+	);
 	return { form };
 };

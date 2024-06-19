@@ -6,12 +6,11 @@ import { deleteGroupSchema } from '$lib/schemas/group/delete-group-schema';
 import { setMembersSchema } from '$lib/schemas/group/set-members-schema';
 import { updateGroupSchema } from '$lib/schemas/group/update-group-schema';
 import type { Group } from '$lib/types/group';
+import { errorLog } from '$lib/utils';
 import { error, redirect } from '@sveltejs/kit';
 import { AndFilter, EqualityFilter, SubstringFilter, type Filter } from 'ldapts';
-import { log } from 'sveltekit-logger-hook';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { v4 } from 'uuid';
 import type { PageServerLoad } from './$types';
 export * as actions from '$lib/actions/groups';
 
@@ -85,8 +84,7 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 			setMembersForm
 		};
 	} catch (e) {
-		const errorId = v4();
-		log({ errorId, error: `${e}` }, { basePath: './logs' });
+		const errorId = errorLog(e, { message: 'Error loading groups page' });
 		throw error(500, {
 			message: 'Something unexpected happened while retrieving the groups, try again later',
 			errorId

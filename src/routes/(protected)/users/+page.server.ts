@@ -8,12 +8,11 @@ import { deleteUserSchema } from '$lib/schemas/user/delete-user-schema';
 import { updateUserSchema } from '$lib/schemas/user/update-user-schema';
 import { jpegPhotoToB64 } from '$lib/transforms';
 import type { User } from '$lib/types/user';
+import { errorLog } from '$lib/utils';
 import { error, redirect } from '@sveltejs/kit';
 import { AndFilter, EqualityFilter, NotFilter, SubstringFilter, type Filter } from 'ldapts';
-import { log } from 'sveltekit-logger-hook';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { v4 } from 'uuid';
 import type { PageServerLoad } from './$types';
 export * as actions from '$lib/actions/users';
 
@@ -98,8 +97,7 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 			changePasswordForm
 		};
 	} catch (e) {
-		const errorId = v4();
-		log({ errorId, error: `${e}` }, { basePath: './logs' });
+		const errorId = errorLog(e, { message: 'Error loading users page' });
 		throw error(500, {
 			message: 'Something unexpected happened while retrieving the users, try again later',
 			errorId
