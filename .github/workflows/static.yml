@@ -37,7 +37,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload config schema
-          path: './src/app.config.schema.json'
+          path: 'app.config.schema.json'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
