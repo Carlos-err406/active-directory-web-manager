@@ -4,7 +4,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Popover from '$lib/components/ui/popover/';
 	import { RangeCalendar } from '$lib/components/ui/range-calendar';
-	import { cn } from '$lib/utils.js';
+	import { cn } from '$lib/utils';
 	import { CalendarDate, DateFormatter, fromDate, getLocalTimeZone } from '@internationalized/date';
 	import type { DateRange } from 'bits-ui';
 	import dayjs from 'dayjs';

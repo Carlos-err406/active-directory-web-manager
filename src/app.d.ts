@@ -4,6 +4,7 @@ import type { Context } from '$lib/types/context';
 import type { Session } from '$lib/types/session';
 import type { Client, FilterParser } from 'ldapts';
 import type { ExternalToast } from 'svelte-sonner';
+import type { Config as AppConfigType } from './app.config';
 // for information about these interfaces
 declare global {
 	namespace App {
@@ -18,6 +19,7 @@ declare global {
 			 * @returns a Promise with the session object and the binded ldap client, or null if session is invalid
 			 */
 			auth: () => Promise<{ ldap: Client; session: Session } | null>;
+			config: Config;
 		}
 		// interface PageData {}
 		interface PageState {
@@ -28,6 +30,7 @@ declare global {
 			};
 		}
 		// interface Platform {}
+		type Config = AppConfigType;
 	}
 }
 

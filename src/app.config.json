@@ -1,0 +1,7 @@
+{
+	"$schema": "../app.config.schema.json",
+	"app": {
+		"captcha_length": 1
+	},
+	"directory": {}
+}

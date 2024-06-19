@@ -36,7 +36,7 @@ export const signIn: Action = async (event) => {
 	try {
 		await ldap.bind(`${sAMAccountName}@${PUBLIC_LDAP_DOMAIN}`, password);
 	} catch (e) {
-		const errorId = errorLog(e);
+		const errorId = errorLog(e, { message: 'Sign in attempt failed for user ' + email });
 		if (e instanceof InvalidCredentialsError)
 			throw error(401, { message: 'Invalid Credentials', errorId });
 		else {
