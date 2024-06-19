@@ -11,7 +11,7 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --check . && eslint .",
-		"app:config": "cat app.config.schema.json | npx json2ts > src/app.config.d.ts",
+		"app:config": "cat src/config/app.config.schema.json | npx json2ts > src/config/app.config.d.ts",
 		"format": "prettier --write .",
 		"test:integration": "playwright test",
 		"test:unit": "vitest",

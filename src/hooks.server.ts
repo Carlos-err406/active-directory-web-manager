@@ -13,8 +13,8 @@ import { sequence } from '@sveltejs/kit/hooks';
 import jsonSchema from 'json-schema-library';
 import { getLoggerHook } from 'sveltekit-logger-hook';
 import { v4 } from 'uuid';
-import schema from '../app.config.schema.json';
-import config from './app.config.json';
+import config from './config/app.config.json';
+import schema from './config/app.config.schema.json';
 
 const { Draft07 } = jsonSchema;
 const apiProtectionHandler: Handle = ({ event, resolve }) => {

@@ -1,5 +1,5 @@
 {
-	"$schema": "../app.config.schema.json",
+	"$schema": "./app.config.schema.json",
 	"app": {
 		"captcha_length": 1
 	},
