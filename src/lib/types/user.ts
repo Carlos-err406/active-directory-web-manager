@@ -1,4 +1,5 @@
 export type User = {
+	[key: string]: unknown;
 	jpegPhoto?: string;
 	dn: string;
 	objectClass: string[];

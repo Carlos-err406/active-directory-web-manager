@@ -3,5 +3,14 @@
 	"app": {
 		"captcha_length": 1
 	},
-	"directory": {}
+	"directory": {
+		"users": {
+			"limit": 3,
+			"hide": ["Guest", "CN=krbtgt,CN=Users,DC=local,DC=com"]
+		},
+		"groups": {
+			"limit": null,
+			"hide": []
+		}
+	}
 }

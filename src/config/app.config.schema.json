@@ -2,9 +2,11 @@
 	"$schema": "http://json-schema.org/draft-07/schema#",
 	"type": "object",
 	"title": "Config",
+	"description": "Application configuration settings",
+	"required": ["app", "directory"],
 	"properties": {
 		"app": {
-			"description": "Application configuration settings",
+			"description": "Interface configuration settings",
 			"properties": {
 				"captcha_length": {
 					"type": "integer",
@@ -16,16 +18,60 @@
 			}
 		},
 		"directory": {
-			"description": "Directory configuration settings",
+			"description": "Directory management configuration settings",
+			"required": ["users", "groups"],
 			"properties": {
-				"user_limit": {
-					"type": ["integer", "null"],
-					"minimum": 0,
-					"default": null,
-					"description": "The maximum amount of users allowed in the directory. If set to null the limit will be ignored.\n\n@default null"
+				"users": {
+					"type": "object",
+					"description": "Directory settings reggarding user management",
+					"title": "Users",
+					"required": ["hide", "limit"],
+					"properties": {
+						"hide": {
+							"type": "array",
+							"items": {
+								"type": "string"
+							},
+							"uniqueItems": true,
+							"default": [],
+							"title": "HiddenUsers",
+							"description": "The list of user DNs or sAMaccountNames that should not be shown in the list view and dropdowns\n\n@default []"
+						},
+						"limit": {
+							"type": ["integer", "null"],
+							"minimum": 0,
+							"default": null,
+							"title": "UserLimit",
+							"description": "The maximum amount of users allowed in the directory. If set to null the limit will be ignored.\n\n@default null"
+						}
+					}
+				},
+				"groups": {
+					"type": "object",
+					"description": "Directory settings reggarding group management",
+					"title": "Groups",
+					"required": ["hide", "limit"],
+					"properties": {
+						"hide": {
+							"type": "array",
+							"items": {
+								"type": "string"
+							},
+							"uniqueItems": true,
+							"default": [],
+							"title": "HiddenGroups",
+							"description": "The list of group DNs that should not be shown in the list view and dropdowns\n\n@default []"
+						},
+						"limit": {
+							"type": ["integer", "null"],
+							"minimum": 0,
+							"default": null,
+							"title": "GroupLimit",
+							"description": "The maximum amount of groups allowed in the directory. If set to null the limit will be ignored.\n\n@default null"
+						}
+					}
 				}
 			}
 		}
-	},
-	"required": ["app", "directory"]
+	}
 }

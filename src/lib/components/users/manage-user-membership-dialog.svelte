@@ -8,7 +8,7 @@
 	import { getCNFromDN } from '$lib/ldap/utils';
 	import { updateUserSchema } from '$lib/schemas/user/update-user-schema';
 	import type { Group } from '$lib/types/group';
-	import { Loader } from 'lucide-svelte';
+	import Loader from '$lucide/loader.svelte';
 	import { toast } from 'svelte-sonner';
 	import { slide } from 'svelte/transition';
 	import GroupChipList from '../groups/chip/group-chip-list.svelte';

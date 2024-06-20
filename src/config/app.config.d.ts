@@ -5,9 +5,37 @@
  * and run json-schema-to-typescript to regenerate this file.
  */
 
+/**
+ * The list of user DNs or sAMaccountNames that should not be shown in the list view and dropdowns
+ *
+ * @default []
+ */
+export type HiddenUsers = string[];
+/**
+ * The maximum amount of users allowed in the directory. If set to null the limit will be ignored.
+ *
+ * @default null
+ */
+export type UserLimit = number | null;
+/**
+ * The list of group DNs that should not be shown in the list view and dropdowns
+ *
+ * @default []
+ */
+export type HiddenGroups = string[];
+/**
+ * The maximum amount of groups allowed in the directory. If set to null the limit will be ignored.
+ *
+ * @default null
+ */
+export type GroupLimit = number | null;
+
+/**
+ * Application configuration settings
+ */
 export interface Config {
 	/**
-	 * Application configuration settings
+	 * Interface configuration settings
 	 */
 	app: {
 		/**
@@ -19,16 +47,28 @@ export interface Config {
 		[k: string]: unknown;
 	};
 	/**
-	 * Directory configuration settings
+	 * Directory management configuration settings
 	 */
 	directory: {
-		/**
-		 * The maximum amount of users allowed in the directory. If set to null the limit will be ignored.
-		 *
-		 * @default null
-		 */
-		user_limit?: number | null;
+		users: Users;
+		groups: Groups;
 		[k: string]: unknown;
 	};
+	[k: string]: unknown;
+}
+/**
+ * Directory settings reggarding user management
+ */
+export interface Users {
+	hide: HiddenUsers;
+	limit: UserLimit;
+	[k: string]: unknown;
+}
+/**
+ * Directory settings reggarding group management
+ */
+export interface Groups {
+	hide: HiddenGroups;
+	limit: GroupLimit;
 	[k: string]: unknown;
 }

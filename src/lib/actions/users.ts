@@ -6,7 +6,8 @@ import {
 	getEntryBySAMAccountName,
 	inferChange,
 	replaceAttribute,
-	sudo
+	sudo,
+	validateUserAmount
 } from '$lib/ldap';
 import { getLDAPClient } from '$lib/ldap/client';
 import { getCNFromDN } from '$lib/ldap/utils';
@@ -49,6 +50,16 @@ export const createUser: Action = async (event) => {
 	const form = await superValidate(event, zod(createUserSchema));
 	if (!form.valid) return fail(400, withFiles({ form }));
 	const { ldap } = auth;
+	const { limit } = locals.config.directory.users;
+
+	const canCreate = await validateUserAmount(ldap, limit);
+	if (!canCreate) {
+		appLog(
+			'(ReachedUserLimit) Can not create more users in this directory. Maximum amount reached.',
+			'Error'
+		);
+		throw error(403, 'Can not create more users in this directory');
+	}
 	const { sAMAccountName, base, givenName, sn, mail, password, description, jpegPhotoBase64 } =
 		form.data;
 
@@ -77,7 +88,8 @@ export const createUser: Action = async (event) => {
 			return setError(form, 'sAMAccountName', 'sAMAccountName already in use!');
 		} else if (e instanceof InsufficientAccessError) {
 			appLog(
-				`[Error: InsufficientAccessError] User ${auth.session.sAMAccountName} tried creating a user without having enough access`
+				`(InsufficientAccessError) User ${auth.session.sAMAccountName} tried creating a user without having enough access`,
+				'Error'
 			);
 			throw error(403, "You don't have permission to create users!");
 		}
@@ -97,7 +109,8 @@ export const createUser: Action = async (event) => {
 	} catch (e) {
 		if (e instanceof InsufficientAccessError) {
 			appLog(
-				`[Error: InsufficientAccessError] User ${auth.session.sAMAccountName} tried creating a user without having enough access`
+				`InsufficientAccessError User ${auth.session.sAMAccountName} tried creating a user without having enough access`,
+				'Error'
 			);
 			throw error(403, { message: 'You dont have permission to perform this opperation!' });
 		}
@@ -122,16 +135,19 @@ export const deleteUser: Action = async (event) => {
 	if (!user) throw error(404, 'User not found!');
 	else if (user.isCriticalSystemObject === 'TRUE') {
 		appLog(
-			`[Error: CriticalSystemObject] User ${auth.session.sAMAccountName} tried deleting ${dn} but is a critical system object and can not be deleted!`
+			`(CriticalSystemObject) User ${auth.session.sAMAccountName} tried deleting ${dn} but is a critical system object and can not be deleted!`,
+			'Error'
 		);
 		throw error(403, `User ${user.sAMAccountName} can not be deleted!`);
 	}
 	try {
 		await ldap.del(dn);
 	} catch (e) {
+		console.log(e);
 		if (e instanceof InsufficientAccessError) {
 			appLog(
-				`[Error: InsufficientAccessError] User ${auth.session.sAMAccountName} tried deleting a user (${dn}) but does not have enough access`
+				`(InsufficientAccessError) User ${auth.session.sAMAccountName} tried deleting a user (${dn}) but does not have enough access`,
+				'Error'
 			);
 			throw error(403, "You don't have permission to delete users!");
 		}
@@ -162,7 +178,8 @@ export const deleteManyUsers: Action = async (event) => {
 	const promises = searchEntries.map(async (entry) => {
 		if (entry['isCriticalSystemObject'] === 'TRUE') {
 			appLog(
-				`[Error: CriticalSystemObject] User ${auth.session.sAMAccountName} tried deleting ${entry.dn} but is a critical system object and can not be deleted!`
+				`(CriticalSystemObject) User ${auth.session.sAMAccountName} tried deleting ${entry.dn} but is a critical system object and can not be deleted!`,
+				'Error'
 			);
 			throw error(403, `Entry ${entry.sAMAccountName} can not be deleted!`);
 		}
@@ -206,11 +223,13 @@ export const changeUserPassword: Action = async (event) => {
 			if (e instanceof InvalidCredentialsError) {
 				if (isUpdatingSelfPassword)
 					appLog(
-						`[Error: InvalidCredentialsError] User ${auth.session.sAMAccountName} tried changing its own password but old password was incorrect`
+						`(InvalidCredentialsError) User ${auth.session.sAMAccountName} tried changing its own password but old password was incorrect`,
+						'Error'
 					);
 				else
 					appLog(
-						`[Error: InvalidCredentialsError] User ${auth.session.sAMAccountName} tried changing ${user.sAMAccountName}'s password but old password was incorrect`
+						`(InvalidCredentialsError) User ${auth.session.sAMAccountName} tried changing ${user.sAMAccountName}'s password but old password was incorrect`,
+						'Error'
 					);
 
 				return setError(form, 'oldPassword', 'Incorrect password');
@@ -284,7 +303,8 @@ export const updateUser: Action = async (event) => {
 			return setError(form, 'sAMAccountName', 'sAMAccountName already in use!');
 		} else if (e instanceof InsufficientAccessError) {
 			appLog(
-				`[Error InsufficientAccessError] User ${auth.session.sAMAccountName} tried updating user ${dn} but does not have enough access`
+				`(InsufficientAccessError) User ${auth.session.sAMAccountName} tried updating user ${dn} but does not have enough access`,
+				'Error'
 			);
 			throw error(403, { message: "You don't have permission to edit this user!" });
 		}

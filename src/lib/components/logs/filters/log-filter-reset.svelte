@@ -3,9 +3,10 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import BookOpenText from '$lucide/book-open-text.svelte';
+	import Calendar from '$lucide/calendar.svelte';
+	import Captions from '$lucide/captions.svelte';
 	import FilterX from '$lucide/filter-x.svelte';
 	import Search from '$lucide/search.svelte';
-	import { Calendar, Captions } from 'lucide-svelte';
 	import { derived } from 'svelte/store';
 	import { slide } from 'svelte/transition';
 

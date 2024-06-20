@@ -9,7 +9,7 @@
 	import { getCNFromDN } from '$lib/ldap/utils';
 	import { setMembersSchema } from '$lib/schemas/group/set-members-schema';
 	import type { User } from '$lib/types/user';
-	import { Loader } from 'lucide-svelte';
+	import Loader from '$lucide/loader.svelte';
 	import { toast } from 'svelte-sonner';
 	import { slide } from 'svelte/transition';
 	import { UsersSelect } from '../users';

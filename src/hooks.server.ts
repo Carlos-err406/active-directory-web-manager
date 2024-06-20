@@ -19,9 +19,7 @@ import schema from './config/app.config.schema.json';
 const { Draft07 } = jsonSchema;
 const apiProtectionHandler: Handle = ({ event, resolve }) => {
 	const { url, request } = event;
-	if (!url.pathname.startsWith('/api')) {
-		return resolve(event);
-	}
+	if (!url.pathname.startsWith('/api')) return resolve(event);
 	const headerApiKey = request.headers.get('Authorization');
 	if (headerApiKey !== `Bearer ${PUBLIC_API_KEY}`) {
 		throw error(401, 'Invalid authorization header');

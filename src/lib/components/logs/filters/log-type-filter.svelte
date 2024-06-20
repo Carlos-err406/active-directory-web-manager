@@ -11,7 +11,7 @@
 	import { page } from '$app/stores';
 	import { Button } from '$lib/components/ui/button';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import { Filter } from 'lucide-svelte';
+	import Filter from '$lucide/filter.svelte';
 	import TypeFilter from './type-filter.svelte';
 	$: activeFilter = $page.url.searchParams.get('type') || 'all';
 </script>

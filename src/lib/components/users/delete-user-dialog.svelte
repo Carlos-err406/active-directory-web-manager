@@ -33,12 +33,13 @@
 					open = false;
 				},
 				onResult: ({ result }) => {
+					open = false;
 					if (result.type === 'success') {
 						invalidate('protected:users');
 						toast.success('User deleted successfully');
-						open = false;
 					} else if (result.type === 'redirect') {
 						goto(result.location, {
+							invalidateAll: true,
 							state: {
 								toast: {
 									type: 'success',

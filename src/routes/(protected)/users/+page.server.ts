@@ -1,5 +1,5 @@
-import { PUBLIC_BASE_DN } from '$env/static/public';
 // import * as userActions from '$lib/actions/users';
+import { getFilteredUsers } from '$lib/ldap';
 import { extractPagination, type PaginationWithUrls } from '$lib/pagination';
 import { deleteManySchema } from '$lib/schemas/delete-many-schema';
 import { changePasswordSchema } from '$lib/schemas/user/change-password-schema';
@@ -10,7 +10,7 @@ import { jpegPhotoToB64 } from '$lib/transforms';
 import type { User } from '$lib/types/user';
 import { errorLog } from '$lib/utils';
 import { error, redirect } from '@sveltejs/kit';
-import { AndFilter, EqualityFilter, NotFilter, SubstringFilter, type Filter } from 'ldapts';
+import { SubstringFilter, type Filter } from 'ldapts';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { PageServerLoad } from './$types';
@@ -22,29 +22,22 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 	if (!auth) throw redirect(302, '/');
 	const { ldap } = auth;
 	const { searchParams, pathname } = url;
-
+	const { directory } = locals.config;
 	const sAMAccountNameQuery = searchParams.get('q');
 	const page = Number(searchParams.get('page') || 1);
 	const pageSize = Number(searchParams.get('pageSize') || 10);
 	const sortAttribute = searchParams.get('sort') || 'sAMAccountName';
 	const order = searchParams.get('order') || 'asc';
 
-	const filters: Filter[] = [
-		new NotFilter({
-			filter: new EqualityFilter({ attribute: 'objectClass', value: 'computer' })
-		}),
-		...['top', 'person', 'organizationalPerson', 'user'].map(
-			(objectClass) => new EqualityFilter({ attribute: 'objectClass', value: objectClass })
-		)
-	];
-	sAMAccountNameQuery &&
-		filters.push(new SubstringFilter({ attribute: 'sAMAccountName', any: [sAMAccountNameQuery] }));
-
-	const filter = new AndFilter({ filters }).toString();
+	const extraFilters: Filter[] = [];
+	if (sAMAccountNameQuery)
+		extraFilters.push(
+			new SubstringFilter({ attribute: 'sAMAccountName', any: [sAMAccountNameQuery] })
+		);
 	try {
-		const { searchEntries } = await ldap.search(PUBLIC_BASE_DN, { filter });
+		const users = await getFilteredUsers(ldap, directory.users.hide, extraFilters);
 
-		searchEntries.sort((a, b) => {
+		users.sort((a, b) => {
 			if (
 				(a[sortAttribute] || '-').toString().toLowerCase() <
 				(b[sortAttribute] || '-').toString().toLowerCase()
@@ -57,7 +50,7 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 				return order === 'asc' ? 1 : -1;
 			return 0;
 		});
-		const pagination = extractPagination<User>(searchEntries as User[], page, pageSize);
+		const pagination = extractPagination<User>(users as User[], page, pageSize);
 
 		pagination.data.map(jpegPhotoToB64);
 

@@ -8,7 +8,7 @@
 	import { CalendarDate, DateFormatter, fromDate, getLocalTimeZone } from '@internationalized/date';
 	import type { DateRange } from 'bits-ui';
 	import dayjs from 'dayjs';
-	import CalendarIcon from 'lucide-svelte/icons/calendar';
+	import Calendar from '$lucide/calendar.svelte';
 	import { derived } from 'svelte/store';
 
 	const df = new DateFormatter('en-US', {
@@ -55,7 +55,7 @@
 			class={cn('w-[250px] justify-start text-left font-normal', !value && 'text-muted-foreground')}
 			builders={[builder]}
 		>
-			<CalendarIcon class="mr-2 size-4 flex-none" />
+			<Calendar class="mr-2 size-4 flex-none" />
 			{#if value && value.start}
 				{#if value.end}
 					{df.format(value.start.toDate(getLocalTimeZone()))} - {df.format(

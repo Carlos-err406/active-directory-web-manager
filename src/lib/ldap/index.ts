@@ -1,11 +1,14 @@
 import { ADMIN_GROUP, SAMBA_DC_ADMIN_PASSWD } from '$env/static/private';
 import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
+import type { User } from '$lib/types/user';
 import {
 	AndFilter,
 	Attribute,
 	Change,
 	Client,
 	EqualityFilter,
+	NotFilter,
+	OrFilter,
 	type AttributeOptions,
 	type Entry,
 	type Filter,
@@ -94,7 +97,6 @@ export const inferChange = <T>(entry: T, attribute: keyof T, value?: string | st
 	//if no value is passed but the entry has the attribute
 	else if (!value && entry[attribute]) return deleteAttribute(att);
 	//if a value is passed but is different from the one pressent on the entrie's attribute
-	//BUG: this doesnt work properly with array values because it compares references instead of values
 	else if (value) {
 		if (typeof value === 'string' && value !== entry[attribute])
 			return replaceAttribute({ type: att, values });
@@ -116,3 +118,42 @@ export const sudo = async (sudoOperation: (ldap: Client) => Promise<void>) => {
 	await sudoOperation(ldap);
 	await ldap.unbind();
 };
+
+export const getAllUsers = (ldap: Client, extraFilters: Filter[] = []): Promise<User[]> =>
+	ldap
+		.search(PUBLIC_BASE_DN, {
+			filter: new AndFilter({
+				filters: [
+					new NotFilter({
+						filter: new EqualityFilter({ attribute: 'objectClass', value: 'computer' })
+					}),
+					...['top', 'person', 'organizationalPerson', 'user'].map(
+						(value) => new EqualityFilter({ attribute: 'objectClass', value })
+					),
+					...extraFilters
+				]
+			})
+		})
+		.then(({ searchEntries }) => searchEntries as User[]);
+
+export const validateUserAmount = async (ldap: Client, limit?: number | null) => {
+	if (!limit) return;
+	const users = await getAllUsers(ldap);
+	return users.length < limit;
+};
+
+export const getFilteredUsers = (ldap: Client, hide: string[] = [], extraFilters: Filter[] = []) =>
+	getAllUsers(ldap, [
+		...hide.map(
+			(q) =>
+				new NotFilter({
+					filter: new OrFilter({
+						filters: [
+							new EqualityFilter({ attribute: 'distinguishedName', value: q }),
+							new EqualityFilter({ attribute: 'sAMAccountName', value: q })
+						]
+					})
+				})
+		),
+		...extraFilters
+	]);
