@@ -1,3 +1,4 @@
+import config from '$config';
 import { ADMIN_GROUP, SAMBA_DC_ADMIN_PASSWD } from '$env/static/private';
 import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
 import type { User } from '$lib/types/user';
@@ -136,24 +137,25 @@ export const getAllUsers = (ldap: Client, extraFilters: Filter[] = []): Promise<
 		})
 		.then(({ searchEntries }) => searchEntries as User[]);
 
-export const validateUserAmount = async (ldap: Client, limit?: number | null) => {
+export const validateUserAmount = async (ldap: Client) => {
+	const { limit } = config.directory.users;
 	if (!limit) return;
 	const users = await getAllUsers(ldap);
 	return users.length < limit;
 };
 
 export const getFilteredUsers = (ldap: Client, hide: string[] = [], extraFilters: Filter[] = []) =>
-	getAllUsers(ldap, [
-		...hide.map(
-			(q) =>
-				new NotFilter({
-					filter: new OrFilter({
-						filters: [
-							new EqualityFilter({ attribute: 'distinguishedName', value: q }),
-							new EqualityFilter({ attribute: 'sAMAccountName', value: q })
-						]
-					})
+	getAllUsers(ldap, [...getHideFilters(hide), ...extraFilters]);
+
+export const getHideFilters = (hide: string[] = []) =>
+	hide.map(
+		(q) =>
+			new NotFilter({
+				filter: new OrFilter({
+					filters: [
+						new EqualityFilter({ attribute: 'distinguishedName', value: q }),
+						new EqualityFilter({ attribute: 'sAMAccountName', value: q })
+					]
 				})
-		),
-		...extraFilters
-	]);
+			})
+	);

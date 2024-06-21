@@ -1,4 +1,5 @@
 // import * as userActions from '$lib/actions/users';
+import config from '$config';
 import { getFilteredUsers } from '$lib/ldap';
 import { extractPagination, type PaginationWithUrls } from '$lib/pagination';
 import { deleteManySchema } from '$lib/schemas/delete-many-schema';
@@ -22,7 +23,7 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 	if (!auth) throw redirect(302, '/');
 	const { ldap } = auth;
 	const { searchParams, pathname } = url;
-	const { directory } = locals.config;
+	const { directory } = config;
 	const sAMAccountNameQuery = searchParams.get('q');
 	const page = Number(searchParams.get('page') || 1);
 	const pageSize = Number(searchParams.get('pageSize') || 10);

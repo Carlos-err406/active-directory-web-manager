@@ -1,5 +1,14 @@
 {
 	"$schema": "./app.config.schema.json",
+	"system": {
+		"logging": {
+			"use_logging": true,
+			"paths": {
+				"app_logs_path": "./logs/app/",
+				"system_logs_path": "./logs/system/"
+			}
+		}
+	},
 	"app": {
 		"captcha_length": 1
 	},

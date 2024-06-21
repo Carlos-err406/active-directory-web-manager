@@ -61,16 +61,15 @@ export const signIn: Action = async (event) => {
 		const errorId = errorLog(e);
 		throw error(500, { message: 'Something unexpected happened, try again later', errorId });
 	}
-	appLog(`User ${user.sAMAccountName} signed in`);
+	appLog(`User ${user.sAMAccountName} signed in`, 'Info');
 	return redirect(302, '/users/me');
 };
 
 export const signOut: Action = async ({ cookies, locals }) => {
 	const auth = await locals.auth();
 	if (!auth) return redirect(302, '/');
-
 	cookies.delete('ad-session', { path: '/' });
 	cookies.delete('ad-access', { path: '/' });
-	appLog(`User ${auth.session.sAMAccountName} signed out`);
+	appLog(`User ${auth.session.sAMAccountName} signed out`, 'Info');
 	return redirect(302, '/');
 };

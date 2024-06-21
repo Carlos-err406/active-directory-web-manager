@@ -1,3 +1,5 @@
-export const load = ({ locals }) => {
-	return { config: locals.config };
+import config from '$config';
+
+export const load = () => {
+	return { config };
 };

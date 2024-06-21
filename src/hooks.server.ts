@@ -1,5 +1,5 @@
+import config from '$config';
 import { PUBLIC_API_KEY, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
-import { SYSTEM_LOGS_DIR } from '$lib';
 import { getLDAPClient } from '$lib/ldap/client';
 import {
 	getAccessToken,
@@ -10,13 +10,8 @@ import {
 import { errorLog } from '$lib/utils';
 import { error, type Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
-import jsonSchema from 'json-schema-library';
 import { getLoggerHook } from 'sveltekit-logger-hook';
-import { v4 } from 'uuid';
-import config from './config/app.config.json';
-import schema from './config/app.config.schema.json';
 
-const { Draft07 } = jsonSchema;
 const apiProtectionHandler: Handle = ({ event, resolve }) => {
 	const { url, request } = event;
 	if (!url.pathname.startsWith('/api')) return resolve(event);
@@ -81,7 +76,7 @@ const ldapUnbindHandler: Handle = async ({ event, resolve }) => {
 const logHandler = getLoggerHook({
 	template: '[{date}] {url}{urlSearchParams} {method} {status}',
 	dateTemplate: 'YYYY-MM-DD HH:mm:ss A',
-	fileOptions: { basePath: SYSTEM_LOGS_DIR },
+	fileOptions: { basePath: config.system.logging.paths?.system_logs_path || './logs/system' },
 	decodeSearchParams: true,
 	colorOptions: {
 		date: ({ status }) => (status >= 400 ? 'redBold' : 'yellow'),
@@ -92,34 +87,8 @@ const logHandler = getLoggerHook({
 	}
 });
 
-const configSetHandler: Handle = ({ event, resolve }) => {
-	let errors: jsonSchema.JsonError[] = [];
-	try {
-		const mySchema: jsonSchema.Draft = new Draft07(schema);
-		errors = mySchema.validate(config);
-	} catch (e) {
-		const message = 'Something went wrong while loading configuration';
-		const errorId = errorLog(e, { message });
-		throw error(500, { message, errorId });
-	}
-	if (errors.length > 0) {
-		console.log(errors[0]);
-		const errorId = v4();
-		errors.map((error) => {
-			errorLog('Invalid Config file', {
-				errorId,
-				message: error.message,
-				errorName: 'Invalid Config file'
-			});
-		});
-		throw error(500, { message: 'Something went wrong loading the configuration file', errorId });
-	}
-	event.locals.config = config as App.Config;
-	return resolve(event);
-};
 export const handle = sequence(
 	logHandler,
-	configSetHandler,
 	apiProtectionHandler,
 	authenticationSetHandler,
 	ldapUnbindHandler

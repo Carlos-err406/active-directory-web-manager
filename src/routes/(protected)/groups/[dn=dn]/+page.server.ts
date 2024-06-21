@@ -1,5 +1,7 @@
 export * as actions from '$lib/actions/groups';
+import config from '$config';
 import { getEntryByDn } from '$lib/ldap';
+import { getCNFromDN } from '$lib/ldap/utils';
 import { deleteGroupSchema } from '$lib/schemas/group/delete-group-schema';
 import { setMembersSchema } from '$lib/schemas/group/set-members-schema';
 import { updateGroupSchema } from '$lib/schemas/group/update-group-schema';
@@ -14,6 +16,8 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 	if (!auth) throw redirect(302, '/');
 	const { ldap } = auth;
 	const { dn } = params;
+	const { hide } = config.directory.groups;
+	if (hide.includes(dn) || hide.includes(getCNFromDN(dn))) throw error(404, 'Group not found');
 	try {
 		const [group, setMembersForm, updateGroupForm, deleteGroupForm] = await Promise.all([
 			getEntryByDn<Group>(ldap, dn),

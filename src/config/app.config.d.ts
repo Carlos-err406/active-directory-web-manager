@@ -10,6 +10,37 @@
  */
 export interface Config {
 	/**
+	 * System settings
+	 */
+	system: {
+		/**
+		 * Logging settings
+		 */
+		logging: {
+			/**
+			 * Enable or disable logging
+			 */
+			use_logging: boolean;
+			/**
+			 * Logging paths
+			 */
+			paths?: {
+				/**
+				 * Path to the app logs
+				 *
+				 * @default logs/app/
+				 */
+				app_logs_path: string;
+				/**
+				 * Path to the system logs
+				 *
+				 * @default logs/system/
+				 */
+				system_logs_path: string;
+			};
+		};
+	};
+	/**
 	 * Interface configuration settings
 	 */
 	app: {
@@ -19,51 +50,45 @@ export interface Config {
 		 * @default 5
 		 */
 		captcha_length?: number;
-		[k: string]: unknown;
 	};
 	/**
 	 * Directory management configuration settings
 	 */
 	directory: {
-		users: Users;
-		groups: Groups;
-		[k: string]: unknown;
+		/**
+		 * Directory settings reggarding user management
+		 */
+		users: {
+			/**
+			 * The list of user distinguishedNames or sAMAccountNames that should not be shown in the list view and dropdowns
+			 *
+			 * @default []
+			 */
+			hide: string[];
+			/**
+			 * The maximum amount of users allowed in the directory. If set to null the limit will be ignored.
+			 *
+			 * @default null
+			 */
+			limit: number | null;
+		};
+		/**
+		 * Directory settings reggarding group management
+		 */
+		groups: {
+			/**
+			 * The list of group distinguishedNames or sAMAccountNames that should not be shown in the list view and dropdowns
+			 *
+			 * @default []
+			 */
+			hide: string[];
+			/**
+			 * The maximum amount of groups allowed in the directory. If set to null the limit will be ignored.
+			 *
+			 * @default null
+			 */
+			limit: number | null;
+		};
 	};
-	[k: string]: unknown;
-}
-/**
- * Directory settings reggarding user management
- */
-export interface Users {
-	/**
-	 * The list of user DNs or sAMaccountNames that should not be shown in the list view and dropdowns
-	 *
-	 * @default []
-	 */
-	hide: string[];
-	/**
-	 * The maximum amount of users allowed in the directory. If set to null the limit will be ignored.
-	 *
-	 * @default null
-	 */
-	limit: number | null;
-	[k: string]: unknown;
-}
-/**
- * Directory settings reggarding group management
- */
-export interface Groups {
-	/**
-	 * The list of group DNs or sAMaccountNames that should not be shown in the list view and dropdowns
-	 *
-	 * @default []
-	 */
-	hide: string[];
-	/**
-	 * The maximum amount of groups allowed in the directory. If set to null the limit will be ignored.
-	 *
-	 * @default null
-	 */
-	limit: number | null;
 	[k: string]: unknown;
 }

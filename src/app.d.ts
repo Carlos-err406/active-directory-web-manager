@@ -19,7 +19,6 @@ declare global {
 			 * @returns a Promise with the session object and the binded ldap client, or null if session is invalid
 			 */
 			auth: () => Promise<{ ldap: Client; session: Session } | null>;
-			config: Config;
 		}
 		// interface PageData {}
 		interface PageState {

@@ -1,4 +1,4 @@
-import { APP_LOGS_DIR, SYSTEM_LOGS_DIR } from '$lib';
+import config from '$config';
 import { type ClassValue, clsx } from 'clsx';
 import dayjs from 'dayjs';
 import type { Action } from 'svelte/action';
@@ -90,19 +90,25 @@ type ErrorLogOpts = {
 	message?: string;
 	/**force an error name to show, else errorId will be used */
 	errorName?: string;
-} & { [key: string]: string };
+};
+
 export const errorLog = (e: unknown, extra?: ErrorLogOpts) => {
+	if (!config.system.logging.use_logging) return;
 	const errorId = extra?.errorId ?? v4();
 	const message = extra?.message ?? 'No error description';
 	const errorName = extra?.errorName ?? errorId;
+	const { paths } = config.system.logging;
+	const system_logs_path = paths?.system_logs_path || '/logs/system/';
+
 	delete extra?.errorName;
 	delete extra?.errorId;
-	log({ errorId, error: `${e}`, ...extra }, { basePath: SYSTEM_LOGS_DIR });
+
+	log({ errorId, error: `${e}`, ...extra }, { basePath: system_logs_path });
 	appLog(`(${errorName || errorId}) ` + message, 'Error');
 
 	return errorId;
 };
 export const appLog = (line: string, type: 'Info' | 'Warning' | 'Error' = 'Info') =>
 	log(`${dayjs().format('YYYY-MM-DD HH:mm:ss A')} -- [${type}]: ${line}`, {
-		basePath: APP_LOGS_DIR
+		basePath: config.system.logging.paths?.app_logs_path || './logs/app/'
 	});
