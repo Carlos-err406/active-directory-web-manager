@@ -12,15 +12,15 @@ export interface Config {
 	/**
 	 * System settings
 	 */
-	system: {
+	system?: {
 		/**
 		 * Logging settings
 		 */
-		logging: {
+		logging?: {
 			/**
 			 * Enable or disable logging. If `false` `basePath` is ignored. If `true` `basePath` is required @default ./logs
 			 */
-			useLogging: boolean;
+			useLogging?: boolean;
 			/**
 			 * Log template as indicated by @link https://www.npmjs.com/package/sveltekit-logger-hook @default "[{date}] {url}{urlSearchParams} {method} {status}"
 			 */
@@ -42,19 +42,148 @@ export interface Config {
 	/**
 	 * Interface configuration settings
 	 */
-	app: {
+	app?: {
 		/**
 		 * configuration reggarding de different pages of the web app
 		 */
-		views: {
+		views?: {
+			/**
+			 * configuration reggarding the users page
+			 */
+			usersPage?: {
+				table?: {
+					columns?: {
+						jpegPhoto?: {
+							show?: boolean;
+							header?: string;
+							hidable?: boolean;
+						};
+						sAMAccountName?: {
+							show?: boolean;
+							header?: string;
+							hidable?: boolean;
+						};
+						displayName?: {
+							show?: boolean;
+							header?: string;
+							hidable?: boolean;
+						};
+						givenName?: {
+							show?: boolean;
+							header?: string;
+							hidable?: boolean;
+						};
+						sn?: {
+							show?: boolean;
+							header?: string;
+							hidable?: boolean;
+						};
+						mail?: {
+							show?: boolean;
+							header?: string;
+							hidable?: boolean;
+						};
+						description?: {
+							show?: boolean;
+							header?: string;
+							hidable?: boolean;
+						};
+						dn?: {
+							show?: boolean;
+							header?: string;
+							hidable?: boolean;
+						};
+						userAccountControl?: {
+							show?: boolean;
+							header?: string;
+							hidable?: boolean;
+						};
+						whenCreated?: {
+							show?: boolean;
+							header?: string;
+							hidable?: boolean;
+						};
+					};
+				};
+			};
+			/**
+			 * configuration reggarding the groups page
+			 */
+			groupsPage?: {
+				/**
+				 * Weather or not to show the /groups page in navigation. Accessing directly to this route will result on a '403 This page has been disabled by configuration' error
+				 */
+				show?: boolean;
+				table?: {
+					columns?: {
+						sAMAccountName?: {
+							show?: boolean;
+							header?: string;
+							hidable?: boolean;
+						};
+						mail?: {
+							show?: boolean;
+							header?: string;
+							hidable?: boolean;
+						};
+						dn?: {
+							show?: boolean;
+							header?: string;
+							hidable?: boolean;
+						};
+						description?: {
+							show?: boolean;
+							header?: string;
+							hidable?: boolean;
+						};
+						groupType?: {
+							show?: boolean;
+							header?: string;
+							hidable?: boolean;
+						};
+						whenCreated?: {
+							show?: boolean;
+							header?: string;
+							hidable?: boolean;
+						};
+					};
+				};
+			};
+			/**
+			 * configuration reggarding the ous page
+			 */
+			ousPage?: {
+				/**
+				 * Weather or not to show the /ous page in navigation. Accessing directly to this route will result on a '403 This page has been disabled by configuration' error
+				 */
+				show?: boolean;
+			};
+			/**
+			 * configuration reggarding the tree page
+			 */
+			treePage?: {
+				/**
+				 * Weather or not to show the /tree page in navigation. Accessing directly to this route will result on a '403 This page has been disabled by configuration' error
+				 */
+				show?: boolean;
+			};
 			/**
 			 * configuration reggarding the logs page
 			 */
-			logsPage: {
+			logsPage?: {
 				/**
 				 * Weather or not to show the /logs page in navigation. Accessing directly to this route will result on a '403 This page has been disabled by configuration' error
 				 */
 				show?: boolean;
+			};
+			/**
+			 * configuration reggarding the settings page
+			 */
+			settingsPage?: {
+				/**
+				 * Weather or not to allow the user to change the configuration. @default false
+				 */
+				showConfigurationForm?: boolean;
 			};
 		};
 		/**
@@ -65,32 +194,32 @@ export interface Config {
 	/**
 	 * Directory management configuration settings
 	 */
-	directory: {
+	directory?: {
 		/**
 		 * Directory settings reggarding user management
 		 */
-		users: {
+		users?: {
 			/**
-			 * The list of user distinguishedNames or sAMAccountNames that should not be shown in the list view and dropdowns]
+			 * The list of user distinguishedNames or sAMAccountNames that should not be shown in the /users view dropdowns and search. Accessing directly to /users/[dn] of a user that is listed here will result on a '403 This user is hidden by configuration' error, however, signing in as a listed user will not result in error. @default []
 			 */
-			hide: string[];
+			hide?: string[];
 			/**
-			 * The maximum amount of users allowed in the directory. If set to null the limit will be ignored.l
+			 * The maximum amount of users allowed in the directory. If set to null the limit will be ignored. Default users are included in the count. @default null
 			 */
-			limit: number | null;
+			limit?: number | null;
 		};
 		/**
 		 * Directory settings reggarding group management
 		 */
-		groups: {
+		groups?: {
 			/**
-			 * The list of group distinguishedNames or sAMAccountNames that should not be shown in the list view and dropdowns]
+			 * The list of group distinguishedNames or sAMAccountNames that should not be shown in the /groups view dropdowns and search. Accessing directly to /groups/[dn] of a user that is listed here will result on a '403 This user is hidden by configuration' error. @default []
 			 */
-			hide: string[];
+			hide?: string[];
 			/**
-			 * The maximum amount of groups allowed in the directory. If set to null the limit will be ignored.l
+			 * The maximum amount of groups allowed in the directory. If set to null the limit will be ignored. Default groups are included in the count. @default null
 			 */
-			limit: number | null;
+			limit?: number | null;
 		};
 	};
 	[k: string]: unknown;

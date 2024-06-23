@@ -1,14 +1,15 @@
-import { PUBLIC_BASE_DN } from '$env/static/public';
+import config from '$config';
+import { getFilteredGroups } from '$lib/ldap';
 import { extractPagination, type PaginationWithUrls } from '$lib/pagination';
 import { deleteManySchema } from '$lib/schemas/delete-many-schema';
 import { createGroupSchema } from '$lib/schemas/group/create-group-schema';
 import { deleteGroupSchema } from '$lib/schemas/group/delete-group-schema';
 import { setMembersSchema } from '$lib/schemas/group/set-members-schema';
 import { updateGroupSchema } from '$lib/schemas/group/update-group-schema';
+import { appLog, errorLog } from '$lib/server/logs';
 import type { Group } from '$lib/types/group';
-import { errorLog } from '$lib/utils';
 import { error, redirect } from '@sveltejs/kit';
-import { AndFilter, EqualityFilter, SubstringFilter, type Filter } from 'ldapts';
+import { EqualityFilter, SubstringFilter, type Filter } from 'ldapts';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { PageServerLoad } from './$types';
@@ -18,6 +19,13 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 	depends('protected:groups');
 	const auth = await locals.auth();
 	if (!auth) throw redirect(302, '/');
+	if (!config.app.views.groupsPage.show) {
+		appLog(
+			`User ${auth.session.sAMAccountName} tried accessing /groups page but is disabled by configuration`,
+			'Error'
+		);
+		throw error(403, 'This page is disabled in the app configuration');
+	}
 	const { ldap } = auth;
 	const { searchParams, pathname } = url;
 	const sAMAccountNameQuery = searchParams.get('q');
@@ -26,15 +34,16 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 	const sortAttribute = searchParams.get('sort') || 'sAMAccountName';
 	const order = searchParams.get('order') || 'asc';
 
-	const filters: Filter[] = [new EqualityFilter({ attribute: 'objectClass', value: 'group' })];
+	const extraFilters: Filter[] = [new EqualityFilter({ attribute: 'objectClass', value: 'group' })];
+
 	sAMAccountNameQuery &&
-		filters.push(new SubstringFilter({ attribute: 'sAMAccountName', any: [sAMAccountNameQuery] }));
+		extraFilters.push(
+			new SubstringFilter({ attribute: 'sAMAccountName', any: [sAMAccountNameQuery] })
+		);
 
-	const filter = new AndFilter({ filters }).toString();
 	try {
-		const { searchEntries } = await ldap.search(PUBLIC_BASE_DN, { filter });
-
-		searchEntries.sort((a, b) => {
+		const groups = await getFilteredGroups(ldap, extraFilters);
+		groups.sort((a, b) => {
 			if (
 				(a[sortAttribute] || '-').toString().toLowerCase() <
 				(b[sortAttribute] || '-').toString().toLowerCase()
@@ -47,7 +56,7 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 				return order === 'asc' ? 1 : -1;
 			return 0;
 		});
-		const pagination = extractPagination<Group>(searchEntries as Group[], page, pageSize);
+		const pagination = extractPagination<Group>(groups as Group[], page, pageSize);
 
 		const previousPageSearchParams = new URLSearchParams(searchParams);
 		if (page - 1 > 0) previousPageSearchParams.set('page', (page - 1).toString());

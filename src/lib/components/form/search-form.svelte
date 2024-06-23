@@ -16,8 +16,10 @@
 
 	const submit = async () => {
 		const { searchParams: search } = $page.url;
-		if (q) search.set('q', q);
-		else search.delete('q');
+		if (q) {
+			search.set('q', q);
+			search.set('page', '1');
+		} else search.delete('q');
 		await goto(`${$page.url.pathname}?${search}`, { invalidateAll: true });
 	};
 

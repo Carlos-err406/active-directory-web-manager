@@ -1,13 +1,3 @@
-<script lang="ts" context="module">
-	import type { Icon } from 'lucide-svelte';
-	import type { ComponentType } from 'svelte';
-	export interface NavigationItemType {
-		name: string;
-		href: string;
-		icon: ComponentType<Icon>;
-	}
-</script>
-
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { cn } from '$lib/utils';

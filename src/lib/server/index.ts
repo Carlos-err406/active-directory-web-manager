@@ -4,9 +4,9 @@ import type { CookieSerializeOptions } from 'cookie';
 import jwt from 'jsonwebtoken';
 import type { Client } from 'ldapts';
 import fs from 'node:fs';
-import { isAdmin } from './ldap';
-import type { Session } from './types/session';
-import type { User } from './types/user';
+import { isAdmin } from '../ldap';
+import type { Session } from '../types/session';
+import type { User } from '../types/user';
 
 const HOURS = 7200 as const; //2h for token and cookie expiration(max age)
 const CAPTCHA_EXPIRATION = 300 as const; //5m for captcha expiration

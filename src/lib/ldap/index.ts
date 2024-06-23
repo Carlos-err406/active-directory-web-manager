@@ -1,6 +1,7 @@
 import config from '$config';
 import { ADMIN_GROUP, SAMBA_DC_ADMIN_PASSWD } from '$env/static/private';
 import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
+import type { Group } from '$lib/types/group';
 import type { User } from '$lib/types/user';
 import {
 	AndFilter,
@@ -137,6 +138,15 @@ export const getAllUsers = (ldap: Client, extraFilters: Filter[] = []): Promise<
 		})
 		.then(({ searchEntries }) => searchEntries as User[]);
 
+export const getAllGroups = (ldap: Client, extraFilters: Filter[] = []): Promise<Group[]> =>
+	ldap
+		.search(PUBLIC_BASE_DN, {
+			filter: new AndFilter({
+				filters: [new EqualityFilter({ attribute: 'objectClass', value: 'group' }), ...extraFilters]
+			})
+		})
+		.then(({ searchEntries }) => searchEntries as Group[]);
+
 export const validateUserAmount = async (ldap: Client) => {
 	const { limit } = config.directory.users;
 	if (!limit) return;
@@ -144,8 +154,18 @@ export const validateUserAmount = async (ldap: Client) => {
 	return users.length < limit;
 };
 
-export const getFilteredUsers = (ldap: Client, hide: string[] = [], extraFilters: Filter[] = []) =>
-	getAllUsers(ldap, [...getHideFilters(hide), ...extraFilters]);
+export const validateGroupAmount = async (ldap: Client) => {
+	const { limit } = config.directory.groups;
+	if (!limit) return;
+	const groups = await getAllGroups(ldap);
+	return groups.length < limit;
+};
+
+export const getFilteredUsers = (ldap: Client, extraFilters: Filter[] = []) =>
+	getAllUsers(ldap, [...getHideFilters(config.directory.users.hide), ...extraFilters]);
+
+export const getFilteredGroups = (ldap: Client, extraFilters: Filter[] = []) =>
+	getAllGroups(ldap, [...getHideFilters(config.directory.groups.hide), ...extraFilters]);
 
 export const getHideFilters = (hide: string[] = []) =>
 	hide.map(

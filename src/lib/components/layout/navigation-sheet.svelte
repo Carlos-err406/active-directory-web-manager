@@ -1,11 +1,12 @@
 <script>
+	import { page } from '$app/stores';
 	import { Button } from '$lib/components/ui/button';
 	import * as Sheet from '$lib/components/ui/sheet';
 	import Code from '$lucide/code.svelte';
 	import PanelLeft from '$lucide/panel-left.svelte';
 	import PanelRight from '$lucide/panel-right.svelte';
 	import Settings from '$lucide/settings.svelte';
-	import { items } from './navigation.svelte';
+	import { getNavigationItems } from '.';
 	import SheetNavigationItem from './sheet-navigation-item.svelte';
 </script>
 
@@ -27,7 +28,7 @@
 				Console
 			</div>
 			<hr class="w-full bg-muted" />
-			{#each items as { name, icon, href }}
+			{#each getNavigationItems($page.data.config) as { name, icon, href }}
 				<SheetNavigationItem {href}>
 					<svelte:component this={icon} class="size-5" />
 					{name}

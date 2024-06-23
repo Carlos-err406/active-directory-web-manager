@@ -12,7 +12,7 @@ import {
 } from '$lib/server';
 import { SESSION_ENTRY_ATTRIBUTES } from '$lib/types/session';
 import type { User } from '$lib/types/user';
-import { appLog, errorLog } from '$lib/utils';
+import { appLog, errorLog } from '$lib/server/logs';
 import { error, redirect, type Action } from '@sveltejs/kit';
 import { InvalidCredentialsError } from 'ldapts';
 import { fail, setError, superValidate } from 'sveltekit-superforms';

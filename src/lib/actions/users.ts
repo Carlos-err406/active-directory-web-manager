@@ -28,7 +28,7 @@ import {
 import type { Group } from '$lib/types/group';
 import { SESSION_ENTRY_ATTRIBUTES } from '$lib/types/session';
 import { UAC, type User } from '$lib/types/user';
-import { appLog, errorLog } from '$lib/utils';
+import { appLog, errorLog } from '$lib/server/logs';
 import { error, fail, redirect, type Action } from '@sveltejs/kit';
 import {
 	AlreadyExistsError,
@@ -50,12 +50,11 @@ export const createUser: Action = async (event) => {
 	const form = await superValidate(event, zod(createUserSchema));
 	if (!form.valid) return fail(400, withFiles({ form }));
 	const { ldap } = auth;
-	const { limit } = locals.config.directory.users;
 
-	const canCreate = await validateUserAmount(ldap, limit);
+	const canCreate = await validateUserAmount(ldap);
 	if (!canCreate) {
 		appLog(
-			'(ReachedUserLimit) Can not create more users in this directory. Maximum amount reached.',
+			`(ReachedUserLimit) User ${auth.session.sAMAccountName} tried creating a user but can not create more users in this directory. Maximum amount reached.`,
 			'Error'
 		);
 		throw error(403, 'Can not create more users in this directory');
@@ -172,9 +171,7 @@ export const deleteManyUsers: Action = async (event) => {
 		filters: dns.map((dn) => new EqualityFilter({ attribute: 'distinguishedName', value: dn }))
 	});
 
-	const { searchEntries } = await ldap.search(PUBLIC_BASE_DN, {
-		filter: filter.toString()
-	});
+	const { searchEntries } = await ldap.search(PUBLIC_BASE_DN, { filter });
 	const promises = searchEntries.map(async (entry) => {
 		if (entry['isCriticalSystemObject'] === 'TRUE') {
 			appLog(
@@ -184,7 +181,7 @@ export const deleteManyUsers: Action = async (event) => {
 			throw error(403, `Entry ${entry.sAMAccountName} can not be deleted!`);
 		}
 		return ldap.del(entry.dn).catch((e) => {
-			const message = `Something unexpected happened while deleting the group ${entry.sAMAccountName}`;
+			const message = `Something unexpected happened while deleting the user ${entry.sAMAccountName}`;
 			const errorId = errorLog(e, { message });
 			throw error(500, { message, errorId });
 		});

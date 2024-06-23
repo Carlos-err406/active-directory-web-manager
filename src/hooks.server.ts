@@ -1,4 +1,4 @@
-import config from '$config';
+import config, { LOGGING_SYSTEM_BASE } from '$config';
 import { PUBLIC_API_KEY, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
 import { getLDAPClient } from '$lib/ldap/client';
 import {
@@ -7,7 +7,7 @@ import {
 	verifyAccessToken,
 	verifySessionToken
 } from '$lib/server';
-import { errorLog } from '$lib/utils';
+import { errorLog } from '$lib/server/logs';
 import { error, type Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 import { getLoggerHook } from 'sveltekit-logger-hook';
@@ -68,16 +68,17 @@ const ldapUnbindHandler: Handle = async ({ event, resolve }) => {
 	return response;
 };
 
+const { decodeSearchParams, logDateTemplate, logTemplate, useLogging } = config.system.logging;
 /** hander hook for logging all requests
  *
  * if LOGGER enviroment variable is 1 the `logHandler` hook is included on the sequence
  * else `logHadler` is not included
  */
 const logHandler = getLoggerHook({
-	template: '[{date}] {url}{urlSearchParams} {method} {status}',
-	dateTemplate: 'YYYY-MM-DD HH:mm:ss A',
-	fileOptions: { basePath: config.system.logging.paths?.system_logs_path || './logs/system' },
-	decodeSearchParams: true,
+	template: logTemplate,
+	dateTemplate: logDateTemplate,
+	fileOptions: { basePath: LOGGING_SYSTEM_BASE },
+	decodeSearchParams: decodeSearchParams,
 	colorOptions: {
 		date: ({ status }) => (status >= 400 ? 'redBold' : 'yellow'),
 		method: ({ status }) => (status >= 400 ? 'redBold' : 'green'),
@@ -87,9 +88,13 @@ const logHandler = getLoggerHook({
 	}
 });
 
-export const handle = sequence(
-	logHandler,
-	apiProtectionHandler,
-	authenticationSetHandler,
-	ldapUnbindHandler
-);
+const getSequence = () => {
+	const sequence: Handle[] = [apiProtectionHandler, authenticationSetHandler, ldapUnbindHandler];
+	if (useLogging) {
+		sequence.unshift(logHandler);
+		console.log('Logging is enabled');
+	} else console.log('Logging is disabled');
+	return sequence;
+};
+
+export const handle = sequence(...getSequence());

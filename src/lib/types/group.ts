@@ -1,6 +1,7 @@
 import { getSelectOptions } from '$lib/components/form/select-input.svelte';
 
 export type Group = {
+	[key: string]: unknown;
 	dn: string;
 	objectClass: string[];
 	cn: string;

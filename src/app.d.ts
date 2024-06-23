@@ -44,6 +44,13 @@ declare module 'svelte' {
 	): void;
 }
 
+declare module '@sveltejs/kit' {
+	/** opposite of recursive required */
+	export type RecursivePartial<T> = {
+		[P in keyof T]?: RecursivePartial<T[P]>;
+	};
+}
+
 declare module 'ldapts' {
 	export type Filter = ReturnType<typeof FilterParser.parse>;
 }
