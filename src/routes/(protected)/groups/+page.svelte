@@ -14,7 +14,6 @@
 		ResetFiltersDropdown
 	} from '$lib/components/table';
 	import { breadcrumbs } from '$lib/stores';
-	import type { Group } from '$lib/types/group';
 	import { DataBodyCell, createRender, createTable } from 'svelte-headless-table';
 	import { addHiddenColumns, addSelectedRows, addSortBy } from 'svelte-headless-table/plugins';
 	import { readable } from 'svelte/store';
@@ -22,15 +21,18 @@
 	import type { PageData } from './$types';
 	export let data: PageData;
 	breadcrumbs.set([{ name: 'Groups' }]);
+	$: ({ columns: configColumns } = $page.data.config.app.views.groupsPage.table);
 
-	const hidableCols: (keyof Group)[] = [
-		'dn',
+	$: hidableCols = [
 		'sAMAccountName',
 		'mail',
-		'groupType',
+		'dn',
 		'description',
+		'groupType',
 		'whenCreated'
-	];
+	].filter((col) =>
+		Object.entries(configColumns).some(([key, value]) => key === col && value.show && value.hidable)
+	);
 
 	$: ({ pagination } = data);
 
@@ -44,66 +46,72 @@
 		select: addSelectedRows()
 	});
 
-	$: columns = table.createColumns([
-		table.column({
-			accessor: 'distinguishedName',
-			header: (_, { pluginStates }) => {
-				const { allPageRowsSelected } = pluginStates.select;
-				return createRender(DataTableCheckbox, {
-					checked: allPageRowsSelected
-				});
-			},
-			cell: ({ row }, { pluginStates }) => {
-				const { getRowState } = pluginStates.select;
-				const { isSelected } = getRowState(row);
+	$: columns = table.createColumns(
+		[
+			table.column({
+				accessor: 'distinguishedName',
+				header: (_, { pluginStates }) => {
+					const { allPageRowsSelected } = pluginStates.select;
+					return createRender(DataTableCheckbox, {
+						checked: allPageRowsSelected
+					});
+				},
+				cell: ({ row }, { pluginStates }) => {
+					const { getRowState } = pluginStates.select;
+					const { isSelected } = getRowState(row);
 
-				return createRender(DataTableCheckbox, {
-					checked: isSelected
-				});
-			},
-			plugins: {
-				sort: {
-					disable: true
+					return createRender(DataTableCheckbox, {
+						checked: isSelected
+					});
+				},
+				plugins: {
+					sort: {
+						disable: true
+					}
 				}
-			}
-		}),
-		table.column({
-			accessor: 'sAMAccountName',
-			header: 'sAMAccountName'
-		}),
-		table.column({
-			accessor: 'mail',
-			header: 'mail',
-			cell: ({ value }) => value ?? '-'
-		}),
-		table.column({
-			accessor: 'dn',
-			header: 'distinguishedName'
-		}),
-		table.column({
-			accessor: 'description',
-			header: 'description',
-			cell: ({ value }) => value ?? '-'
-		}),
-		table.column({
-			accessor: 'groupType',
-			header: 'groupType',
-			cell: ({ value }) => {
-				return createRender(GroupTypeCell, {
-					groupType: Number(value)
-				});
-			}
-		}),
-		table.column({
-			accessor: 'whenCreated',
-			header: 'whenCreated',
-			cell: ({ value }) => {
-				return createRender(CreatedAtCell, {
-					whenCreated: value
-				});
-			}
-		})
-	]);
+			}),
+			table.column({
+				accessor: 'sAMAccountName',
+				header: configColumns.sAMAccountName.header
+			}),
+			table.column({
+				accessor: 'mail',
+				header: configColumns.mail.header,
+				cell: ({ value }) => value ?? '-'
+			}),
+			table.column({
+				accessor: 'dn',
+				header: configColumns.dn.header
+			}),
+			table.column({
+				accessor: 'description',
+				header: configColumns.description.header,
+				cell: ({ value }) => value ?? '-'
+			}),
+			table.column({
+				accessor: 'groupType',
+				header: configColumns.groupType.header,
+				cell: ({ value }) => {
+					return createRender(GroupTypeCell, {
+						groupType: Number(value)
+					});
+				}
+			}),
+			table.column({
+				accessor: 'whenCreated',
+				header: configColumns.whenCreated.header,
+				cell: ({ value }) => {
+					return createRender(CreatedAtCell, {
+						whenCreated: value
+					});
+				}
+			})
+		].filter(
+			(col) =>
+				col.id === 'distinguishedName' ||
+				Object.entries(configColumns).some(([key, value]) => key === col.id && value.show)
+		)
+	);
 	$: data.session.isAdmin &&
 		(columns = [
 			...columns,

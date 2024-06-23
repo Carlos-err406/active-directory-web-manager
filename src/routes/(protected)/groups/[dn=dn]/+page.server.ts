@@ -5,8 +5,8 @@ import { getCNFromDN } from '$lib/ldap/utils';
 import { deleteGroupSchema } from '$lib/schemas/group/delete-group-schema';
 import { setMembersSchema } from '$lib/schemas/group/set-members-schema';
 import { updateGroupSchema } from '$lib/schemas/group/update-group-schema';
+import { appLog, errorLog } from '$lib/server/logs';
 import type { Group } from '$lib/types/group';
-import { errorLog } from '$lib/utils';
 import { error, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -14,10 +14,17 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ locals, params }) => {
 	const auth = await locals.auth();
 	if (!auth) throw redirect(302, '/');
-	const { ldap } = auth;
 	const { dn } = params;
 	const { hide } = config.directory.groups;
-	if (hide.includes(dn) || hide.includes(getCNFromDN(dn))) throw error(404, 'Group not found');
+	if (hide.includes(dn) || hide.includes(getCNFromDN(dn))) {
+		appLog(
+			`User ${auth.session.sAMAccountName} tried to access group ${dn}, but is hiden by configuration`,
+			'Error'
+		);
+		throw error(403, 'This group is hidden by configuration');
+	}
+	const { ldap } = auth;
+
 	try {
 		const [group, setMembersForm, updateGroupForm, deleteGroupForm] = await Promise.all([
 			getEntryByDn<Group>(ldap, dn),

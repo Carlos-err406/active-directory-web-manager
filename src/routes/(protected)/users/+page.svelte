@@ -13,18 +13,19 @@
 		UserPhotoCell,
 		UserTableActions
 	} from '$lib/components/users';
+	import UserAccountControlCell from '$lib/components/users/user-account-control-cell.svelte';
 	import { breadcrumbs } from '$lib/stores';
-	import type { User } from '$lib/types/user';
 	import { DataBodyCell, createRender, createTable } from 'svelte-headless-table';
 	import { addHiddenColumns, addSelectedRows, addSortBy } from 'svelte-headless-table/plugins';
 	import { readable } from 'svelte/store';
 	import { slide } from 'svelte/transition';
 	import type { PageData } from './$types';
-	import UserAccountControlCell from '$lib/components/users/user-account-control-cell.svelte';
 	export let data: PageData;
 	breadcrumbs.set([{ name: 'Users' }]);
 
-	const hidableCols: (keyof User)[] = [
+	$: ({ columns: configColumns } = $page.data.config.app.views.usersPage.table);
+
+	$: hidableCols = [
 		'jpegPhoto',
 		'sAMAccountName',
 		'dn',
@@ -35,8 +36,9 @@
 		'description',
 		'userAccountControl',
 		'whenCreated'
-	];
-
+	].filter((col) =>
+		Object.entries(configColumns).some(([key, value]) => key === col && value.show && value.hidable)
+	);
 	$: ({ pagination } = data);
 
 	$: table = createTable(readable(pagination.data), {
@@ -49,98 +51,104 @@
 		select: addSelectedRows()
 	});
 
-	$: columns = table.createColumns([
-		table.column({
-			accessor: 'distinguishedName',
-			header: (_, { pluginStates }) => {
-				const { allPageRowsSelected } = pluginStates.select;
-				return createRender(DataTableCheckbox, {
-					checked: allPageRowsSelected
-				});
-			},
-			cell: ({ row }, { pluginStates }) => {
-				const { getRowState } = pluginStates.select;
-				const { isSelected } = getRowState(row);
+	$: columns = table.createColumns(
+		[
+			table.column({
+				accessor: 'distinguishedName',
+				header: (_, { pluginStates }) => {
+					const { allPageRowsSelected } = pluginStates.select;
+					return createRender(DataTableCheckbox, {
+						checked: allPageRowsSelected
+					});
+				},
+				cell: ({ row }, { pluginStates }) => {
+					const { getRowState } = pluginStates.select;
+					const { isSelected } = getRowState(row);
 
-				return createRender(DataTableCheckbox, {
-					checked: isSelected
-				});
-			},
-			plugins: {
-				sort: {
-					disable: true
+					return createRender(DataTableCheckbox, {
+						checked: isSelected
+					});
+				},
+				plugins: {
+					sort: {
+						disable: true
+					}
 				}
-			}
-		}),
-		table.column({
-			accessor: 'jpegPhoto',
-			header: 'jpegPhoto',
-			cell: ({ value, row }) => {
-				return createRender(UserPhotoCell, {
-					jpegPhoto: value,
-					sAMAccountName: (row.cellForId.sAMAccountName as unknown as { value: string }).value
-				});
-			},
-			plugins: {
-				sort: {
-					disable: true
+			}),
+			table.column({
+				accessor: 'jpegPhoto',
+				header: configColumns.jpegPhoto.header,
+				cell: ({ value, row }) => {
+					return createRender(UserPhotoCell, {
+						jpegPhoto: value,
+						sAMAccountName: (row.cellForId.sAMAccountName as unknown as { value: string }).value
+					});
+				},
+				plugins: {
+					sort: {
+						disable: true
+					}
 				}
-			}
-		}),
-		table.column({
-			accessor: 'sAMAccountName',
-			header: 'sAMAccountName'
-		}),
+			}),
+			table.column({
+				accessor: 'sAMAccountName',
+				header: configColumns.sAMAccountName.header
+			}),
 
-		table.column({
-			accessor: 'displayName',
-			header: 'displayName',
-			cell: ({ value }) => value ?? '-'
-		}),
+			table.column({
+				accessor: 'displayName',
+				header: configColumns.displayName.header,
+				cell: ({ value }) => value ?? '-'
+			}),
 
-		table.column({
-			accessor: 'givenName',
-			header: 'givenName',
-			cell: ({ value }) => value ?? '-'
-		}),
-		table.column({
-			accessor: 'sn',
-			header: 'sn',
-			cell: ({ value }) => value ?? '-'
-		}),
-		table.column({
-			accessor: 'dn',
-			header: 'distinguishedName'
-		}),
-		table.column({
-			accessor: 'mail',
-			header: 'mail',
-			cell: ({ value }) => value ?? '-'
-		}),
-		table.column({
-			accessor: 'description',
-			header: 'description',
-			cell: ({ value }) => value ?? '-'
-		}),
-		table.column({
-			accessor: 'userAccountControl',
-			header: 'userAccountControl',
-			cell: ({ value }) => {
-				return createRender(UserAccountControlCell, {
-					userAccountControl: Number(value)
-				});
-			}
-		}),
-		table.column({
-			accessor: 'whenCreated',
-			header: 'whenCreated',
-			cell: ({ value }) => {
-				return createRender(CreatedAtCell, {
-					whenCreated: value
-				});
-			}
-		})
-	]);
+			table.column({
+				accessor: 'givenName',
+				header: configColumns.givenName.header,
+				cell: ({ value }) => value ?? '-'
+			}),
+			table.column({
+				accessor: 'sn',
+				header: configColumns.sn.header,
+				cell: ({ value }) => value ?? '-'
+			}),
+			table.column({
+				accessor: 'dn',
+				header: configColumns.dn.header
+			}),
+			table.column({
+				accessor: 'mail',
+				header: configColumns.mail.header,
+				cell: ({ value }) => value ?? '-'
+			}),
+			table.column({
+				accessor: 'description',
+				header: configColumns.description.header,
+				cell: ({ value }) => value ?? '-'
+			}),
+			table.column({
+				accessor: 'userAccountControl',
+				header: configColumns.userAccountControl.header,
+				cell: ({ value }) => {
+					return createRender(UserAccountControlCell, {
+						userAccountControl: Number(value)
+					});
+				}
+			}),
+			table.column({
+				accessor: 'whenCreated',
+				header: configColumns.whenCreated.header,
+				cell: ({ value }) => {
+					return createRender(CreatedAtCell, {
+						whenCreated: value
+					});
+				}
+			})
+		].filter(
+			(col) =>
+				col.id === 'distinguishedName' ||
+				Object.entries(configColumns).some(([key, value]) => key === col.id && value.show)
+		)
+	);
 	$: data.session.isAdmin &&
 		(columns = [
 			...columns,
@@ -167,7 +175,7 @@
 <div class="w-full">
 	<div class="my-2 flex w-full justify-end gap-4">
 		<ResetFiltersDropdown />
-		<ColumnsDropdown {hidableCols} {flatColumns} />
+		<ColumnsDropdown hidableCols={hidableCols.map(String)} {flatColumns} />
 		<CreateUserDialog />
 	</div>
 	<DataTable viewModel={{ ...viewModel, flatColumns, rows, pluginStates }}>

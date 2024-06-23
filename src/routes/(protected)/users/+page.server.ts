@@ -1,5 +1,4 @@
 // import * as userActions from '$lib/actions/users';
-import config from '$config';
 import { getFilteredUsers } from '$lib/ldap';
 import { extractPagination, type PaginationWithUrls } from '$lib/pagination';
 import { deleteManySchema } from '$lib/schemas/delete-many-schema';
@@ -7,9 +6,9 @@ import { changePasswordSchema } from '$lib/schemas/user/change-password-schema';
 import { createUserSchema } from '$lib/schemas/user/create-user-schema';
 import { deleteUserSchema } from '$lib/schemas/user/delete-user-schema';
 import { updateUserSchema } from '$lib/schemas/user/update-user-schema';
+import { errorLog } from '$lib/server/logs';
 import { jpegPhotoToB64 } from '$lib/transforms';
 import type { User } from '$lib/types/user';
-import { errorLog } from '$lib/utils';
 import { error, redirect } from '@sveltejs/kit';
 import { SubstringFilter, type Filter } from 'ldapts';
 import { superValidate } from 'sveltekit-superforms';
@@ -23,7 +22,6 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 	if (!auth) throw redirect(302, '/');
 	const { ldap } = auth;
 	const { searchParams, pathname } = url;
-	const { directory } = config;
 	const sAMAccountNameQuery = searchParams.get('q');
 	const page = Number(searchParams.get('page') || 1);
 	const pageSize = Number(searchParams.get('pageSize') || 10);
@@ -31,12 +29,13 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 	const order = searchParams.get('order') || 'asc';
 
 	const extraFilters: Filter[] = [];
+
 	if (sAMAccountNameQuery)
 		extraFilters.push(
 			new SubstringFilter({ attribute: 'sAMAccountName', any: [sAMAccountNameQuery] })
 		);
 	try {
-		const users = await getFilteredUsers(ldap, directory.users.hide, extraFilters);
+		const users = await getFilteredUsers(ldap, extraFilters);
 
 		users.sort((a, b) => {
 			if (
