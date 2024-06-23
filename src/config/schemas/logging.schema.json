@@ -1,0 +1,36 @@
+{
+	"$id": "logging.schema.json",
+	"description": "Logging configuration according to @link https://www.npmjs.com/package/sveltekit-logger-hook",
+	"title": "LoggingConfig",
+	"type": "object",
+	"properties": {
+		"basePath": {
+			"default": "./logs/",
+			"description": "Logging paths. Where the app and system logs will be stored. @default \"./logs/\"",
+			"format": "path",
+			"type": "string"
+		},
+		"decodeSearchParams": {
+			"$comment": "Converts %20 to whitespace, and so on using decodeUriComponent",
+			"description": "Enable or disable url search params decoding. @default false",
+			"type": "boolean",
+			"default": false
+		},
+		"logDateTemplate": {
+			"default": "\"YYYY-MM-DD HH:mm:ss A\"",
+			"description": "Log date template as indicated by @link https://day.js.org/docs/en/display/format @default \"YYYY-MM-DD HH:mm:ss A\"",
+			"type": "string"
+		},
+		"logTemplate": {
+			"default": "[{date}] {url}{urlSearchParams} {method} {status}",
+			"description": "Log template as indicated by @link https://www.npmjs.com/package/sveltekit-logger-hook @default \"[{date}] {url}{urlSearchParams} {method} {status}\"",
+			"type": "string"
+		},
+		"useLogging": {
+			"description": "Enable or disable logging. If `false` `basePath` is ignored. If `true` `basePath` is required @default false",
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"additionalProperties": false
+}

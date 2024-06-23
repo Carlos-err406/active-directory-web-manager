@@ -15,8 +15,8 @@
 		"test:integration": "playwright test",
 		"test:unit": "vitest",
 		"prepare": "husky",
-		"app:config": "cat src/config/config.schema.json | npx json2ts > src/config/app.config.d.ts",
-		"watch:config": "chokidar src/config/config.schema.json --initial -c \"npm run app:config\""
+		"app:config": "npx json2ts -i src/config/schemas/index.schema.json -o src/config/app.config.d.ts --cwd=src/config/schemas",
+		"watch:config": "chokidar src/config/schemas/ --initial -c \"npm run app:config\""
 	},
 	"lint-staged": {
 		"*": [
@@ -26,6 +26,7 @@
 		]
 	},
 	"devDependencies": {
+		"@adobe/jsonschema2md": "^8.0.2",
 		"@playwright/test": "^1.28.1",
 		"@sveltejs/adapter-node": "^5.0.1",
 		"@sveltejs/kit": "^2.0.0",

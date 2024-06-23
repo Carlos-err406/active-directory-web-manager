@@ -5,7 +5,7 @@
 	"json.schemas": [
 		{
 			"schema": false,
-			"url": "./src/config/config.schema.json",
+			"url": "./src/config/schemas/index.schema.json",
 			"fileMatch": ["app.config.json"]
 		}
 	]

@@ -1,7 +1,7 @@
 import type { RecursiveRequired } from '@sveltejs/kit';
 import merge from 'deepmerge';
 import Config from './app.config.json';
-import Schema from './config.schema.json';
+import Schema from './schemas/index.schema.json';
 import defaults from './defaults';
 const validateConfig = async () => {
 	console.log('Validating config file...');

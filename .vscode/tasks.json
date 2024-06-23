@@ -49,7 +49,7 @@
 			"script": "watch:config",
 			"problemMatcher": [],
 			"label": "watch:config",
-			"detail": "chokidar src/config/config.schema.json --initial -c \"npm run app:config\"",
+			"detail": "chokidar src/config/schemas --initial -c \"npm run app:config\"",
 			"isBackground": true,
 			"icon": {
 				"id": "eye-watch",

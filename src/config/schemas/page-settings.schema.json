@@ -1,0 +1,14 @@
+{
+	"$id": "page-settings.schema.json",
+	"description": "Configuration reggarding the settings page",
+	"title": "SettingsPageConfig",
+	"type": "object",
+	"properties": {
+		"showConfigurationForm": {
+			"description": "Weather or not to allow the user to change the configuration. @default false",
+			"type": "boolean",
+			"default": true
+		}
+	},
+	"additionalProperties": false
+}

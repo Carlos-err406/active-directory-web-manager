@@ -1,0 +1,15 @@
+{
+	"$id": "app.schema.json",
+	"description": "Application configuration settings",
+	"title": "AppConfig",
+	"type": "object",
+	"properties": {
+		"captcha": {
+			"$ref": "captcha.schema.json"
+		},
+		"views": {
+			"$ref": "views.schema.json"
+		}
+	},
+	"additionalProperties": false
+}

@@ -1,0 +1,26 @@
+{
+	"$id": "views.schema.json",
+	"description": "Configuration reggarding de different pages of the web app",
+	"title": "ViewsConfig",
+	"type": "object",
+	"properties": {
+		"groupsPage": {
+			"$ref": "page-groups.schema.json"
+		},
+		"logsPage": {
+			"$ref": "page-logs.schema.json"
+		},
+		"ousPage": {
+			"$ref": "page-ous.schema.json"
+		},
+		"settingsPage": {
+			"$ref": "page-settings.schema.json"
+		},
+		"treePage": {
+			"$ref": "page-tree.schema.json"
+		},
+		"usersPage": {
+			"$ref": "page-users.schema.json"
+		}
+	}
+}

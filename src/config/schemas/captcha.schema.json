@@ -1,0 +1,73 @@
+{
+	"$id": "captcha.schema.json",
+	"description": "Captcha personalization options. You can test these live in @link https://vanilla-captcha-demo.vercel.app/server-captcha",
+	"title": "CaptchaConfig",
+	"type": "object",
+	"properties": {
+		"backgroundColor": {
+			"default": "#FFFFFF",
+			"description": "CSS color of the captcha background. Can use other css variants other than hex. @default \"#FFFFFF\"",
+			"type": "string",
+			"examples": ["#FFFFFF", "rgb(255,255,255)", "hsl(0, 0%, 100%)", "white"]
+		},
+		"font": {
+			"default": "Arial",
+			"description": "Font of the characters in the captcha. @default \"Arial\"",
+			"type": "string"
+		},
+		"fontColor": {
+			"default": "#777777",
+			"description": "CSS color of the captcha text. Can use other css variants other than hex. @default \"#777777\"",
+			"type": "string",
+			"examples": ["#FFFFFF", "rgb(255,255,255)", "hsl(0, 0%, 100%)", "white"]
+		},
+		"fontSize": {
+			"default": 30,
+			"minimum": 0,
+			"description": "Font size of the characters in the captcha. @default 30",
+			"type": "integer"
+		},
+		"fontWeight": {
+			"default": 600,
+			"minimum": 100,
+			"description": "Font size of the characters in the captcha. @default 600",
+			"type": "integer"
+		},
+		"height": {
+			"default": 96,
+			"description": "Height of the captcha image. @default 96",
+			"type": "integer"
+		},
+		"length": {
+			"default": 5,
+			"maximum": 9,
+			"minimum": 1,
+			"description": "Length of the captcha shown in the authentication page, recommended to use a low value for development. @default 5",
+			"type": "integer"
+		},
+		"lineAmount": {
+			"default": 10,
+			"minimum": 0,
+			"description": "Number of lines that strike over the captcha. @default 10",
+			"type": "integer"
+		},
+		"lineColor": {
+			"default": "#777777",
+			"description": "CSS color of the lines that strike the captcha text. Can use other css variants other than hex. @default \"#777777\"",
+			"type": "string",
+			"examples": ["#FFFFFF", "rgb(255,255,255)", "hsl(0, 0%, 100%)", "white"]
+		},
+		"lineWidth": {
+			"default": 1,
+			"minimum": 1,
+			"description": "Width of lines that strike over the captcha. @default 1",
+			"type": "integer"
+		},
+		"width": {
+			"default": 345,
+			"description": "Width of the captcha image. @default 345",
+			"type": "integer"
+		}
+	},
+	"additionalProperties": false
+}

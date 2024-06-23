@@ -1,0 +1,12 @@
+{
+	"$id": "system.schema.json",
+	"type": "object",
+	"title": "SystemConfig",
+	"description": "System settings",
+	"properties": {
+		"logging": {
+			"$ref": "logging.schema.json"
+		}
+	},
+	"additionalProperties": false
+}
