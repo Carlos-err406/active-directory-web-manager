@@ -1,0 +1,139 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"type": "object",
+	"title": "Config",
+	"description": "Application configuration settings",
+	"required": ["app", "directory", "system"],
+	"properties": {
+		"system": {
+			"additionalProperties": false,
+			"type": "object",
+			"description": "System settings",
+			"required": ["logging"],
+			"properties": {
+				"logging": {
+					"additionalProperties": false,
+					"type": "object",
+					"description": "Logging settings",
+					"required": ["useLogging"],
+					"properties": {
+						"useLogging": {
+							"type": "boolean",
+							"default": false,
+							"description": "Enable or disable logging. If `false` `basePath` is ignored. If `true` `basePath` is required @default ./logs"
+						},
+						"logTemplate": {
+							"type": "string",
+							"default": "[{date}] {url}{urlSearchParams} {method} {status}",
+							"description": "Log template as indicated by @link https://www.npmjs.com/package/sveltekit-logger-hook @default \"[{date}] {url}{urlSearchParams} {method} {status}\""
+						},
+						"logDateTemplate": {
+							"type": "string",
+							"default": "\"YYYY-MM-DD HH:mm:ss A\"",
+							"description": "Log date template as indicated by @link https://day.js.org/docs/en/display/format @default \"YYYY-MM-DD HH:mm:ss A\""
+						},
+						"decodeSearchParams": {
+							"type": "boolean",
+							"default": false,
+							"description": "Enable or disable url search params decoding. @default false"
+						},
+						"basePath": {
+							"required": ["app_logs_path", "system_logs_path"],
+							"description": "Logging paths. Where the app and system logs will be stored",
+							"type": "string",
+							"default": "./logs/",
+							"format": "path"
+						}
+					}
+				}
+			}
+		},
+		"app": {
+			"additionalProperties": false,
+			"description": "Interface configuration settings",
+			"required": ["views"],
+			"properties": {
+				"views": {
+					"type": "object",
+					"additionalProperties": false,
+					"description": "configuration reggarding de different pages of the web app",
+					"required": ["logsPage"],
+					"properties": {
+						"logsPage": {
+							"type": "object",
+							"description": "configuration reggarding the logs page",
+							"additionalProperties": false,
+							"properties": {
+								"show": {
+									"type": "boolean",
+									"default": false,
+									"description": "Weather or not to show the /logs page in navigation. Accessing directly to this route will result on a '403 This page has been disabled by configuration' error"
+								}
+							}
+						}
+					}
+				},
+				"captchaLength": {
+					"type": "integer",
+					"minimum": 1,
+					"maximum": 9,
+					"default": 5,
+					"description": "Length of the captcha shown in the authentication page, recommended to use a low value for development.5"
+				}
+			}
+		},
+		"directory": {
+			"additionalProperties": false,
+			"description": "Directory management configuration settings",
+			"required": ["users", "groups"],
+			"properties": {
+				"users": {
+					"additionalProperties": false,
+					"type": "object",
+					"description": "Directory settings reggarding user management",
+					"required": ["hide", "limit"],
+					"properties": {
+						"hide": {
+							"type": "array",
+							"items": {
+								"type": "string"
+							},
+							"uniqueItems": true,
+							"default": [],
+							"description": "The list of user distinguishedNames or sAMAccountNames that should not be shown in the list view and dropdowns]"
+						},
+						"limit": {
+							"type": ["integer", "null"],
+							"minimum": 0,
+							"default": null,
+							"description": "The maximum amount of users allowed in the directory. If set to null the limit will be ignored.l"
+						}
+					}
+				},
+				"groups": {
+					"additionalProperties": false,
+					"type": "object",
+					"description": "Directory settings reggarding group management",
+					"required": ["hide", "limit"],
+					"properties": {
+						"hide": {
+							"type": "array",
+							"items": {
+								"type": "string"
+							},
+							"uniqueItems": true,
+							"default": [],
+							"description": "The list of group distinguishedNames or sAMAccountNames that should not be shown in the list view and dropdowns]"
+						},
+						"limit": {
+							"type": ["integer", "null"],
+							"minimum": 0,
+							"default": null,
+							"description": "The maximum amount of groups allowed in the directory. If set to null the limit will be ignored.l"
+						}
+					}
+				}
+			}
+		}
+	}
+}

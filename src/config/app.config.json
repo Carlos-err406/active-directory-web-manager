@@ -1,21 +1,26 @@
 {
-	"$schema": "./app.config.schema.json",
+	"$schema": "./config.schema.json",
 	"system": {
 		"logging": {
-			"use_logging": true,
-			"paths": {
-				"app_logs_path": "./logs/app/",
-				"system_logs_path": "./logs/system/"
-			}
+			"useLogging": true,
+			"decodeSearchParams": true,
+			"basePath": "./logs/",
+			"logTemplate": "[{date}] {url}{urlSearchParams} {method} {status}",
+			"logDateTemplate": "YYYY-MM-DD HH:mm:ss A"
 		}
 	},
 	"app": {
-		"captcha_length": 1
+		"captchaLength": 1,
+		"views": {
+			"logsPage": {
+				"show": true
+			}
+		}
 	},
 	"directory": {
 		"users": {
-			"limit": 3,
-			"hide": ["Guest", "CN=krbtgt,CN=Users,DC=local,DC=com"]
+			"limit": null,
+			"hide": []
 		},
 		"groups": {
 			"limit": null,

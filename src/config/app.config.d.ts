@@ -18,26 +18,25 @@ export interface Config {
 		 */
 		logging: {
 			/**
-			 * Enable or disable logging
+			 * Enable or disable logging. If `false` `basePath` is ignored. If `true` `basePath` is required @default ./logs
 			 */
-			use_logging: boolean;
+			useLogging: boolean;
 			/**
-			 * Logging paths
+			 * Log template as indicated by @link https://www.npmjs.com/package/sveltekit-logger-hook @default "[{date}] {url}{urlSearchParams} {method} {status}"
 			 */
-			paths?: {
-				/**
-				 * Path to the app logs
-				 *
-				 * @default logs/app/
-				 */
-				app_logs_path: string;
-				/**
-				 * Path to the system logs
-				 *
-				 * @default logs/system/
-				 */
-				system_logs_path: string;
-			};
+			logTemplate?: string;
+			/**
+			 * Log date template as indicated by @link https://day.js.org/docs/en/display/format @default "YYYY-MM-DD HH:mm:ss A"
+			 */
+			logDateTemplate?: string;
+			/**
+			 * Enable or disable url search params decoding. @default false
+			 */
+			decodeSearchParams?: boolean;
+			/**
+			 * Logging paths. Where the app and system logs will be stored
+			 */
+			basePath?: string;
 		};
 	};
 	/**
@@ -45,11 +44,23 @@ export interface Config {
 	 */
 	app: {
 		/**
-		 * Length of the captcha shown in the authentication page, recommended to use a low value for development.
-		 *
-		 * @default 5
+		 * configuration reggarding de different pages of the web app
 		 */
-		captcha_length?: number;
+		views: {
+			/**
+			 * configuration reggarding the logs page
+			 */
+			logsPage: {
+				/**
+				 * Weather or not to show the /logs page in navigation. Accessing directly to this route will result on a '403 This page has been disabled by configuration' error
+				 */
+				show?: boolean;
+			};
+		};
+		/**
+		 * Length of the captcha shown in the authentication page, recommended to use a low value for development.5
+		 */
+		captchaLength?: number;
 	};
 	/**
 	 * Directory management configuration settings
@@ -60,15 +71,11 @@ export interface Config {
 		 */
 		users: {
 			/**
-			 * The list of user distinguishedNames or sAMAccountNames that should not be shown in the list view and dropdowns
-			 *
-			 * @default []
+			 * The list of user distinguishedNames or sAMAccountNames that should not be shown in the list view and dropdowns]
 			 */
 			hide: string[];
 			/**
-			 * The maximum amount of users allowed in the directory. If set to null the limit will be ignored.
-			 *
-			 * @default null
+			 * The maximum amount of users allowed in the directory. If set to null the limit will be ignored.l
 			 */
 			limit: number | null;
 		};
@@ -77,15 +84,11 @@ export interface Config {
 		 */
 		groups: {
 			/**
-			 * The list of group distinguishedNames or sAMAccountNames that should not be shown in the list view and dropdowns
-			 *
-			 * @default []
+			 * The list of group distinguishedNames or sAMAccountNames that should not be shown in the list view and dropdowns]
 			 */
 			hide: string[];
 			/**
-			 * The maximum amount of groups allowed in the directory. If set to null the limit will be ignored.
-			 *
-			 * @default null
+			 * The maximum amount of groups allowed in the directory. If set to null the limit will be ignored.l
 			 */
 			limit: number | null;
 		};

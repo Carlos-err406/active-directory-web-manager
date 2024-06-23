@@ -1,0 +1,90 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "dev",
+			"problemMatcher": [],
+			"label": "npm: dev",
+			"detail": "vite dev",
+			"icon": {
+				"id": "wrench",
+				"color": "terminal.ansiBlue"
+			},
+			"isBackground": true,
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": true,
+				"panel": "dedicated",
+				"showReuseMessage": true,
+				"clear": true,
+				"close": true
+			},
+			"dependsOn": "docker-compose up samba",
+			"dependsOrder": "sequence"
+		},
+		{
+			"label": "docker-compose up samba",
+			"type": "shell",
+			"command": "docker-compose",
+			"args": ["up", "--detach", "samba"],
+			"problemMatcher": [],
+			"icon": {
+				"color": "terminal.ansiBlue",
+				"id": "file-directory"
+			},
+			"presentation": {
+				"echo": false,
+				"reveal": "never",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": false,
+				"close": true,
+				"clear": true
+			}
+		},
+		{
+			"type": "npm",
+			"script": "watch:config",
+			"problemMatcher": [],
+			"label": "watch:config",
+			"detail": "chokidar src/config/config.schema.json --initial -c \"npm run app:config\"",
+			"isBackground": true,
+			"icon": {
+				"id": "eye-watch",
+				"color": "terminal.ansiMagenta"
+			},
+			"presentation": {
+				"echo": true,
+				"reveal": "silent",
+				"focus": false,
+				"panel": "dedicated",
+				"showReuseMessage": false,
+				"clear": true,
+				"close": true
+			}
+		},
+		{
+			"type": "npm",
+			"script": "build",
+			"group": { "kind": "build", "isDefault": true },
+			"problemMatcher": [],
+			"label": "npm: build",
+			"detail": "vite build",
+			"isBackground": true,
+			"icon": {
+				"color": "terminal.ansiGreen",
+				"id": "coffee"
+			},
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "dedicated",
+				"showReuseMessage": true,
+				"clear": true
+			}
+		}
+	]
+}

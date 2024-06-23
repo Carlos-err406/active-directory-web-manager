@@ -2,6 +2,7 @@
 
 import type { Context } from '$lib/types/context';
 import type { Session } from '$lib/types/session';
+import type { RecursiveRequired } from '@sveltejs/kit';
 import type { Client, FilterParser } from 'ldapts';
 import type { ExternalToast } from 'svelte-sonner';
 import type { Config as AppConfigType } from './config/app.config';
@@ -20,7 +21,9 @@ declare global {
 			 */
 			auth: () => Promise<{ ldap: Client; session: Session } | null>;
 		}
-		// interface PageData {}
+		interface PageData {
+			config: RecursiveRequired<AppConfigType>;
+		}
 		interface PageState {
 			toast?: {
 				type: 'success' | 'error' | 'info' | 'message' | 'warning';
