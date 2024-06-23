@@ -3,7 +3,19 @@ import type { RecursiveRequired } from '@sveltejs/kit';
 /** default values to be overriden by the values in Config*/
 const defaults: RecursiveRequired<App.Config> = {
 	app: {
-		captchaLength: 5,
+		captcha: {
+			length: 5,
+			backgroundColor: '#FFFFFF',
+			width: 345,
+			height: 96,
+			font: 'Arial',
+			fontSize: 30,
+			fontWeight: 600,
+			fontColor: '#777777',
+			lineColor: '#777777',
+			lineAmount: 10,
+			lineWidth: 1
+		},
 		views: {
 			logsPage: { show: true },
 			ousPage: { show: true },

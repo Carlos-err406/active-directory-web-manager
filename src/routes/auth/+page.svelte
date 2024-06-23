@@ -77,7 +77,7 @@
 					data-loading={loadingCaptcha}
 					class="relative flex w-full flex-row data-[loading=true]:hidden"
 				>
-					<img bind:this={captcha} src="" alt="captcha" />
+					<img bind:this={captcha} src="" class="rounded-lg" alt="captcha" />
 					<Button
 						variant="outline"
 						type="button"

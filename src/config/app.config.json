@@ -101,12 +101,8 @@
 				}
 			}
 		},
-		"captchaLength": 1
-	},
-	"directory": {
-		"groups": {
-			"limit": 40,
-			"hide": ["Domain Admins"]
+		"captcha": {
+			"length": 1
 		}
 	}
 }

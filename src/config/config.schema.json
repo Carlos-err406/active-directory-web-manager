@@ -1,23 +1,22 @@
 {
 	"$schema": "http://json-schema.org/draft-07/schema#",
-	"type": "object",
 	"title": "Config",
 	"description": "Application configuration settings",
 	"properties": {
 		"system": {
 			"additionalProperties": false,
-			"type": "object",
+			"title": "SystemConfig",
 			"description": "System settings",
 			"properties": {
 				"logging": {
 					"additionalProperties": false,
-					"type": "object",
-					"description": "Logging settings",
+					"title": "LoggingConfig",
+					"description": "Logging configuration according to @link https://www.npmjs.com/package/sveltekit-logger-hook",
 					"properties": {
 						"useLogging": {
 							"type": "boolean",
 							"default": false,
-							"description": "Enable or disable logging. If `false` `basePath` is ignored. If `true` `basePath` is required @default ./logs"
+							"description": "Enable or disable logging. If `false` `basePath` is ignored. If `true` `basePath` is required @default false"
 						},
 						"logTemplate": {
 							"type": "string",
@@ -32,10 +31,11 @@
 						"decodeSearchParams": {
 							"type": "boolean",
 							"default": false,
+							"$comment": "Converts %20 to whitespace, and so on using decodeUriComponent",
 							"description": "Enable or disable url search params decoding. @default false"
 						},
 						"basePath": {
-							"description": "Logging paths. Where the app and system logs will be stored",
+							"description": "Logging paths. Where the app and system logs will be stored. @default \"./logs/\"",
 							"type": "string",
 							"default": "./logs/",
 							"format": "path"
@@ -45,202 +45,231 @@
 			}
 		},
 		"app": {
+			"title": "AppConfig",
 			"additionalProperties": false,
 			"description": "Interface configuration settings",
 			"properties": {
 				"views": {
-					"type": "object",
 					"additionalProperties": false,
-					"description": "configuration reggarding de different pages of the web app",
+					"description": "Configuration reggarding de different pages of the web app",
 					"properties": {
 						"usersPage": {
-							"type": "object",
 							"additionalProperties": false,
-							"description": "configuration reggarding the users page",
+							"description": "Configuration reggarding the users page",
 							"properties": {
 								"table": {
-									"type": "object",
 									"additionalProperties": false,
+									"description": "Users table view configuration",
 									"properties": {
 										"columns": {
-											"type": "object",
 											"additionalProperties": false,
+											"description": "Users table columns configuration",
 											"properties": {
 												"jpegPhoto": {
-													"type": "object",
+													"description": "Configure the users table jpegPhoto column",
 													"additionalProperties": false,
 													"properties": {
 														"show": {
+															"description": "Wether or not to show the jpegPhoto column. If false \"hidable\" is ignored. @default true",
 															"type": "boolean",
 															"default": true
 														},
 														"header": {
+															"description": "Name of the table header for the jpegPhoto column. @default \"jpegPhoto\"",
 															"type": "string",
 															"default": "jpegPhoto"
 														},
 														"hidable": {
+															"description": "Wether or not the \"jpegPhoto\" is hidable or not. @default true",
 															"type": "boolean",
 															"default": true
 														}
 													}
 												},
 												"sAMAccountName": {
-													"type": "object",
+													"description": "Configure the users table \"sAMAccountName\" column",
 													"additionalProperties": false,
 													"properties": {
 														"show": {
+															"description": "Wether or not to show the \"sAMAccountName\" column. If false \"hidable\" is ignored. @default true",
 															"type": "boolean",
 															"default": true
 														},
 														"header": {
+															"description": "Name of the table header for the \"sAMAccountName\" column. @default \"sAMAccountName\"",
 															"type": "string",
 															"default": "sAMAccountName"
 														},
 														"hidable": {
+															"description": "Wether or not the \"sAMAccountName\" is hidable or not. @default falses",
 															"type": "boolean",
-															"default": true
+															"default": false
 														}
 													}
 												},
 												"displayName": {
-													"type": "object",
+													"description": "Configure the users table displayName column",
 													"additionalProperties": false,
 													"properties": {
 														"show": {
+															"description": "Wether or not to show the displayName column. If false \"hidable\" is ignored. @default true",
 															"type": "boolean",
 															"default": true
 														},
 														"header": {
+															"description": "Name of the table header for the displayName column. @default \"displayName\"",
 															"type": "string",
 															"default": "displayName"
 														},
 														"hidable": {
+															"description": "Wether or not the \"displayName\" is hidable or not. @default true",
 															"type": "boolean",
 															"default": true
 														}
 													}
 												},
 												"givenName": {
-													"type": "object",
+													"description": "Configure the users table givenName column",
 													"additionalProperties": false,
 													"properties": {
 														"show": {
+															"description": "Wether or not to show the givenName column. If false \"hidable\" is ignored. @default true",
 															"type": "boolean",
 															"default": true
 														},
 														"header": {
+															"description": "Name of the table header for the givenName column. @default \"givenName\"",
 															"type": "string",
 															"default": "givenName"
 														},
 														"hidable": {
+															"description": "Wether or not the \"givenName\" is hidable or not. @default true",
 															"type": "boolean",
 															"default": true
 														}
 													}
 												},
 												"sn": {
-													"type": "object",
+													"description": "Configure the users table sn column",
 													"additionalProperties": false,
 													"properties": {
 														"show": {
+															"description": "Wether or not to show the sn column. If false \"hidable\" is ignored. @default true",
 															"type": "boolean",
 															"default": true
 														},
 														"header": {
+															"description": "Name of the table header for the sn column. @default \"sn\"",
 															"type": "string",
 															"default": "sn"
 														},
 														"hidable": {
+															"description": "Wether or not the \"sn\" is hidable or not. @default true",
 															"type": "boolean",
 															"default": true
 														}
 													}
 												},
 												"mail": {
-													"type": "object",
+													"description": "Configure the users table mail column",
 													"additionalProperties": false,
 													"properties": {
 														"show": {
+															"description": "Wether or not to show the mail column. If false \"hidable\" is ignored. @default true",
 															"type": "boolean",
 															"default": true
 														},
 														"header": {
+															"description": "Name of the table header for the mail column. @default \"mail\"",
 															"type": "string",
 															"default": "mail"
 														},
 														"hidable": {
+															"description": "Wether or not the \"mail\" is hidable or not. @default true",
 															"type": "boolean",
 															"default": true
 														}
 													}
 												},
 												"description": {
-													"type": "object",
+													"description": "Configure the users table description column",
 													"additionalProperties": false,
 													"properties": {
 														"show": {
+															"description": "Wether or not to show the description column. If false \"hidable\" is ignored. @default true",
 															"type": "boolean",
 															"default": true
 														},
 														"header": {
+															"description": "Name of the table header for the description column. @default \"description\"",
 															"type": "string",
 															"default": "description"
 														},
 														"hidable": {
+															"description": "Wether or not the \"description\" is hidable or not. @default true",
 															"type": "boolean",
 															"default": true
 														}
 													}
 												},
 												"dn": {
-													"type": "object",
+													"description": "Configure the users table dn column",
 													"additionalProperties": false,
 													"properties": {
 														"show": {
+															"description": "Wether or not to show the dn column. If false \"hidable\" is ignored. @default true",
 															"type": "boolean",
 															"default": true
 														},
 														"header": {
+															"description": "Name of the table header for the dn column. @default \"dn\"",
 															"type": "string",
 															"default": "distinguishedName"
 														},
 														"hidable": {
+															"description": "Wether or not the \"dn\" is hidable or not. @default true",
 															"type": "boolean",
 															"default": true
 														}
 													}
 												},
 												"userAccountControl": {
-													"type": "object",
+													"description": "Configure the users table userAccountControl column",
 													"additionalProperties": false,
 													"properties": {
 														"show": {
+															"description": "Wether or not to show the userAccountControl column. If false \"hidable\" is ignored. @default true",
 															"type": "boolean",
 															"default": true
 														},
 														"header": {
+															"description": "Name of the table header for the userAccountControl column. @default \"userAccountControl\"",
 															"type": "string",
 															"default": "userAccountControl"
 														},
 														"hidable": {
+															"description": "Wether or not the \"userAccountControl\" is hidable or not. @default true",
 															"type": "boolean",
 															"default": true
 														}
 													}
 												},
 												"whenCreated": {
-													"type": "object",
+													"description": "Configure the users table whenCreated column",
 													"additionalProperties": false,
 													"properties": {
 														"show": {
+															"description": "Wether or not to show the whenCreated column. If false \"hidable\" is ignored. @default true",
 															"type": "boolean",
 															"default": true
 														},
 														"header": {
+															"description": "Name of the table header for the whenCreated column. @default \"whenCreated\"",
 															"type": "string",
 															"default": "whenCreated"
 														},
 														"hidable": {
+															"description": "Wether or not the \"whenCreated\" is hidable or not. @default true",
 															"type": "boolean",
 															"default": true
 														}
@@ -253,7 +282,6 @@
 							}
 						},
 						"groupsPage": {
-							"type": "object",
 							"additionalProperties": false,
 							"description": "configuration reggarding the groups page",
 							"properties": {
@@ -263,15 +291,12 @@
 									"description": "Weather or not to show the /groups page in navigation. Accessing directly to this route will result on a '403 This page has been disabled by configuration' error"
 								},
 								"table": {
-									"type": "object",
 									"additionalProperties": false,
 									"properties": {
 										"columns": {
-											"type": "object",
 											"additionalProperties": false,
 											"properties": {
 												"sAMAccountName": {
-													"type": "object",
 													"additionalProperties": false,
 													"properties": {
 														"show": {
@@ -289,7 +314,6 @@
 													}
 												},
 												"mail": {
-													"type": "object",
 													"additionalProperties": false,
 													"properties": {
 														"show": {
@@ -307,7 +331,6 @@
 													}
 												},
 												"dn": {
-													"type": "object",
 													"additionalProperties": false,
 													"properties": {
 														"show": {
@@ -325,7 +348,6 @@
 													}
 												},
 												"description": {
-													"type": "object",
 													"additionalProperties": false,
 													"properties": {
 														"show": {
@@ -343,7 +365,6 @@
 													}
 												},
 												"groupType": {
-													"type": "object",
 													"additionalProperties": false,
 													"properties": {
 														"show": {
@@ -361,7 +382,6 @@
 													}
 												},
 												"whenCreated": {
-													"type": "object",
 													"additionalProperties": false,
 													"properties": {
 														"show": {
@@ -385,7 +405,6 @@
 							}
 						},
 						"ousPage": {
-							"type": "object",
 							"description": "configuration reggarding the ous page",
 							"additionalProperties": false,
 							"properties": {
@@ -397,7 +416,6 @@
 							}
 						},
 						"treePage": {
-							"type": "object",
 							"description": "configuration reggarding the tree page",
 							"additionalProperties": false,
 							"properties": {
@@ -409,7 +427,6 @@
 							}
 						},
 						"logsPage": {
-							"type": "object",
 							"description": "configuration reggarding the logs page",
 							"additionalProperties": false,
 							"properties": {
@@ -421,7 +438,6 @@
 							}
 						},
 						"settingsPage": {
-							"type": "object",
 							"additionalProperties": false,
 							"description": "configuration reggarding the settings page",
 							"properties": {
@@ -434,22 +450,87 @@
 						}
 					}
 				},
-				"captchaLength": {
-					"type": "integer",
-					"minimum": 1,
-					"maximum": 9,
-					"default": 5,
-					"description": "Length of the captcha shown in the authentication page, recommended to use a low value for development.5"
+				"captcha": {
+					"additionalProperties": false,
+					"title": "CaptchaConfig",
+					"description": "Captcha personalization options. You can test these live in @link https://vanilla-captcha-demo.vercel.app/server-captcha",
+					"properties": {
+						"length": {
+							"type": "integer",
+							"minimum": 1,
+							"maximum": 9,
+							"default": 5,
+							"description": "Length of the captcha shown in the authentication page, recommended to use a low value for development. @default 5"
+						},
+						"backgroundColor": {
+							"type": "string",
+							"default": "#FFFFFF",
+							"description": "CSS color of the captcha background. Can use other css variants other than hex. @default \"#FFFFFF\"",
+							"examples": ["#FFFFFF", "rgb(255,255,255)", "hsl(0, 0%, 100%)", "white"]
+						},
+						"width": {
+							"type": "integer",
+							"default": 345,
+							"description": "Width of the captcha image. @default 345"
+						},
+						"height": {
+							"type": "integer",
+							"default": 96,
+							"description": "Height of the captcha image. @default 96"
+						},
+						"font": {
+							"type": "string",
+							"default": "Arial",
+							"description": "Font of the characters in the captcha. @default \"Arial\""
+						},
+						"fontSize": {
+							"type": "integer",
+							"default": 30,
+							"minimum": 0,
+							"description": "Font size of the characters in the captcha. @default 30"
+						},
+						"fontWeight": {
+							"type": "integer",
+							"default": 600,
+							"minimum": 100,
+							"description": "Font size of the characters in the captcha. @default 600"
+						},
+						"fontColor": {
+							"type": "string",
+							"default": "#777777",
+							"description": "CSS color of the captcha text. Can use other css variants other than hex. @default \"#777777\"",
+							"examples": ["#FFFFFF", "rgb(255,255,255)", "hsl(0, 0%, 100%)", "white"]
+						},
+						"lineColor": {
+							"type": "string",
+							"default": "#777777",
+							"description": "CSS color of the lines that strike the captcha text. Can use other css variants other than hex. @default \"#777777\"",
+							"examples": ["#FFFFFF", "rgb(255,255,255)", "hsl(0, 0%, 100%)", "white"]
+						},
+						"lineAmount": {
+							"type": "integer",
+							"default": 10,
+							"minimum": 0,
+							"description": "Number of lines that strike over the captcha. @default 10"
+						},
+						"lineWidth": {
+							"type": "integer",
+							"default": 1,
+							"minimum": 1,
+							"description": "Width of lines that strike over the captcha. @default 1"
+						}
+					}
 				}
 			}
 		},
 		"directory": {
+			"title": "DirectoryConfig",
 			"additionalProperties": false,
 			"description": "Directory management configuration settings",
 			"properties": {
 				"users": {
 					"additionalProperties": false,
-					"type": "object",
+					"title": "DirectoryUsersConfig",
 					"description": "Directory settings reggarding user management",
 					"properties": {
 						"hide": {
@@ -471,7 +552,7 @@
 				},
 				"groups": {
 					"additionalProperties": false,
-					"type": "object",
+					"title": "DirectoryGroupsConfig",
 					"description": "Directory settings reggarding group management",
 					"properties": {
 						"hide": {
