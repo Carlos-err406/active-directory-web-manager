@@ -2,29 +2,111 @@
 	"$schema": "./config.schema.json",
 	"system": {
 		"logging": {
-			"useLogging": true,
-			"decodeSearchParams": true,
-			"basePath": "./logs/",
-			"logTemplate": "[{date}] {url}{urlSearchParams} {method} {status}",
-			"logDateTemplate": "YYYY-MM-DD HH:mm:ss A"
+			"decodeSearchParams": true
 		}
 	},
 	"app": {
-		"captchaLength": 1,
 		"views": {
-			"logsPage": {
-				"show": true
+			"usersPage": {
+				"table": {
+					"columns": {
+						"jpegPhoto": {
+							"hidable": true,
+							"show": false,
+							"header": "Profile picture"
+						},
+						"sAMAccountName": {
+							"hidable": false,
+							"show": true,
+							"header": "Username"
+						},
+						"description": {
+							"hidable": true,
+							"show": true,
+							"header": "Description"
+						},
+						"displayName": {
+							"hidable": true,
+							"show": true,
+							"header": "Full name"
+						},
+						"givenName": {
+							"hidable": true,
+							"show": true,
+							"header": "First name"
+						},
+						"sn": {
+							"hidable": true,
+							"show": true,
+							"header": "Last name"
+						},
+						"dn": {
+							"hidable": true,
+							"show": true,
+							"header": "Directory name"
+						},
+						"mail": {
+							"hidable": true,
+							"show": true,
+							"header": "Email"
+						},
+						"userAccountControl": {
+							"hidable": true,
+							"show": true,
+							"header": "User flags"
+						},
+						"whenCreated": {
+							"hidable": true,
+							"show": true,
+							"header": "Created at"
+						}
+					}
+				}
+			},
+			"groupsPage": {
+				"show": true,
+				"table": {
+					"columns": {
+						"sAMAccountName": {
+							"hidable": false,
+							"show": true,
+							"header": "Group name"
+						},
+						"mail": {
+							"hidable": true,
+							"show": true,
+							"header": "Email"
+						},
+						"dn": {
+							"hidable": true,
+							"show": true,
+							"header": "Directory name"
+						},
+						"description": {
+							"hidable": true,
+							"show": true,
+							"header": "Description"
+						},
+						"groupType": {
+							"hidable": true,
+							"show": false,
+							"header": "Group type"
+						},
+						"whenCreated": {
+							"hidable": true,
+							"show": true,
+							"header": "Created at"
+						}
+					}
+				}
 			}
-		}
+		},
+		"captchaLength": 1
 	},
 	"directory": {
-		"users": {
-			"limit": null,
-			"hide": []
-		},
 		"groups": {
-			"limit": null,
-			"hide": []
+			"limit": 40,
+			"hide": ["Domain Admins"]
 		}
 	}
 }

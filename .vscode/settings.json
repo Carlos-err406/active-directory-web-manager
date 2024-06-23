@@ -1,5 +1,12 @@
 {
 	"files.associations": {
 		"*.pcss": "tailwindcss"
-	}
+	},
+	"json.schemas": [
+		{
+			"schema": false,
+			"url": "./src/config/config.schema.json",
+			"fileMatch": ["app.config.json"]
+		}
+	]
 }
