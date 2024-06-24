@@ -15,7 +15,7 @@
 		"test:integration": "playwright test",
 		"test:unit": "vitest",
 		"prepare": "husky",
-		"app:config": "npx json2ts -i src/config/schemas/index.schema.json -o src/app.config.d.ts --cwd=src/config/schemas",
+		"app:config": "npx json2ts -i src/config/schemas/index.schema.json -o src/app.config.d.ts --cwd=src/config/schemas && prettier --write src/app.config.d.ts --log-level=silent",
 		"watch:config": "chokidar src/config/schemas/ --initial -c \"npm run app:config\""
 	},
 	"lint-staged": {
