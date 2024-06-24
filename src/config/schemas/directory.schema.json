@@ -3,7 +3,16 @@
 	"description": "Directory management configuration settings",
 	"title": "DirectoryConfig",
 	"type": "object",
+	"required": ["ldap"],
 	"properties": {
+		"ldap": {
+			"$ref": "directory-ldap.schema.json"
+		},
+		"adminGroup": {
+			"type": "string",
+			"default": "Domain Admins",
+			"description": "CN of the directory's administrators group. @default Domain Admins"
+		},
 		"groups": {
 			"description": "Directory settings reggarding group management",
 			"type": "object",

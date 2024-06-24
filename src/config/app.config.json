@@ -50,6 +50,12 @@
 		}
 	},
 	"directory": {
+		"ldap": {
+			"ldapURL": "ldaps://localhost:636",
+			"tlsOptions": {
+				"rejectUnauthorized": false
+			}
+		},
 		"users": {
 			"hide": ["CN=krbtgt,CN=Users,DC=local,DC=com"]
 		}

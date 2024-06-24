@@ -78,6 +78,17 @@ const defaults: RecursiveRequired<App.Config> = {
 		}
 	},
 	directory: {
+		ldap: {
+			ldapURL: 'ldaps://localhost:636',
+			strictDN: true,
+			tlsOptions: {
+				clientCertEngine: null,
+				enableTrace: false,
+				rejectUnauthorized: true,
+				requestCert: false
+			}
+		},
+		adminGroup: 'Domain Admins',
 		groups: { hide: [], limit: null },
 		users: { hide: [], limit: null }
 	},

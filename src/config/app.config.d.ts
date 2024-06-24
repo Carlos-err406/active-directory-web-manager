@@ -722,6 +722,11 @@ export interface UsersTableConfig {
  * Directory management configuration settings
  */
 export interface DirectoryConfig {
+	ldap: LDAPClientConfig;
+	/**
+	 * CN of the directory's administrators group. @default Domain Admins
+	 */
+	adminGroup?: string;
 	/**
 	 * Directory settings reggarding group management
 	 */
@@ -748,6 +753,41 @@ export interface DirectoryConfig {
 		 */
 		limit?: number | null;
 	};
+}
+/**
+ * LDAP client configuration
+ */
+export interface LDAPClientConfig {
+	/**
+	 * LDAP connection string. @default ldaps://localhost:636
+	 */
+	ldapURL: string;
+	/**
+	 * Force strict DN parsing for client methods @default true
+	 */
+	strictDN?: boolean;
+	tlsOptions?: TLSOptions;
+}
+/**
+ * Additional options passed to TLS connection layer when connecting via ldaps://
+ */
+export interface TLSOptions {
+	/**
+	 * Name of an OpenSSL engine which can provide the client certificate.
+	 */
+	clientCertEngine?: string | null;
+	/**
+	 * When enabled, TLS packet trace information is written to stderr. This can be used to debug TLS connection problems. @default false
+	 */
+	enableTrace?: boolean;
+	/**
+	 * If true the server will reject any connection which is not authorized with the list of supplied CAs. This option only has an effect if requestCert is true. @default true
+	 */
+	rejectUnauthorized?: boolean;
+	/**
+	 * If true the server will request a certificate from clients that connect and attempt to verify that certificate. @default false
+	 */
+	requestCert?: boolean;
 }
 /**
  * System settings
