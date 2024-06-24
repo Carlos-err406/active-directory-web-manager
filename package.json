@@ -26,7 +26,6 @@
 		]
 	},
 	"devDependencies": {
-		"@adobe/jsonschema2md": "^8.0.2",
 		"@playwright/test": "^1.28.1",
 		"@sveltejs/adapter-node": "^5.0.1",
 		"@sveltejs/kit": "^2.0.0",
