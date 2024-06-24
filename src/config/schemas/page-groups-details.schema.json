@@ -1,0 +1,167 @@
+{
+	"$id": "page-groups-details.schema.json",
+	"description": "Configuration reggarding the detailed view of a group (\"/groups/[dn]\")",
+	"title": "GroupDetailsConfig",
+	"type": "object",
+	"properties": {
+		"cn": {
+			"description": "Configuration reggarding the \"cn\" attribute of the group",
+			"type": "object",
+			"properties": {
+				"label": {
+					"default": "cn",
+					"description": "@default \"cn\"",
+					"type": "string"
+				},
+				"show": {
+					"description": "Wether or not to show the \"cn\" attribute in the \"/groups/[dn]\" page. @default true",
+					"type": "boolean",
+					"default": true
+				}
+			},
+			"additionalProperties": false
+		},
+		"description": {
+			"description": "Configuration reggarding the \"description\" attribute of the group",
+			"type": "object",
+			"properties": {
+				"label": {
+					"default": "description",
+					"description": "@default \"description\"",
+					"type": "string"
+				},
+				"show": {
+					"description": "Wether or not to show the \"description\" attribute in the \"/groups/[dn]\" page. @default true",
+					"type": "boolean",
+					"default": true
+				}
+			},
+			"additionalProperties": false
+		},
+		"distinguishedName": {
+			"description": "Configuration reggarding the \"distinguishedName\" attribute of the group",
+			"type": "object",
+			"properties": {
+				"label": {
+					"default": "distinguishedName",
+					"description": "@default \"distinguishedName\"",
+					"type": "string"
+				},
+				"show": {
+					"description": "Wether or not to show the \"distinguishedName\" attribute in the \"/groups/[dn]\" page. @default true",
+					"type": "boolean",
+					"default": true
+				}
+			},
+			"additionalProperties": false
+		},
+		"groupType": {
+			"description": "Configuration reggarding the \"groupType\" attribute of the group",
+			"type": "object",
+			"properties": {
+				"label": {
+					"default": "groupType",
+					"description": "@default \"groupType\"",
+					"type": "string"
+				},
+				"show": {
+					"description": "Wether or not to show the \"groupType\" attribute in the \"/groups/[dn]\" page. @default true",
+					"type": "boolean",
+					"default": true
+				}
+			},
+			"additionalProperties": false
+		},
+		"mail": {
+			"description": "Configuration reggarding the \"mail\" attribute of the group",
+			"type": "object",
+			"properties": {
+				"label": {
+					"default": "mail",
+					"description": "@default \"mail\"",
+					"type": "string"
+				},
+				"show": {
+					"description": "Wether or not to show the \"mail\" attribute in the \"/groups/[dn]\" page. @default true",
+					"type": "boolean",
+					"default": true
+				}
+			},
+			"additionalProperties": false
+		},
+		"member": {
+			"description": "Configuration reggarding the \"member\" attribute of the group",
+			"type": "object",
+			"properties": {
+				"label": {
+					"default": "member",
+					"description": "@default \"member\"",
+					"type": "string"
+				},
+				"shortMember": {
+					"description": "If false the attribute \"member\" of the group will be shown as the full distinguishedName, else only the CN is shown. @default false",
+					"type": "boolean",
+					"default": false
+				},
+				"show": {
+					"description": "Wether or not to show the \"member\" attribute in the \"/groups/[dn]\" page. If false \"shortMember\" will be ignored @default true",
+					"type": "boolean",
+					"default": true
+				}
+			},
+			"additionalProperties": false
+		},
+		"sAMAccountName": {
+			"description": "Configuration reggarding the \"sAMAccountName\" attribute of the group",
+			"type": "object",
+			"properties": {
+				"label": {
+					"default": "sAMAccountName",
+					"description": "@default \"sAMAccountName\"",
+					"type": "string"
+				},
+				"show": {
+					"description": "Wether or not to show the \"sAMAccountName\" attribute in the \"/groups/[dn]\" page. @default true",
+					"type": "boolean",
+					"default": true
+				}
+			},
+			"additionalProperties": false
+		},
+		"whenChanged": {
+			"description": "Configuration reggarding the \"whenChanged\" attribute of the group",
+			"type": "object",
+			"properties": {
+				"label": {
+					"default": "whenChanged",
+					"description": "@default \"whenChanged\"",
+					"type": "string"
+				},
+				"show": {
+					"description": "Wether or not to show the \"whenChanged\" attribute in the \"/groups/[dn]\" page. @default true",
+					"type": "boolean",
+					"default": true
+				}
+			},
+			"additionalProperties": false
+		},
+		"whenCreated": {
+			"description": "Configuration reggarding the \"whenCreated\" attribute of the group",
+			"type": "object",
+			"properties": {
+				"label": {
+					"default": "whenCreated",
+					"description": "@default \"whenCreated\"",
+					"type": "string"
+				},
+				"show": {
+					"description": "Wether or not to show the \"whenCreated\" attribute in the \"/groups/[dn]\" page. @default true",
+					"type": "boolean",
+					"default": true
+				}
+			},
+			"additionalProperties": false
+		}
+	},
+	"additionalProperties": false
+}

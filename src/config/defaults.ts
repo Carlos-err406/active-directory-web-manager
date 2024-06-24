@@ -22,6 +22,20 @@ const defaults: RecursiveRequired<App.Config> = {
 			settingsPage: { showConfigurationForm: true },
 			treePage: { show: true },
 			usersPage: {
+				details: {
+					jpegPhoto: { show: true },
+					description: { label: 'description', show: true },
+					displayName: { label: 'displayName', show: true },
+					distinguishedName: { label: 'distinguishedName', show: true },
+					givenName: { label: 'givenName', show: true },
+					mail: { label: 'mail', show: true },
+					memberOf: { label: 'memberOf', shortMemberOf: false, show: true },
+					sAMAccountName: { label: 'sAMAccountName', show: true },
+					sn: { label: 'sn', show: true },
+					userAccountControl: { label: 'userAccountControl', show: true },
+					whenChanged: { label: 'whenChanged', show: true },
+					whenCreated: { label: 'whenCreated', show: true }
+				},
 				table: {
 					columns: {
 						description: { header: 'description', hidable: true, show: true },
@@ -39,6 +53,17 @@ const defaults: RecursiveRequired<App.Config> = {
 			},
 			groupsPage: {
 				show: true,
+				details: {
+					cn: { show: true, label: 'cn' },
+					description: { show: true, label: 'description' },
+					distinguishedName: { show: true, label: 'distinguishedName' },
+					groupType: { show: true, label: 'groupType' },
+					mail: { show: true, label: 'mail' },
+					member: { shortMember: false, show: true, label: 'member' },
+					sAMAccountName: { show: true, label: 'sAMAccountName' },
+					whenChanged: { show: true, label: 'whenChanged' },
+					whenCreated: { show: true, label: 'whenCreated' }
+				},
 				table: {
 					columns: {
 						description: { header: 'description', hidable: true, show: true },

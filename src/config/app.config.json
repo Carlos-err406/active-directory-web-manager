@@ -19,6 +19,19 @@
 			"ousPage": { "show": false },
 			"treePage": { "show": false },
 			"usersPage": {
+				"details": {
+					"description": { "label": "Description" },
+					"displayName": { "label": "Full name" },
+					"distinguishedName": { "label": "Directory name" },
+					"givenName": { "label": "First name" },
+					"mail": { "label": "Email" },
+					"memberOf": { "label": "Belongs to groups" },
+					"sAMAccountName": { "label": "Username" },
+					"sn": { "label": "Last name" },
+					"userAccountControl": { "label": "User flags" },
+					"whenChanged": { "label": "Created at" },
+					"whenCreated": { "label": "Updated at" }
+				},
 				"table": {
 					"columns": {
 						"description": { "header": "Description" },

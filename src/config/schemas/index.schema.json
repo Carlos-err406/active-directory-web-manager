@@ -3,16 +3,15 @@
 	"description": "Application configuration settings",
 	"title": "Config",
 	"type": "object",
-
 	"properties": {
-		"system": {
-			"$ref": "system.schema.json"
-		},
 		"app": {
 			"$ref": "app.schema.json"
 		},
 		"directory": {
 			"$ref": "directory.schema.json"
+		},
+		"system": {
+			"$ref": "system.schema.json"
 		}
 	}
 }

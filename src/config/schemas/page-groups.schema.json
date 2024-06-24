@@ -4,150 +4,16 @@
 	"title": "GroupsPageConfig",
 	"type": "object",
 	"properties": {
+		"details": {
+			"$ref": "page-groups-details.schema.json"
+		},
 		"show": {
 			"description": "Weather or not to show the \"/groups\" page in navigation. Accessing directly to this route will result on a \"403 This page has been disabled by configuration\" error. @default true",
 			"type": "boolean",
 			"default": true
 		},
 		"table": {
-			"description": "Groups table view configuration",
-			"type": "object",
-			"properties": {
-				"columns": {
-					"description": "Groups table column settings",
-					"type": "object",
-					"properties": {
-						"description": {
-							"description": "Configure groups table \"description\" clolumn.",
-							"properties": {
-								"header": {
-									"default": "description",
-									"description": "Header for the \"description\" column of the groups table. @default \"description\"",
-									"type": "string"
-								},
-								"hidable": {
-									"description": "Wether or not allow the \"description\" column to be hidable. @default true",
-									"type": "boolean",
-									"default": true
-								},
-								"show": {
-									"description": "Wether or not to show the \"description\" group table column. @default true",
-									"type": "boolean",
-									"default": true
-								}
-							},
-							"additionalProperties": false
-						},
-						"dn": {
-							"description": "Configure groups table \"dn\" clolumn.",
-							"properties": {
-								"header": {
-									"default": "distinguishedName",
-									"description": "Header for the \"dn\" column of the groups table. @default \"dn\"",
-									"type": "string"
-								},
-								"hidable": {
-									"description": "Wether or not allow the \"dn\" column to be hidable. @default true",
-									"type": "boolean",
-									"default": true
-								},
-								"show": {
-									"description": "Wether or not to show the \"dn\" group table column. @default true",
-									"type": "boolean",
-									"default": true
-								}
-							},
-							"additionalProperties": false
-						},
-						"groupType": {
-							"description": "Configure groups table \"groupType\" clolumn.",
-							"properties": {
-								"header": {
-									"default": "userAccountControl",
-									"description": "Header for the \"groupType\" column of the groups table. @default \"groupType\"",
-									"type": "string"
-								},
-								"hidable": {
-									"description": "Wether or not allow the \"groupType\" column to be hidable. @default true",
-									"type": "boolean",
-									"default": true
-								},
-								"show": {
-									"description": "Wether or not to show the \"groupType\" group table column. @default true",
-									"type": "boolean",
-									"default": true
-								}
-							},
-							"additionalProperties": false
-						},
-						"mail": {
-							"description": "Configure groups table \"mail\" clolumn.",
-							"properties": {
-								"header": {
-									"default": "mail",
-									"description": "Header for the \"mail\" column of the groups table. @default \"mail\"",
-									"type": "string"
-								},
-								"hidable": {
-									"description": "Wether or not allow the \"mail\" column to be hidable. @default true",
-									"type": "boolean",
-									"default": true
-								},
-								"show": {
-									"description": "Wether or not to show the \"mail\" group table column. @default true",
-									"type": "boolean",
-									"default": true
-								}
-							},
-							"additionalProperties": false
-						},
-						"sAMAccountName": {
-							"description": "Configure groups table \"sAMAccountName\" clolumn.",
-							"properties": {
-								"header": {
-									"default": "sAMAccountName",
-									"description": "Header for the \"sAMAccountName\" column of the groups table. @default \"sAMAccountName\"",
-									"type": "string"
-								},
-								"hidable": {
-									"description": "Wether or not allow the \"sAMAccountName\" column to be hidable. @default false",
-									"type": "boolean",
-									"default": false
-								},
-								"show": {
-									"description": "Wether or not to show the \"sAMAccountName\" group table column. @default true",
-									"type": "boolean",
-									"default": true
-								}
-							},
-							"additionalProperties": false
-						},
-						"whenCreated": {
-							"description": "Configure groups table \"whenCreated\" clolumn.",
-							"properties": {
-								"header": {
-									"default": "whenCreated",
-									"description": "Header for the \"whenCreated\" column of the groups table. @default \"whenCreated\"",
-									"type": "string"
-								},
-								"hidable": {
-									"description": "Wether or not allow the \"whenCreated\" column to be hidable. @default true",
-									"type": "boolean",
-									"default": true
-								},
-								"show": {
-									"description": "Wether or not to show the \"whenCreated\" group table column. @default true",
-									"type": "boolean",
-									"default": true
-								}
-							},
-							"additionalProperties": false
-						}
-					},
-					"additionalProperties": false
-				}
-			},
-			"additionalProperties": false
+			"$ref": "page-groups-table.schema.json"
 		}
 	},
 	"additionalProperties": false

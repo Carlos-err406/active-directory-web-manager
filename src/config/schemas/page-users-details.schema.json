@@ -1,0 +1,213 @@
+{
+	"$id": "page-users-details.schema.json",
+	"description": "Configuration reggarding the detailed view of a user (\"/users/[dn]\" or \"/users/me\")",
+	"title": "UserDetailsConfig",
+	"type": "object",
+	"properties": {
+		"description": {
+			"description": "Configuration reggarding the \"description\" attribute of the user",
+			"type": "object",
+			"properties": {
+				"label": {
+					"default": "description",
+					"description": "@default \"description\"",
+					"type": "string"
+				},
+				"show": {
+					"description": "Wether or not to show the \"description\" attribute in the detail pages (\"/users/[dn]\" or \"/users/me\"). @default true",
+					"type": "boolean",
+					"default": true
+				}
+			},
+			"additionalProperties": false
+		},
+		"displayName": {
+			"description": "Configuration reggarding the \"displayName\" attribute of the user",
+			"type": "object",
+			"properties": {
+				"label": {
+					"default": "displayName",
+					"description": "@default \"displayName\"",
+					"type": "string"
+				},
+				"show": {
+					"description": "Wether or not to show the \"displayName\" attribute in the detail pages (\"/users/[dn]\" or \"/users/me\"). @default true",
+					"type": "boolean",
+					"default": true
+				}
+			},
+			"additionalProperties": false
+		},
+		"distinguishedName": {
+			"description": "Configuration reggarding the \"distinguishedName\" attribute of the user",
+			"type": "object",
+			"properties": {
+				"label": {
+					"default": "distinguishedName",
+					"description": "@default \"distinguishedName\"",
+					"type": "string"
+				},
+				"show": {
+					"description": "Wether or not to show the \"distinguishedName\" attribute in the detail pages (\"/users/[dn]\" or \"/users/me\"). @default true",
+					"type": "boolean",
+					"default": true
+				}
+			},
+			"additionalProperties": false
+		},
+		"givenName": {
+			"description": "Configuration reggarding the \"givenName\" attribute of the user",
+			"type": "object",
+			"properties": {
+				"label": {
+					"default": "givenName",
+					"description": "@default \"givenName\"",
+					"type": "string"
+				},
+				"show": {
+					"description": "Wether or not to show the \"givenName\" attribute in the detail pages (\"/users/[dn]\" or \"/users/me\"). @default true",
+					"type": "boolean",
+					"default": true
+				}
+			},
+			"additionalProperties": false
+		},
+		"jpegPhoto": {
+			"description": "Configuration reggarding the \"jpegPhoto\" attribute of the user. If \"showFallback\" and \"show\" are false then nothing will be shown",
+			"type": "object",
+			"properties": {
+				"show": {
+					"description": "Wether or not to show the \"jpegPhoto\" in the detail pages (\"/users/[dn]\" or \"/users/me\"). @default true",
+					"type": "boolean",
+					"default": true
+				}
+			},
+			"additionalProperties": false
+		},
+		"mail": {
+			"description": "Configuration reggarding the \"mail\" attribute of the user",
+			"type": "object",
+			"properties": {
+				"label": {
+					"default": "mail",
+					"description": "@default \"mail\"",
+					"type": "string"
+				},
+				"show": {
+					"description": "Wether or not to show the \"mail\" attribute in the detail pages (\"/users/[dn]\" or \"/users/me\"). @default true",
+					"type": "boolean",
+					"default": true
+				}
+			},
+			"additionalProperties": false
+		},
+		"memberOf": {
+			"description": "Configuration reggarding the \"memberOf\" attribute of the user",
+			"type": "object",
+			"properties": {
+				"label": {
+					"default": "memberOf",
+					"description": "@default \"memberOf\"",
+					"type": "string"
+				},
+				"shortMemberOf": {
+					"description": "If false the attribute \"memberOf\" of the user will be shown as the full distinguishedName, else only the CN is shown. @default false",
+					"type": "boolean",
+					"default": false
+				},
+				"show": {
+					"description": "Wether or not to show the \"memberOf\" attribute in the detail pages (\"/users/[dn]\" or \"/users/me\"). If false \"shortMemberOf\" will be ignored @default true",
+					"type": "boolean",
+					"default": true
+				}
+			},
+			"additionalProperties": false
+		},
+		"sAMAccountName": {
+			"description": "Configuration reggarding the \"sAMAccountName\" attribute of the user",
+			"type": "object",
+			"properties": {
+				"label": {
+					"default": "sAMAccountName",
+					"description": "@default \"sAMAccountName\"",
+					"type": "string"
+				},
+				"show": {
+					"description": "Wether or not to show the \"sAMAccountName\" attribute in the detail pages (\"/users/[dn]\" or \"/users/me\"). @default true",
+					"type": "boolean",
+					"default": true
+				}
+			},
+			"additionalProperties": false
+		},
+		"sn": {
+			"description": "Configuration reggarding the \"sn\" attribute of the user",
+			"type": "object",
+			"properties": {
+				"label": {
+					"default": "sn",
+					"description": "@default \"sn\"",
+					"type": "string"
+				},
+				"show": {
+					"description": "Wether or not to show the \"sn\" attribute in the detail pages (\"/users/[dn]\" or \"/users/me\"). @default true",
+					"type": "boolean",
+					"default": true
+				}
+			},
+			"additionalProperties": false
+		},
+		"userAccountControl": {
+			"description": "Configuration reggarding the \"userAccountControl\" attribute of the user",
+			"type": "object",
+			"properties": {
+				"label": {
+					"default": "userAccountControl",
+					"description": "@default \"userAccountControl\"",
+					"type": "string"
+				},
+				"show": {
+					"description": "Wether or not to show the \"userAccountControl\" attribute in the detail pages (\"/users/[dn]\" or \"/users/me\"). @default true",
+					"type": "boolean",
+					"default": true
+				}
+			},
+			"additionalProperties": false
+		},
+		"whenChanged": {
+			"description": "Configuration reggarding the \"whenChanged\" attribute of the user",
+			"type": "object",
+			"properties": {
+				"label": {
+					"default": "whenChanged",
+					"description": "@default \"whenChanged\"",
+					"type": "string"
+				},
+				"show": {
+					"description": "Wether or not to show the \"whenChanged\" attribute in the detail pages (\"/users/[dn]\" or \"/users/me\"). @default true",
+					"type": "boolean",
+					"default": true
+				}
+			},
+			"additionalProperties": false
+		},
+		"whenCreated": {
+			"description": "Configuration reggarding the \"whenCreated\" attribute of the user",
+			"type": "object",
+			"properties": {
+				"label": {
+					"default": "whenCreated",
+					"description": "@default \"whenCreated\"",
+					"type": "string"
+				},
+				"show": {
+					"description": "Wether or not to show the \"whenCreated\" attribute in the detail pages (\"/users/[dn]\" or \"/users/me\"). @default true",
+					"type": "boolean",
+					"default": true
+				}
+			},
+			"additionalProperties": false
+		}
+	},
+	"additionalProperties": false
+}

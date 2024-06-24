@@ -1,8 +1,9 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { DeleteGroupDialog, UpdateGroupDialog } from '$lib/components/groups';
 	import ManageGroupMembersDialog from '$lib/components/groups/manage-group-members-dialog.svelte';
 	import { Button } from '$lib/components/ui/button';
-	import { getGroupTypes } from '$lib/ldap/utils';
+	import { getCNFromDN, getGroupTypes } from '$lib/ldap/utils';
 	import { breadcrumbs } from '$lib/stores';
 	import { GroupFlags, GroupTypes } from '$lib/types/group';
 	import PencilLine from '$lucide/pencil-line.svelte';
@@ -12,7 +13,7 @@
 	import type { PageData } from './$types';
 	export let data: PageData;
 	$: breadcrumbs.set([{ name: 'Groups', link: '/groups' }, { name: group.cn }]);
-
+	const { details: config } = $page.data.config.app.views.groupsPage;
 	let isUpdateGroupDialogOpen = false;
 	let isManageMembersDialogOpen = false;
 	let isDeleteGroupDialogOpen = false;
@@ -39,52 +40,70 @@
 				</h1>
 			</div>
 			<div class="group-info grid grid-cols-2 gap-y-3">
-				<span>sAMAccountName:</span>
-				<span class="info-value">{group.sAMAccountName}</span>
-				{#if group.cn}
-					<span>cn:</span>
+				{#if config.sAMAccountName.show}
+					<span>{config.sAMAccountName.label}:</span>
+					<span class="info-value">{group.sAMAccountName}</span>
+				{/if}
+				{#if config.cn.show && group.cn}
+					<span>{config.cn.label}:</span>
 					<span class="info-value">{group.cn}</span>
 				{/if}
 
-				{#if group.description}
-					<span>description:</span>
+				{#if config.description.show && group.description}
+					<span>{config.description.label}:</span>
 					<span class="info-value">{group.description}</span>
 				{/if}
 
-				{#if group.mail}
-					<span>mail:</span>
+				{#if config.mail.show && group.mail}
+					<span>{config.mail.label}:</span>
 					<span class="info-value">{group.mail}</span>
 				{/if}
-				{#if group.distinguishedName}
-					<span>distinguishedName:</span>
+				{#if config.distinguishedName.show && group.distinguishedName}
+					<span>{config.distinguishedName.label}:</span>
 					<span class="info-value">{group.distinguishedName}</span>
 				{/if}
-				{#if group.groupType}
-					<span>groupType:</span>
+				{#if config.groupType.show && group.groupType}
+					<span>{config.groupType.label}:</span>
 					<span class="info-value">
 						{getGroupTypes(group.groupType)
 							.map((gt) => GroupTypes[gt])
 							.join(', ')}
 					</span>
 				{/if}
-				<span>whenCreated:</span>
-				<span class="info-value">
-					{dayjs(group.whenCreated.replace('Z', '')).format('MMMM D, YYYY. hh:mm:ss A')}
-				</span>
-				<span>whenChanged:</span>
-				<span class="info-value">
-					{dayjs(group.whenChanged.replace('Z', '')).format('MMMM D, YYYY. hh:mm:ss A')}
-				</span>
-				<span>member:</span>
-				<div class="info-value flex flex-wrap space-y-2">
-					{#each group.member || [] as memberDn}
-						<span>
-							{memberDn}
-						</span>
-					{:else}
-						<span> - </span>
-					{/each}
-				</div>
+				{#if config.whenCreated.show}
+					<span>{config.whenCreated.label}:</span>
+					<span class="info-value">
+						{dayjs(group.whenCreated.replace('Z', '')).format('MMMM D, YYYY. hh:mm:ss A')}
+					</span>
+				{/if}
+				{#if config.whenChanged.show}
+					<span>{config.whenChanged.label}:</span>
+					<span class="info-value">
+						{dayjs(group.whenChanged.replace('Z', '')).format('MMMM D, YYYY. hh:mm:ss A')}
+					</span>
+				{/if}
+				{#if config.member.show}
+					<span>{config.member.label}:</span>
+					<div
+						data-isShort={config.member.shortMember}
+						class="info-value flex flex-wrap data-[isShort=false]:gap-2"
+					>
+						{#each (group.member || []).sort( (a, b) => (a < b ? -1 : a > b ? 1 : 0) ) as userDn, index}
+							<a
+								href="/users/{userDn}"
+								data-sveltekit-preload-data="hover"
+								class="text-primary hover:underline"
+							>
+								{config.member.shortMember ? getCNFromDN(userDn) : userDn}
+							</a>
+							{#if config.member.shortMember && index < group.member.length - 1}
+								<pre class="!mx-0 font-sans">, </pre>
+							{/if}
+						{:else}
+							<span> - </span>
+						{/each}
+					</div>
+				{/if}
 			</div>
 		</div>
 	</div>
