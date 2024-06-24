@@ -33,15 +33,14 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
-      - name: List content to deploy
-        run: ls -l docs/pages
-      - name: Copy index file
+      - name: Copy config schemas
+        run: cp -r src/config/schemas docs/pages/schemas
+      - name: Create index html
         run: cp docs/pages/index.schema.html docs/pages/index.html
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload content from the docs folder
-          path: docs/pages'
+          path: docs/pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
