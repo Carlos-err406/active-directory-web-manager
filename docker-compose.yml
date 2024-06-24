@@ -2,7 +2,9 @@
 
 services:
   samba:
+
     build:
+      context: samba
       dockerfile: samba.Dockerfile
       args:
         samba_version: '4.16.7' #value selected from https://download.samba.org/pub/samba/stable
@@ -18,8 +20,7 @@ services:
       - 636:636
       - 389:389
     networks:
-      admanager.net:
-        ipv4_address: 172.16.239.12
+      admanager.net: # ipv4_address: 172.16.239.12
   app:
     build:
       context: .
@@ -36,10 +37,6 @@ services:
 networks:
   admanager.net:
     driver: bridge
-    ipam:
-      config:
-        - subnet: 172.16.239.0/24
-
-volumes:
-  admanager.pgvol:
-  admanager.pgadminvol:
+    # ipam:
+    #   config:
+    #     - subnet: 172.16.239.0/24
