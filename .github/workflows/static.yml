@@ -31,16 +31,32 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Create folders
+        run: mkdir -p docs/pages/schemas
+
+      - name: Install json-schema-for-humans
+        run: pip install json-schema-for-humans
+
+      - name: Generate documentation
+        run: generate-schema-doc src/config/schemas docs/pages --config description_is_markdown=true --config expand_buttons=true --config collapse_long_examples=true --config deprecated_from_description=true --config show_toc=true
+
       - name: Copy config schemas
         run: cp -r src/config/schemas docs/pages/schemas
+
       - name: Create index html
         run: cp docs/pages/index.schema.html docs/pages/index.html
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: docs/pages
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
