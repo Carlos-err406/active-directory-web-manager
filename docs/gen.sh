@@ -1,0 +1,1 @@
+generate-schema-doc ../src/config/schemas ./pages --config description_is_markdown=true --config expand_buttons=true --config collapse_long_examples=true --config deprecated_from_description=true --config show_toc=true
