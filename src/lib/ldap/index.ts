@@ -1,5 +1,5 @@
 import config from '$config';
-import { ADMIN_GROUP, SAMBA_DC_ADMIN_PASSWD } from '$env/static/private';
+import { SAMBA_DC_ADMIN_PASSWD } from '$env/static/private';
 import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
 import type { Group } from '$lib/types/group';
 import type { User } from '$lib/types/user';
@@ -112,7 +112,8 @@ export const extractBase = (dn: string) => {
 	return base.join(',');
 };
 
-export const isAdmin = (ldap: Client, dn: string) => entryBelongsToGroup(ldap, dn, ADMIN_GROUP);
+export const isAdmin = (ldap: Client, dn: string) =>
+	entryBelongsToGroup(ldap, dn, config.directory.adminGroup);
 
 export const sudo = async (sudoOperation: (ldap: Client) => Promise<void>) => {
 	const ldap = getLDAPClient();

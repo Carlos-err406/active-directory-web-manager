@@ -1,14 +1,10 @@
-import { LDAP_URL } from '$env/static/private';
+import config from '$config';
+import deepmerge from 'deepmerge';
 import { Client, type ClientOptions } from 'ldapts';
 
+const { ldapURL: url, strictDN, tlsOptions } = config.directory.ldap;
+
 export const getLDAPClient = (options?: ClientOptions) => {
-	return new Client({
-		url: LDAP_URL,
-		strictDN: true,
-		tlsOptions: {
-			// requestCert:false,
-			rejectUnauthorized: false
-		},
-		...options
-	});
+	const opts = deepmerge({ url, strictDN, tlsOptions }, options || {});
+	return new Client({ ...opts });
 };

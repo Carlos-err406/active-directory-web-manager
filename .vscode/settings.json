@@ -5,8 +5,8 @@
 	"json.schemas": [
 		{
 			"schema": false,
-			"url": "./src/config/schemas/index.schema.json",
-			"fileMatch": ["app.config.json"]
+			"url": "https://carlos-err406.github.io/active-directory-web-manager/schemas/index.schema.json",
+			"fileMatch": ["app.config.json", "app.config.dev.json"]
 		}
 	]
 }
