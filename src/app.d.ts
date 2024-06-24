@@ -5,7 +5,7 @@ import type { Session } from '$lib/types/session';
 import type { RecursiveRequired } from '@sveltejs/kit';
 import type { Client, FilterParser } from 'ldapts';
 import type { ExternalToast } from 'svelte-sonner';
-import type { Config as AppConfigType } from './config/app.config';
+import type { Config as AppConfigType } from './app.config';
 // for information about these interfaces
 declare global {
 	namespace App {

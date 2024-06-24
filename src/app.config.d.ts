@@ -10,7 +10,7 @@
  */
 export interface Config {
 	app?: AppConfig;
-	directory?: DirectoryConfig;
+	directory: DirectoryConfig;
 	system?: SystemConfig;
 	[k: string]: unknown;
 }

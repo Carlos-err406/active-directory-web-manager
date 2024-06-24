@@ -1,0 +1,66 @@
+{
+	"$schema": "src/config/schemas/index.schema.json",
+	"app": {
+		"captcha": { "length": 1 },
+		"views": {
+			"groupsPage": {
+				"table": {
+					"columns": {
+						"description": { "header": "Description" },
+						"dn": { "header": "Directory name" },
+						"groupType": { "header": "Group type" },
+						"mail": { "header": "Email" },
+						"sAMAccountName": { "header": "Group name" },
+						"whenCreated": { "header": "Created at" }
+					}
+				},
+				"show": true
+			},
+			"ousPage": { "show": false },
+			"treePage": { "show": false },
+			"usersPage": {
+				"details": {
+					"description": { "label": "Description" },
+					"displayName": { "label": "Full name" },
+					"distinguishedName": { "label": "Directory name" },
+					"givenName": { "label": "First name" },
+					"mail": { "label": "Email" },
+					"memberOf": { "label": "Belongs to groups" },
+					"sAMAccountName": { "label": "Username" },
+					"sn": { "label": "Last name" },
+					"userAccountControl": { "label": "User flags" },
+					"whenChanged": { "label": "Created at" },
+					"whenCreated": { "label": "Updated at" }
+				},
+				"table": {
+					"columns": {
+						"description": { "header": "Description" },
+						"displayName": { "header": "Full name" },
+						"dn": { "header": "Directory name" },
+						"givenName": { "header": "First name" },
+						"jpegPhoto": { "header": "Profile picture" },
+						"mail": { "header": "Email" },
+						"sAMAccountName": { "header": "Username" },
+						"sn": { "header": "Last name" },
+						"userAccountControl": { "header": "User flags" },
+						"whenCreated": { "header": "Created at" }
+					}
+				}
+			}
+		}
+	},
+	"directory": {
+		"ldap": {
+			"ldapURL": "ldaps://localhost:636",
+			"tlsOptions": {
+				"rejectUnauthorized": false
+			}
+		},
+		"users": {
+			"hide": ["CN=krbtgt,CN=Users,DC=local,DC=com"]
+		}
+	},
+	"system": {
+		"logging": { "decodeSearchParams": true }
+	}
+}
