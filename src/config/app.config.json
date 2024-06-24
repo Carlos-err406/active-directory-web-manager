@@ -1,5 +1,5 @@
 {
-	"$schema": "schemas/index.schema.json",
+	"$schema": "https://carlos-err406.github.io/active-directory-web-manager/schemas/index.schema.json",
 	"app": {
 		"captcha": { "length": 1 },
 		"views": {
