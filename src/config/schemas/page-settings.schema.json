@@ -8,6 +8,11 @@
 			"description": "Weather or not to allow the user to change the configuration. @default false",
 			"type": "boolean",
 			"default": true
+		},
+		"allowToChangeTheme": {
+			"description": "Allow to toggle dark/light modes. @default false",
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"additionalProperties": false

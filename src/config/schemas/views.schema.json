@@ -22,5 +22,6 @@
 		"usersPage": {
 			"$ref": "page-users.schema.json"
 		}
-	}
+	},
+	"additionalProperties": false
 }

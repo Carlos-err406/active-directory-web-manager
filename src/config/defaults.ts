@@ -19,7 +19,7 @@ const defaults: RecursiveRequired<App.Config> = {
 		views: {
 			logsPage: { show: true },
 			ousPage: { show: true },
-			settingsPage: { showConfigurationForm: true },
+			settingsPage: { showConfigurationForm: true, allowToChangeTheme: false },
 			treePage: { show: true },
 			usersPage: {
 				details: {
