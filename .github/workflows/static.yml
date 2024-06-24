@@ -47,7 +47,7 @@ jobs:
         run: generate-schema-doc src/config/schemas docs/pages --config-file=docs/config.json
 
       - name: Copy config schemas
-        run: cp -r src/config/schemas docs/pages/schemas
+        run: cp -r src/config/schemas docs/pages
 
       - name: Create index html
         run: cp docs/pages/index.schema.html docs/pages/index.html
