@@ -6,7 +6,6 @@
 			"script": "dev",
 			"problemMatcher": [],
 			"label": "npm: dev",
-			"detail": "vite dev",
 			"icon": {
 				"id": "wrench",
 				"color": "terminal.ansiBlue"
@@ -49,7 +48,6 @@
 			"script": "watch:config",
 			"problemMatcher": [],
 			"label": "watch:config",
-			"detail": "chokidar src/config/schemas --initial -c \"npm run app:config\"",
 			"isBackground": true,
 			"icon": {
 				"id": "eye-watch",
@@ -71,7 +69,6 @@
 			"group": { "kind": "build", "isDefault": true },
 			"problemMatcher": [],
 			"label": "npm: build",
-			"detail": "vite build",
 			"isBackground": true,
 			"icon": {
 				"color": "terminal.ansiGreen",
