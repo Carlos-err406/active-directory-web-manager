@@ -20,31 +20,6 @@ services:
     networks:
       admanager.net:
         ipv4_address: 172.16.239.12
-
-  db:
-    image: postgres:16.2-alpine3.19
-    container_name: admanager.db
-    env_file:
-      - .env
-    ports:
-      - 5432:5432
-    volumes:
-      - admanager.pgvol:/var/lib/postgresql/data
-    networks:
-      - admanager.net
-
-  pgadmin:
-    container_name: admanager.pgadmin
-    image: dpage/pgadmin4:8.5
-    env_file:
-      - .env
-    volumes:
-      - admanager.pgadminvol:/var/lib/pgadmin
-    ports:
-      - 80:80
-    networks:
-      - admanager.net
-
   app:
     build:
       context: .
@@ -54,7 +29,6 @@ services:
     ports:
       - 3000:3000
     depends_on:
-      - db
       - samba
     networks:
       - admanager.net
