@@ -5,13 +5,12 @@ import fs from 'fs';
 import defaults from './defaults';
 import Schema from './schemas/index.schema.json';
 
-const getJSONConfig = () => {
-	if (!CONFIG_PATH) throw Error('Missing CONFIG_PATH enviroment varable!');
-	const content = fs.readFileSync(CONFIG_PATH, { encoding: 'utf-8' });
-	const config = JSON.parse(content);
-	return config;
-};
+//Load json config file
+if (!CONFIG_PATH) throw Error('Missing CONFIG_PATH enviroment varable!');
+const content = fs.readFileSync(CONFIG_PATH, { encoding: 'utf-8' });
+const Config = JSON.parse(content);
 
+/**Validate config file against the json schema */
 const validateConfig = async () => {
 	console.log('Validating config file...');
 	// Use dynamic import with require to handle CommonJS module
@@ -19,7 +18,6 @@ const validateConfig = async () => {
 	const { Draft07 } = pkg;
 
 	const validator = new Draft07(Schema);
-	const Config = getJSONConfig();
 	const errors = validator.validate(Config);
 
 	if (errors.length) {
@@ -31,8 +29,8 @@ const validateConfig = async () => {
 
 validateConfig();
 
-// final configuration with defaults and values from Config, this ensures all values are present
-const config = merge(defaults, getJSONConfig(), {
+//Merge json config to the default values
+const config = merge(defaults, Config, {
 	arrayMerge: (_, source) => source
 });
 export default config as RecursiveRequired<App.Config>;
