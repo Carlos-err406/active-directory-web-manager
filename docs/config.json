@@ -1,0 +1,12 @@
+{
+    "$schema":"https://raw.githubusercontent.com/coveooss/json-schema-for-humans/main/config_schema.json",
+    "collapse_long_descriptions": false,
+    "collapse_long_examples": true,
+    "deprecated_from_description": true,
+    "expand_buttons": true,
+    "with_footer": false,
+    "minify": false,
+    "show_breadcrumbs": true,
+    "show_toc": true,
+    "template_name": "js"
+}
