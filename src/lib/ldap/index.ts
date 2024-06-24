@@ -150,14 +150,14 @@ export const getAllGroups = (ldap: Client, extraFilters: Filter[] = []): Promise
 
 export const validateUserAmount = async (ldap: Client) => {
 	const { limit } = config.directory.users;
-	if (!limit) return;
+	if (!limit) return true;
 	const users = await getAllUsers(ldap);
 	return users.length < limit;
 };
 
 export const validateGroupAmount = async (ldap: Client) => {
 	const { limit } = config.directory.groups;
-	if (!limit) return;
+	if (!limit) return true;
 	const groups = await getAllGroups(ldap);
 	return groups.length < limit;
 };
