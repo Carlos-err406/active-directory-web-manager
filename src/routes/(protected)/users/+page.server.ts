@@ -20,7 +20,7 @@ export * as actions from '$lib/actions/users';
 export const load: PageServerLoad = async ({ url, locals, depends }) => {
 	depends('protected:users');
 	const auth = await locals.auth();
-	if (!auth) throw redirect(302, '/');
+	if (!auth) throw redirect(302, '/auth');
 	const { ldap, session } = auth;
 	if (!session.isAdmin && !config.app.nonAdmin.allowAccessToUsersPage)
 		throw redirect(302, '/users/me');

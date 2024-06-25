@@ -46,7 +46,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 export const createUser: Action = async (event) => {
 	const { locals } = event;
 	const auth = await locals.auth();
-	if (!auth) throw redirect(302, '/');
+	if (!auth) throw redirect(302, '/auth');
 
 	const form = await superValidate(event, zod(createUserSchema));
 	if (!form.valid) return fail(400, withFiles({ form }));
@@ -112,7 +112,7 @@ export const createUser: Action = async (event) => {
 				`InsufficientAccessError User ${auth.session.sAMAccountName} tried creating a user without having enough access`,
 				'Error'
 			);
-			throw error(403, { message: 'You dont have permission to perform this opperation!' });
+			throw error(403, { message: "You don't have permission to perform this operation!" });
 		}
 		await sudo((sudoLdap) => sudoLdap.del(dn));
 		const message = `Something unexpected happened while setting ${sAMAccountName}'s password`;
@@ -126,7 +126,7 @@ export const createUser: Action = async (event) => {
 export const deleteUser: Action = async (event) => {
 	const { locals, params } = event;
 	const auth = await locals.auth();
-	if (!auth) throw redirect(302, '/');
+	if (!auth) throw redirect(302, '/auth');
 	const form = await superValidate(event, zod(deleteUserSchema));
 	if (!form.valid) return fail(400, { form });
 	const { ldap } = auth;
@@ -164,7 +164,7 @@ export const deleteUser: Action = async (event) => {
 export const deleteManyUsers: Action = async (event) => {
 	const { locals } = event;
 	const auth = await locals.auth();
-	if (!auth) throw redirect(302, '/');
+	if (!auth) throw redirect(302, '/auth');
 	const form = await superValidate(event, zod(deleteManySchema));
 	if (!form.valid) return fail(400, { form });
 	const { ldap } = auth;
@@ -203,7 +203,7 @@ export const changeUserPassword: Action = async (event) => {
 	const { locals, cookies } = event;
 	const auth = await locals.auth();
 	const access = getAccessToken(cookies);
-	if (!access || !auth) throw redirect(302, '/'); //type narrowing
+	if (!access || !auth) throw redirect(302, '/auth'); //type narrowing
 
 	const form = await superValidate(event, zod(changePasswordSchema));
 	if (!form.valid) return fail(400, { form });
@@ -270,7 +270,7 @@ export const updateUser: Action = async (event) => {
 	const { locals, cookies, params } = event;
 	const auth = await locals.auth();
 	const access = getAccessToken(cookies);
-	if (!access || !auth) throw redirect(302, '/'); //type narrowing
+	if (!access || !auth) throw redirect(302, '/auth'); //type narrowing
 	const { dn } = params;
 
 	if (!dn) throw error(400, 'No user DN provided');
@@ -370,7 +370,7 @@ export const updateUser: Action = async (event) => {
 export const updateMembership: Action = async (event) => {
 	const { locals, params } = event;
 	const auth = await locals.auth();
-	if (!auth) throw redirect(302, '/'); //type narrowing
+	if (!auth) throw redirect(302, '/auth'); //type narrowing
 	const { dn: userDn } = params;
 	if (!userDn) throw error(400, 'No user DN was provided');
 	const form = await superValidate(event, zod(updateMembershipSchema));

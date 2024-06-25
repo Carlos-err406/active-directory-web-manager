@@ -18,7 +18,7 @@ export * as actions from '$lib/actions/groups';
 export const load: PageServerLoad = async ({ url, locals, depends }) => {
 	depends('protected:groups');
 	const auth = await locals.auth();
-	if (!auth) throw redirect(302, '/');
+	if (!auth) throw redirect(302, '/auth');
 	const { ldap, session } = auth;
 	if (!config.app.views.groupsPage.show) {
 		appLog(

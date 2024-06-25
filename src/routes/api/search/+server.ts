@@ -7,7 +7,7 @@ import { AndFilter, FilterParser } from 'ldapts';
 
 export const GET: RequestHandler = async ({ url, locals }) => {
 	const auth = await locals.auth();
-	if (!auth) throw redirect(302, '/');
+	if (!auth) throw redirect(302, '/auth');
 	const { ldap } = auth;
 	const urlFilter = url.searchParams.get('filter');
 	if (!urlFilter) throw error(400, 'No filter provided');

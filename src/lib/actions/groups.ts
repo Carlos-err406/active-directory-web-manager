@@ -22,7 +22,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 export const createGroup: Action = async (event) => {
 	const { locals } = event;
 	const auth = await locals.auth();
-	if (!auth) throw redirect(302, '/');
+	if (!auth) throw redirect(302, '/auth');
 
 	const form = await superValidate(event, zod(createGroupSchema));
 	if (!form.valid) return fail(400, { form });
@@ -75,7 +75,7 @@ export const createGroup: Action = async (event) => {
 export const deleteGroup: Action = async (event) => {
 	const { locals, params } = event;
 	const auth = await locals.auth();
-	if (!auth) throw redirect(302, '/');
+	if (!auth) throw redirect(302, '/auth');
 	const form = await superValidate(event, zod(deleteGroupSchema));
 	if (!form.valid) return fail(400, { form });
 	const { ldap } = auth;
@@ -115,7 +115,7 @@ export const deleteGroup: Action = async (event) => {
 export const deleteManyGroups: Action = async (event) => {
 	const { locals } = event;
 	const auth = await locals.auth();
-	if (!auth) throw redirect(302, '/');
+	if (!auth) throw redirect(302, '/auth');
 	const form = await superValidate(event, zod(deleteManySchema));
 	if (!form.valid) return fail(400, { form });
 	const { ldap } = auth;
@@ -152,7 +152,7 @@ export const deleteManyGroups: Action = async (event) => {
 export const updateGroup: Action = async (event) => {
 	const { locals } = event;
 	const auth = await locals.auth();
-	if (!auth) throw redirect(302, '/'); //type narrowing
+	if (!auth) throw redirect(302, '/auth'); //type narrowing
 	const form = await superValidate(event, zod(updateGroupSchema));
 
 	if (!form.valid) return fail(400, { form });
@@ -197,7 +197,7 @@ export const updateGroup: Action = async (event) => {
 export const setMembers: Action = async (event) => {
 	const { locals } = event;
 	const auth = await locals.auth();
-	if (!auth) throw redirect(302, '/'); //type narrowing
+	if (!auth) throw redirect(302, '/auth'); //type narrowing
 	const form = await superValidate(event, zod(setMembersSchema));
 	if (!form.valid) return fail(400, { form });
 	const { ldap } = auth;

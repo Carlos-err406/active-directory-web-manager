@@ -6,7 +6,7 @@ import { EqualityFilter, OrFilter, type Filter } from 'ldapts';
 
 export const GET: RequestHandler = async ({ locals, url }) => {
 	const auth = await locals.auth();
-	if (!auth) throw redirect(302, '/');
+	if (!auth) throw redirect(302, '/auth');
 	const dn = url.searchParams.get('dn');
 	if (!dn) return json([]);
 	const { ldap } = auth;

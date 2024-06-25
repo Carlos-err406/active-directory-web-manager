@@ -10,7 +10,7 @@ import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const auth = await locals.auth();
-	if (!auth) throw redirect(302, '/');
+	if (!auth) throw redirect(302, '/auth');
 	const { ldap, session } = auth;
 	const user = await getEntryByDn<User>(ldap, session.dn).then(jpegPhotoToB64);
 	if (!user) throw error(404, 'User not found');

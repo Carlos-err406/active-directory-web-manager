@@ -14,7 +14,7 @@ import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	const auth = await locals.auth();
-	if (!auth) throw redirect(302, '/');
+	if (!auth) throw redirect(302, '/auth');
 	const { ldap, session } = auth;
 
 	if (session.dn === params.dn) throw redirect(302, '/users/me');

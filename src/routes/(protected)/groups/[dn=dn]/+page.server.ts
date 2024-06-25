@@ -13,7 +13,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ locals, params }) => {
 	const auth = await locals.auth();
-	if (!auth) throw redirect(302, '/');
+	if (!auth) throw redirect(302, '/auth');
 	const { ldap, session } = auth;
 	const { dn } = params;
 	if (!session.isAdmin && !config.app.nonAdmin.allowAccessToGroupsPage) {
