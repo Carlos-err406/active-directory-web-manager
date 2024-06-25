@@ -1,3 +1,4 @@
+import config from '$config';
 import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
 import {
 	encodePassword,
@@ -25,10 +26,10 @@ import {
 	setSessionCookie,
 	verifyAccessToken
 } from '$lib/server';
+import { appLog, errorLog } from '$lib/server/logs';
 import type { Group } from '$lib/types/group';
 import { SESSION_ENTRY_ATTRIBUTES } from '$lib/types/session';
 import { UAC, type User } from '$lib/types/user';
-import { appLog, errorLog } from '$lib/server/logs';
 import { error, fail, redirect, type Action } from '@sveltejs/kit';
 import {
 	AlreadyExistsError,
@@ -121,6 +122,7 @@ export const createUser: Action = async (event) => {
 	appLog(`${auth.session.sAMAccountName} created user: ${dn}`);
 	return withFiles({ form });
 };
+
 export const deleteUser: Action = async (event) => {
 	const { locals, params } = event;
 	const auth = await locals.auth();
@@ -158,6 +160,7 @@ export const deleteUser: Action = async (event) => {
 	if (params.dn === dn) throw redirect(302, '/users');
 	return { form };
 };
+
 export const deleteManyUsers: Action = async (event) => {
 	const { locals } = event;
 	const auth = await locals.auth();
@@ -195,6 +198,7 @@ export const deleteManyUsers: Action = async (event) => {
 		);
 	return { form };
 };
+
 export const changeUserPassword: Action = async (event) => {
 	const { locals, cookies } = event;
 	const auth = await locals.auth();
@@ -261,17 +265,32 @@ export const changeUserPassword: Action = async (event) => {
 	}
 	return { form };
 };
+
 export const updateUser: Action = async (event) => {
-	const { locals, cookies } = event;
+	const { locals, cookies, params } = event;
 	const auth = await locals.auth();
 	const access = getAccessToken(cookies);
 	if (!access || !auth) throw redirect(302, '/'); //type narrowing
+	const { dn } = params;
+
+	if (!dn) throw error(400, 'No user DN provided');
+
+	const { ldap, session } = auth;
+
+	const isSelfUpdating = dn === session.dn;
+
+	if (isSelfUpdating && !session.isAdmin && !config.app.nonAdmin.allowSelfEdit) {
+		appLog(
+			`User ${session.sAMAccountName} tried updating its own profile but non-admin self-update is disabled by configuration`,
+			'Error'
+		);
+		throw error(403, 'Non-Admin self-update is disabled by configuration');
+	}
 
 	const form = await superValidate(event, zod(updateUserSchema));
 	if (!form.valid) return fail(400, withFiles({ form }));
-	const { ldap, session } = auth;
 
-	const { sAMAccountName, givenName, sn, mail, description, jpegPhotoBase64, dn } = form.data;
+	const { sAMAccountName, givenName, sn, mail, description, jpegPhotoBase64 } = form.data;
 
 	const user = await getEntryByDn<User>(ldap, dn);
 	if (!user) throw error(404, 'User not found');
@@ -294,7 +313,11 @@ export const updateUser: Action = async (event) => {
 	if (!changes.length) throw error(400, 'No changes to apply');
 
 	try {
-		await ldap.modify(dn, changes);
+		if (isSelfUpdating && !session.isAdmin) {
+			await sudo((ldap) => ldap.modify(dn, changes));
+		} else {
+			await ldap.modify(dn, changes);
+		}
 	} catch (e) {
 		if (e instanceof AlreadyExistsError) {
 			return setError(form, 'sAMAccountName', 'sAMAccountName already in use!');
@@ -313,14 +336,17 @@ export const updateUser: Action = async (event) => {
 		const base = extractBase(user.dn);
 		const newDN = `CN=${sAMAccountName},${base}`;
 		try {
-			await ldap.modifyDN(dn, newDN);
+			if (isSelfUpdating && !session.isAdmin) {
+				await sudo((ldap) => ldap.modifyDN(dn, newDN));
+			} else {
+				await ldap.modifyDN(dn, newDN);
+			}
 		} catch (e) {
 			const message = `Something unexpected happened while updating ${user.sAMAccountName}'s distinguishedName`;
 			const errorId = errorLog(e, { message });
 			throw error(500, { message, errorId });
 		}
 	}
-	const isSelfUpdating = session.distinguishedName === dn;
 	const updatedUser = await getEntryBySAMAccountName<User>(ldap, sAMAccountName, {
 		searchOpts: { attributes: SESSION_ENTRY_ATTRIBUTES }
 	});
@@ -342,13 +368,15 @@ export const updateUser: Action = async (event) => {
 };
 
 export const updateMembership: Action = async (event) => {
-	const { locals } = event;
+	const { locals, params } = event;
 	const auth = await locals.auth();
 	if (!auth) throw redirect(302, '/'); //type narrowing
+	const { dn: userDn } = params;
+	if (!userDn) throw error(400, 'No user DN was provided');
 	const form = await superValidate(event, zod(updateMembershipSchema));
 	if (!form.valid) return fail(400, { form });
 	const { ldap } = auth;
-	const { dns, userDn } = form.data;
+	const { dns } = form.data;
 	const user = await getEntryByDn<User>(ldap, userDn);
 	const currentUserGroups = new Set(user.memberOf);
 	const newGroups = new Set(dns);
