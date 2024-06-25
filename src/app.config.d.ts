@@ -763,7 +763,7 @@ export interface DirectoryConfig {
 	 */
 	groups?: {
 		/**
-		 * The list of group distinguishedNames or sAMAccountNames that should not be shown in the /groups view dropdowns and search. Accessing directly to /groups/[dn] of a user that is listed here will result on a '403 This user is hidden by configuration' error. @default []
+		 * The list of group distinguishedNames or sAMAccountNames that should not be shown in the /groups view dropdowns and search. Accessing directly to /groups/[dn] of a group that is listed here will result on a '403 This group is hidden by configuration' error. @default []
 		 */
 		hide?: string[];
 		/**
