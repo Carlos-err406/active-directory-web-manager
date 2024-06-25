@@ -26,13 +26,7 @@ const COOKIE_CONFIG = (
 	...opts
 });
 
-/**
- * You can generate a public-private keypair with the genrsa context (the last number is the keylength in bits):
- *
- * `openssl genrsa -out keypair.pem 2048`
- */
-
-// SESION
+// SESSION
 export const generateSessionToken = async (ldap: Client, user: User) =>
 	jwt.sign({ ...user, isAdmin: await isAdmin(ldap, user.dn) }, SECRET_KEY, {
 		algorithm: JWT_ALGORITHM,

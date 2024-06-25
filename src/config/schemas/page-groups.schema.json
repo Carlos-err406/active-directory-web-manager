@@ -1,6 +1,6 @@
 {
 	"$id": "page-groups.schema.json",
-	"description": "Configuration reggarding the groups page",
+	"description": "Configuration regarding the groups page",
 	"title": "GroupsPageConfig",
 	"type": "object",
 	"properties": {

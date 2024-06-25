@@ -1,6 +1,6 @@
 {
 	"$id": "page-tree.schema.json",
-	"description": "Configuration reggarding the tree page",
+	"description": "Configuration regarding the tree page",
 	"title": "TreePageConfig",
 	"type": "object",
 	"properties": {

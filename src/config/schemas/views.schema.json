@@ -1,6 +1,6 @@
 {
 	"$id": "views.schema.json",
-	"description": "Configuration reggarding de different pages of the web app",
+	"description": "Configuration regarding de different pages of the web app",
 	"title": "ViewsConfig",
 	"type": "object",
 	"properties": {

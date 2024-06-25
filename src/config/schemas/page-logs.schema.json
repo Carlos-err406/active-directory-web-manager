@@ -1,6 +1,6 @@
 {
 	"$id": "page-logs.schema.json",
-	"description": "configuration reggarding the logs page",
+	"description": "configuration regarding the logs page",
 	"title": "LogsPageConfig",
 	"type": "object",
 	"properties": {

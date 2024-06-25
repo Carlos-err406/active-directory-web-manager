@@ -1,6 +1,6 @@
 import type { RecursiveRequired } from '@sveltejs/kit';
 
-/** default values to be overriden by the values in Config*/
+/** default values to be overridden by the values in Config*/
 const defaults: RecursiveRequired<App.Config> = {
 	app: {
 		captcha: {

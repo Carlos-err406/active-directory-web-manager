@@ -25,7 +25,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 	const { hide } = config.directory.groups;
 	if (hide.includes(dn) || hide.includes(getCNFromDN(dn))) {
 		appLog(
-			`User ${session.sAMAccountName} tried to access group ${dn}, but is hiden by configuration.`,
+			`User ${session.sAMAccountName} tried to access group ${dn}, but is hidden by configuration.`,
 			'Error'
 		);
 		throw error(403, 'This group is hidden by configuration');

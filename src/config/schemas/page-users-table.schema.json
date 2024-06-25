@@ -142,7 +142,7 @@
 							"type": "string"
 						},
 						"hidable": {
-							"description": "Wether or not the \"sAMAccountName\" is hidable or not. @default falses",
+							"description": "Wether or not the \"sAMAccountName\" is hidable or not. @default false",
 							"type": "boolean",
 							"default": false
 						},

@@ -14,7 +14,7 @@
 			"description": "CN of the directory's administrators group. @default Domain Admins"
 		},
 		"groups": {
-			"description": "Directory settings reggarding group management",
+			"description": "Directory settings regarding group management",
 			"type": "object",
 			"properties": {
 				"hide": {
@@ -36,7 +36,7 @@
 			"additionalProperties": false
 		},
 		"users": {
-			"description": "Directory settings reggarding user management",
+			"description": "Directory settings regarding user management",
 			"type": "object",
 			"properties": {
 				"hide": {

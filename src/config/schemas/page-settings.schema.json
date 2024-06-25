@@ -1,6 +1,6 @@
 {
 	"$id": "page-settings.schema.json",
-	"description": "Configuration reggarding the settings page",
+	"description": "Configuration regarding the settings page",
 	"title": "SettingsPageConfig",
 	"type": "object",
 	"properties": {

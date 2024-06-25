@@ -1,6 +1,6 @@
 {
 	"$id": "page-users.schema.json",
-	"description": "Configuration reggarding the users page",
+	"description": "Configuration regarding the users page",
 	"title": "UsersPageConfig",
 	"type": "object",
 	"properties": {

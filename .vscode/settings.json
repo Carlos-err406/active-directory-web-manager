@@ -8,5 +8,7 @@
 			"url": "https://carlos-err406.github.io/active-directory-web-manager/schemas/index.schema.json",
 			"fileMatch": ["app.config.json", "app.config.dev.json"]
 		}
-	]
+	],
+	"cSpell.enabled": true,
+	"cSpell.words": ["ldaps", "ldapts", "recyclebin"]
 }

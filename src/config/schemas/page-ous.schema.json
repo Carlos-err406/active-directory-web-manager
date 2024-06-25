@@ -1,6 +1,6 @@
 {
 	"$id": "page-ous.schema.json",
-	"description": "Configuration reggarding the ous page",
+	"description": "Configuration regarding the ous page",
 	"title": "OusPageConfig",
 	"type": "object",
 	"properties": {

@@ -24,7 +24,7 @@ export interface AppConfig {
 	views?: ViewsConfig;
 }
 /**
- * Settings reggarding non-admin users
+ * Settings regarding non-admin users
  */
 export interface AppNonAdminSchemaJson {
 	/**
@@ -102,7 +102,7 @@ export interface CaptchaConfig {
 	width?: number;
 }
 /**
- * Configuration reggarding de different pages of the web app
+ * Configuration regarding de different pages of the web app
  */
 export interface ViewsConfig {
 	groupsPage?: GroupsPageConfig;
@@ -113,7 +113,7 @@ export interface ViewsConfig {
 	usersPage?: UsersPageConfig;
 }
 /**
- * Configuration reggarding the groups page
+ * Configuration regarding the groups page
  */
 export interface GroupsPageConfig {
 	details?: GroupDetailsConfig;
@@ -124,11 +124,11 @@ export interface GroupsPageConfig {
 	table?: GroupsTableConfig;
 }
 /**
- * Configuration reggarding the detailed view of a group ("/groups/[dn]")
+ * Configuration regarding the detailed view of a group ("/groups/[dn]")
  */
 export interface GroupDetailsConfig {
 	/**
-	 * Configuration reggarding the "cn" attribute of the group
+	 * Configuration regarding the "cn" attribute of the group
 	 */
 	cn?: {
 		/**
@@ -141,7 +141,7 @@ export interface GroupDetailsConfig {
 		show?: boolean;
 	};
 	/**
-	 * Configuration reggarding the "description" attribute of the group
+	 * Configuration regarding the "description" attribute of the group
 	 */
 	description?: {
 		/**
@@ -154,7 +154,7 @@ export interface GroupDetailsConfig {
 		show?: boolean;
 	};
 	/**
-	 * Configuration reggarding the "distinguishedName" attribute of the group
+	 * Configuration regarding the "distinguishedName" attribute of the group
 	 */
 	distinguishedName?: {
 		/**
@@ -167,7 +167,7 @@ export interface GroupDetailsConfig {
 		show?: boolean;
 	};
 	/**
-	 * Configuration reggarding the "groupType" attribute of the group
+	 * Configuration regarding the "groupType" attribute of the group
 	 */
 	groupType?: {
 		/**
@@ -180,7 +180,7 @@ export interface GroupDetailsConfig {
 		show?: boolean;
 	};
 	/**
-	 * Configuration reggarding the "mail" attribute of the group
+	 * Configuration regarding the "mail" attribute of the group
 	 */
 	mail?: {
 		/**
@@ -193,7 +193,7 @@ export interface GroupDetailsConfig {
 		show?: boolean;
 	};
 	/**
-	 * Configuration reggarding the "member" attribute of the group
+	 * Configuration regarding the "member" attribute of the group
 	 */
 	member?: {
 		/**
@@ -210,7 +210,7 @@ export interface GroupDetailsConfig {
 		show?: boolean;
 	};
 	/**
-	 * Configuration reggarding the "sAMAccountName" attribute of the group
+	 * Configuration regarding the "sAMAccountName" attribute of the group
 	 */
 	sAMAccountName?: {
 		/**
@@ -223,7 +223,7 @@ export interface GroupDetailsConfig {
 		show?: boolean;
 	};
 	/**
-	 * Configuration reggarding the "whenChanged" attribute of the group
+	 * Configuration regarding the "whenChanged" attribute of the group
 	 */
 	whenChanged?: {
 		/**
@@ -236,7 +236,7 @@ export interface GroupDetailsConfig {
 		show?: boolean;
 	};
 	/**
-	 * Configuration reggarding the "whenCreated" attribute of the group
+	 * Configuration regarding the "whenCreated" attribute of the group
 	 */
 	whenCreated?: {
 		/**
@@ -258,7 +258,7 @@ export interface GroupsTableConfig {
 	 */
 	columns?: {
 		/**
-		 * Configure groups table "description" clolumn.
+		 * Configure groups table "description" column.
 		 */
 		description?: {
 			/**
@@ -275,7 +275,7 @@ export interface GroupsTableConfig {
 			show?: boolean;
 		};
 		/**
-		 * Configure groups table "dn" clolumn.
+		 * Configure groups table "dn" column.
 		 */
 		dn?: {
 			/**
@@ -292,7 +292,7 @@ export interface GroupsTableConfig {
 			show?: boolean;
 		};
 		/**
-		 * Configure groups table "groupType" clolumn.
+		 * Configure groups table "groupType" column.
 		 */
 		groupType?: {
 			/**
@@ -309,7 +309,7 @@ export interface GroupsTableConfig {
 			show?: boolean;
 		};
 		/**
-		 * Configure groups table "mail" clolumn.
+		 * Configure groups table "mail" column.
 		 */
 		mail?: {
 			/**
@@ -326,7 +326,7 @@ export interface GroupsTableConfig {
 			show?: boolean;
 		};
 		/**
-		 * Configure groups table "sAMAccountName" clolumn.
+		 * Configure groups table "sAMAccountName" column.
 		 */
 		sAMAccountName?: {
 			/**
@@ -343,7 +343,7 @@ export interface GroupsTableConfig {
 			show?: boolean;
 		};
 		/**
-		 * Configure groups table "whenCreated" clolumn.
+		 * Configure groups table "whenCreated" column.
 		 */
 		whenCreated?: {
 			/**
@@ -362,7 +362,7 @@ export interface GroupsTableConfig {
 	};
 }
 /**
- * configuration reggarding the logs page
+ * configuration regarding the logs page
  */
 export interface LogsPageConfig {
 	/**
@@ -371,7 +371,7 @@ export interface LogsPageConfig {
 	show?: boolean;
 }
 /**
- * Configuration reggarding the ous page
+ * Configuration regarding the ous page
  */
 export interface OusPageConfig {
 	/**
@@ -380,7 +380,7 @@ export interface OusPageConfig {
 	show?: boolean;
 }
 /**
- * Configuration reggarding the settings page
+ * Configuration regarding the settings page
  */
 export interface SettingsPageConfig {
 	/**
@@ -393,7 +393,7 @@ export interface SettingsPageConfig {
 	allowToChangeTheme?: boolean;
 }
 /**
- * Configuration reggarding the tree page
+ * Configuration regarding the tree page
  */
 export interface TreePageConfig {
 	/**
@@ -402,18 +402,18 @@ export interface TreePageConfig {
 	show?: boolean;
 }
 /**
- * Configuration reggarding the users page
+ * Configuration regarding the users page
  */
 export interface UsersPageConfig {
 	details?: UserDetailsConfig;
 	table?: UsersTableConfig;
 }
 /**
- * Configuration reggarding the detailed view of a user ("/users/[dn]" or "/users/me")
+ * Configuration regarding the detailed view of a user ("/users/[dn]" or "/users/me")
  */
 export interface UserDetailsConfig {
 	/**
-	 * Configuration reggarding the "description" attribute of the user
+	 * Configuration regarding the "description" attribute of the user
 	 */
 	description?: {
 		/**
@@ -426,7 +426,7 @@ export interface UserDetailsConfig {
 		show?: boolean;
 	};
 	/**
-	 * Configuration reggarding the "displayName" attribute of the user
+	 * Configuration regarding the "displayName" attribute of the user
 	 */
 	displayName?: {
 		/**
@@ -439,7 +439,7 @@ export interface UserDetailsConfig {
 		show?: boolean;
 	};
 	/**
-	 * Configuration reggarding the "distinguishedName" attribute of the user
+	 * Configuration regarding the "distinguishedName" attribute of the user
 	 */
 	distinguishedName?: {
 		/**
@@ -452,7 +452,7 @@ export interface UserDetailsConfig {
 		show?: boolean;
 	};
 	/**
-	 * Configuration reggarding the "givenName" attribute of the user
+	 * Configuration regarding the "givenName" attribute of the user
 	 */
 	givenName?: {
 		/**
@@ -465,7 +465,7 @@ export interface UserDetailsConfig {
 		show?: boolean;
 	};
 	/**
-	 * Configuration reggarding the "jpegPhoto" attribute of the user. If "showFallback" and "show" are false then nothing will be shown
+	 * Configuration regarding the "jpegPhoto" attribute of the user. If "showFallback" and "show" are false then nothing will be shown
 	 */
 	jpegPhoto?: {
 		/**
@@ -474,7 +474,7 @@ export interface UserDetailsConfig {
 		show?: boolean;
 	};
 	/**
-	 * Configuration reggarding the "mail" attribute of the user
+	 * Configuration regarding the "mail" attribute of the user
 	 */
 	mail?: {
 		/**
@@ -487,7 +487,7 @@ export interface UserDetailsConfig {
 		show?: boolean;
 	};
 	/**
-	 * Configuration reggarding the "memberOf" attribute of the user
+	 * Configuration regarding the "memberOf" attribute of the user
 	 */
 	memberOf?: {
 		/**
@@ -504,7 +504,7 @@ export interface UserDetailsConfig {
 		show?: boolean;
 	};
 	/**
-	 * Configuration reggarding the "sAMAccountName" attribute of the user
+	 * Configuration regarding the "sAMAccountName" attribute of the user
 	 */
 	sAMAccountName?: {
 		/**
@@ -517,7 +517,7 @@ export interface UserDetailsConfig {
 		show?: boolean;
 	};
 	/**
-	 * Configuration reggarding the "sn" attribute of the user
+	 * Configuration regarding the "sn" attribute of the user
 	 */
 	sn?: {
 		/**
@@ -530,7 +530,7 @@ export interface UserDetailsConfig {
 		show?: boolean;
 	};
 	/**
-	 * Configuration reggarding the "userAccountControl" attribute of the user
+	 * Configuration regarding the "userAccountControl" attribute of the user
 	 */
 	userAccountControl?: {
 		/**
@@ -543,7 +543,7 @@ export interface UserDetailsConfig {
 		show?: boolean;
 	};
 	/**
-	 * Configuration reggarding the "whenChanged" attribute of the user
+	 * Configuration regarding the "whenChanged" attribute of the user
 	 */
 	whenChanged?: {
 		/**
@@ -556,7 +556,7 @@ export interface UserDetailsConfig {
 		show?: boolean;
 	};
 	/**
-	 * Configuration reggarding the "whenCreated" attribute of the user
+	 * Configuration regarding the "whenCreated" attribute of the user
 	 */
 	whenCreated?: {
 		/**
@@ -688,7 +688,7 @@ export interface UsersTableConfig {
 			 */
 			header?: string;
 			/**
-			 * Wether or not the "sAMAccountName" is hidable or not. @default falses
+			 * Wether or not the "sAMAccountName" is hidable or not. @default false
 			 */
 			hidable?: boolean;
 			/**
@@ -759,7 +759,7 @@ export interface DirectoryConfig {
 	 */
 	adminGroup?: string;
 	/**
-	 * Directory settings reggarding group management
+	 * Directory settings regarding group management
 	 */
 	groups?: {
 		/**

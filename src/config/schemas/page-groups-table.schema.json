@@ -9,7 +9,7 @@
 			"type": "object",
 			"properties": {
 				"description": {
-					"description": "Configure groups table \"description\" clolumn.",
+					"description": "Configure groups table \"description\" column.",
 					"properties": {
 						"header": {
 							"default": "description",
@@ -30,7 +30,7 @@
 					"additionalProperties": false
 				},
 				"dn": {
-					"description": "Configure groups table \"dn\" clolumn.",
+					"description": "Configure groups table \"dn\" column.",
 					"properties": {
 						"header": {
 							"default": "distinguishedName",
@@ -51,7 +51,7 @@
 					"additionalProperties": false
 				},
 				"groupType": {
-					"description": "Configure groups table \"groupType\" clolumn.",
+					"description": "Configure groups table \"groupType\" column.",
 					"properties": {
 						"header": {
 							"default": "userAccountControl",
@@ -72,7 +72,7 @@
 					"additionalProperties": false
 				},
 				"mail": {
-					"description": "Configure groups table \"mail\" clolumn.",
+					"description": "Configure groups table \"mail\" column.",
 					"properties": {
 						"header": {
 							"default": "mail",
@@ -93,7 +93,7 @@
 					"additionalProperties": false
 				},
 				"sAMAccountName": {
-					"description": "Configure groups table \"sAMAccountName\" clolumn.",
+					"description": "Configure groups table \"sAMAccountName\" column.",
 					"properties": {
 						"header": {
 							"default": "sAMAccountName",
@@ -114,7 +114,7 @@
 					"additionalProperties": false
 				},
 				"whenCreated": {
-					"description": "Configure groups table \"whenCreated\" clolumn.",
+					"description": "Configure groups table \"whenCreated\" column.",
 					"properties": {
 						"header": {
 							"default": "whenCreated",

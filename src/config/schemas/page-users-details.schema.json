@@ -1,11 +1,11 @@
 {
 	"$id": "page-users-details.schema.json",
-	"description": "Configuration reggarding the detailed view of a user (\"/users/[dn]\" or \"/users/me\")",
+	"description": "Configuration regarding the detailed view of a user (\"/users/[dn]\" or \"/users/me\")",
 	"title": "UserDetailsConfig",
 	"type": "object",
 	"properties": {
 		"description": {
-			"description": "Configuration reggarding the \"description\" attribute of the user",
+			"description": "Configuration regarding the \"description\" attribute of the user",
 			"type": "object",
 			"properties": {
 				"label": {
@@ -22,7 +22,7 @@
 			"additionalProperties": false
 		},
 		"displayName": {
-			"description": "Configuration reggarding the \"displayName\" attribute of the user",
+			"description": "Configuration regarding the \"displayName\" attribute of the user",
 			"type": "object",
 			"properties": {
 				"label": {
@@ -39,7 +39,7 @@
 			"additionalProperties": false
 		},
 		"distinguishedName": {
-			"description": "Configuration reggarding the \"distinguishedName\" attribute of the user",
+			"description": "Configuration regarding the \"distinguishedName\" attribute of the user",
 			"type": "object",
 			"properties": {
 				"label": {
@@ -56,7 +56,7 @@
 			"additionalProperties": false
 		},
 		"givenName": {
-			"description": "Configuration reggarding the \"givenName\" attribute of the user",
+			"description": "Configuration regarding the \"givenName\" attribute of the user",
 			"type": "object",
 			"properties": {
 				"label": {
@@ -73,7 +73,7 @@
 			"additionalProperties": false
 		},
 		"jpegPhoto": {
-			"description": "Configuration reggarding the \"jpegPhoto\" attribute of the user. If \"showFallback\" and \"show\" are false then nothing will be shown",
+			"description": "Configuration regarding the \"jpegPhoto\" attribute of the user. If \"showFallback\" and \"show\" are false then nothing will be shown",
 			"type": "object",
 			"properties": {
 				"show": {
@@ -85,7 +85,7 @@
 			"additionalProperties": false
 		},
 		"mail": {
-			"description": "Configuration reggarding the \"mail\" attribute of the user",
+			"description": "Configuration regarding the \"mail\" attribute of the user",
 			"type": "object",
 			"properties": {
 				"label": {
@@ -102,7 +102,7 @@
 			"additionalProperties": false
 		},
 		"memberOf": {
-			"description": "Configuration reggarding the \"memberOf\" attribute of the user",
+			"description": "Configuration regarding the \"memberOf\" attribute of the user",
 			"type": "object",
 			"properties": {
 				"label": {
@@ -124,7 +124,7 @@
 			"additionalProperties": false
 		},
 		"sAMAccountName": {
-			"description": "Configuration reggarding the \"sAMAccountName\" attribute of the user",
+			"description": "Configuration regarding the \"sAMAccountName\" attribute of the user",
 			"type": "object",
 			"properties": {
 				"label": {
@@ -141,7 +141,7 @@
 			"additionalProperties": false
 		},
 		"sn": {
-			"description": "Configuration reggarding the \"sn\" attribute of the user",
+			"description": "Configuration regarding the \"sn\" attribute of the user",
 			"type": "object",
 			"properties": {
 				"label": {
@@ -158,7 +158,7 @@
 			"additionalProperties": false
 		},
 		"userAccountControl": {
-			"description": "Configuration reggarding the \"userAccountControl\" attribute of the user",
+			"description": "Configuration regarding the \"userAccountControl\" attribute of the user",
 			"type": "object",
 			"properties": {
 				"label": {
@@ -175,7 +175,7 @@
 			"additionalProperties": false
 		},
 		"whenChanged": {
-			"description": "Configuration reggarding the \"whenChanged\" attribute of the user",
+			"description": "Configuration regarding the \"whenChanged\" attribute of the user",
 			"type": "object",
 			"properties": {
 				"label": {
@@ -192,7 +192,7 @@
 			"additionalProperties": false
 		},
 		"whenCreated": {
-			"description": "Configuration reggarding the \"whenCreated\" attribute of the user",
+			"description": "Configuration regarding the \"whenCreated\" attribute of the user",
 			"type": "object",
 			"properties": {
 				"label": {

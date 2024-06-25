@@ -1,11 +1,11 @@
 {
 	"$id": "page-groups-details.schema.json",
-	"description": "Configuration reggarding the detailed view of a group (\"/groups/[dn]\")",
+	"description": "Configuration regarding the detailed view of a group (\"/groups/[dn]\")",
 	"title": "GroupDetailsConfig",
 	"type": "object",
 	"properties": {
 		"cn": {
-			"description": "Configuration reggarding the \"cn\" attribute of the group",
+			"description": "Configuration regarding the \"cn\" attribute of the group",
 			"type": "object",
 			"properties": {
 				"label": {
@@ -22,7 +22,7 @@
 			"additionalProperties": false
 		},
 		"description": {
-			"description": "Configuration reggarding the \"description\" attribute of the group",
+			"description": "Configuration regarding the \"description\" attribute of the group",
 			"type": "object",
 			"properties": {
 				"label": {
@@ -39,7 +39,7 @@
 			"additionalProperties": false
 		},
 		"distinguishedName": {
-			"description": "Configuration reggarding the \"distinguishedName\" attribute of the group",
+			"description": "Configuration regarding the \"distinguishedName\" attribute of the group",
 			"type": "object",
 			"properties": {
 				"label": {
@@ -56,7 +56,7 @@
 			"additionalProperties": false
 		},
 		"groupType": {
-			"description": "Configuration reggarding the \"groupType\" attribute of the group",
+			"description": "Configuration regarding the \"groupType\" attribute of the group",
 			"type": "object",
 			"properties": {
 				"label": {
@@ -73,7 +73,7 @@
 			"additionalProperties": false
 		},
 		"mail": {
-			"description": "Configuration reggarding the \"mail\" attribute of the group",
+			"description": "Configuration regarding the \"mail\" attribute of the group",
 			"type": "object",
 			"properties": {
 				"label": {
@@ -90,7 +90,7 @@
 			"additionalProperties": false
 		},
 		"member": {
-			"description": "Configuration reggarding the \"member\" attribute of the group",
+			"description": "Configuration regarding the \"member\" attribute of the group",
 			"type": "object",
 			"properties": {
 				"label": {
@@ -112,7 +112,7 @@
 			"additionalProperties": false
 		},
 		"sAMAccountName": {
-			"description": "Configuration reggarding the \"sAMAccountName\" attribute of the group",
+			"description": "Configuration regarding the \"sAMAccountName\" attribute of the group",
 			"type": "object",
 			"properties": {
 				"label": {
@@ -129,7 +129,7 @@
 			"additionalProperties": false
 		},
 		"whenChanged": {
-			"description": "Configuration reggarding the \"whenChanged\" attribute of the group",
+			"description": "Configuration regarding the \"whenChanged\" attribute of the group",
 			"type": "object",
 			"properties": {
 				"label": {
@@ -146,7 +146,7 @@
 			"additionalProperties": false
 		},
 		"whenCreated": {
-			"description": "Configuration reggarding the \"whenCreated\" attribute of the group",
+			"description": "Configuration regarding the \"whenCreated\" attribute of the group",
 			"type": "object",
 			"properties": {
 				"label": {
