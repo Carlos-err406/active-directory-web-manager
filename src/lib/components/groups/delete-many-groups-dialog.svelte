@@ -9,7 +9,6 @@
 	import { toast } from 'svelte-sonner';
 	let open: boolean;
 	export let dns: string[] = [];
-	export let action = '/groups?/deleteMany';
 	$: form = $page.data.deleteManyGroupsForm;
 </script>
 
@@ -33,7 +32,7 @@
 			bind:form
 			schema={deleteManySchema}
 			loadingText="Deleting groups..."
-			formProps={{ action }}
+			formProps={{ action: '/groups?/deleteManyGroups' }}
 			formOptions={{
 				resetForm: false,
 				onError: ({ result }) => {

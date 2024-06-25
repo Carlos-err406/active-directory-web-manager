@@ -31,7 +31,7 @@
 			bind:form
 			schema={deleteManySchema}
 			loadingText="Deleting users..."
-			formProps={{ action: '/users?/deleteMany' }}
+			formProps={{ action: '/users?/deleteManyUsers' }}
 			formOptions={{
 				resetForm: false,
 				onError: ({ result }) => {
