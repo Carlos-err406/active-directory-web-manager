@@ -1,6 +1,6 @@
 {
 	"$schema": "http://json-schema.org/draft-07/schema#",
-	"description": "Application configuration settings",
+	"description": "Configuration settings",
 	"title": "Config",
 	"type": "object",
 	"required": ["directory"],
@@ -13,6 +13,9 @@
 		},
 		"system": {
 			"$ref": "system.schema.json"
+		},
+		"recyclebin": {
+			"$ref": "recyclebin.schema.json"
 		}
 	}
 }

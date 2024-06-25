@@ -4,12 +4,9 @@
 	"title": "AppConfig",
 	"type": "object",
 	"properties": {
-		"captcha": {
-			"$ref": "captcha.schema.json"
-		},
-		"views": {
-			"$ref": "views.schema.json"
-		}
+		"nonAdmin": { "$ref": "app-nonAdmin.schema.json" },
+		"captcha": { "$ref": "captcha.schema.json" },
+		"views": { "$ref": "views.schema.json" }
 	},
 	"additionalProperties": false
 }

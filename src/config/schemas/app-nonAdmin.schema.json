@@ -1,0 +1,38 @@
+{
+	"$id": "app-nonAdmin.schema.json",
+	"additionalProperties": false,
+	"type": "object",
+	"description": "Settings reggarding non-admin users",
+	"properties": {
+		"allowSelfEdit": {
+			"type": "boolean",
+			"description": "Allow non-admin users to edit their own profiles and change their passwords. In the server this is done using the administrator credentials since in a directory only administrators have edit access (administrator@{PUBLIC_LDAP_DOMAIN}, ADMIN_PASSWD, PUBLIC_LDAP_DOMAIN and ADMIN_PASSWD are .env variables). @default false",
+			"default": false
+		},
+		"allowAccessToUsersPage": {
+			"type": "boolean",
+			"default": false,
+			"description": "Allow non-admin users to access the \"/users\" and \"/users/[dn]\" pages. @default false"
+		},
+		"allowAccessToGroupsPage": {
+			"type": "boolean",
+			"default": false,
+			"description": "Allow non-admin users to access the \"/groups\" and \"/groups/[dn]\" pages. @default false"
+		},
+		"allowAccessToOUsPage": {
+			"type": "boolean",
+			"default": false,
+			"description": "Allow non-admin users to access the \"/ous\" and \"/ous/[dn]\" pages. @default false"
+		},
+		"allowAccessToTreePage": {
+			"type": "boolean",
+			"default": false,
+			"description": "Allow non-admin users to access the \"/tree\" page. @default false"
+		},
+		"allowAccessToLogsPage": {
+			"type": "boolean",
+			"default": false,
+			"description": "Allow non-admin users to access the \"/logs\" page. @default false"
+		}
+	}
+}

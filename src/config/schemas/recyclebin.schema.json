@@ -1,0 +1,8 @@
+{
+	"$id": "recyclebin.schema.json",
+	"type": "object",
+	"additionalProperties": false,
+	"description": "Recycle Bin configuration",
+	"title": "RecycleBinConfig",
+	"properties": {}
+}
