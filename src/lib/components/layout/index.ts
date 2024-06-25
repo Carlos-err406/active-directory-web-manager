@@ -13,20 +13,30 @@ export interface NavigationItemType {
 	icon: ComponentType<Icon>;
 }
 
-export const getNavigationItems = (config: RecursiveRequired<App.Config>): NavigationItemType[] => {
+export const getNavigationItems = (
+	config: RecursiveRequired<App.Config>,
+	isAdmin: boolean
+): NavigationItemType[] => {
 	const filterLogsPageIfDisabled = (item: NavigationItemType) => {
+		const canAccess = config.app.nonAdmin.allowAccessToLogsPage || isAdmin;
 		if (!item.href.startsWith('/logs')) return true;
-		else return config.app.views.logsPage.show;
+		else return config.app.views.logsPage.show && canAccess;
 	};
 	const filterTreePageIfDisabled = (item: NavigationItemType) => {
+		const canAccess = config.app.nonAdmin.allowAccessToGroupsPage || isAdmin;
 		if (!item.href.startsWith('/tree')) return true;
-		else return config.app.views.treePage.show;
+		else return config.app.views.treePage.show && canAccess;
 	};
 	const filterOusPageIfDisabled = (item: NavigationItemType) => {
+		const canAccess = config.app.nonAdmin.allowAccessToOUsPage || isAdmin;
 		if (!item.href.startsWith('/ous')) return true;
-		else return config.app.views.ousPage.show;
+		else return config.app.views.ousPage.show && canAccess;
 	};
-
+	const filterGroupsPageIfDisabled = (item: NavigationItemType) => {
+		const canAccess = config.app.nonAdmin.allowAccessToGroupsPage || isAdmin;
+		if (!item.href.startsWith('/groups')) return true;
+		else return config.app.views.groupsPage.show && canAccess;
+	};
 	return [
 		{ href: '/users', name: 'Users', icon: User },
 		{ href: '/groups', name: 'Groups', icon: Users },
@@ -44,5 +54,6 @@ export const getNavigationItems = (config: RecursiveRequired<App.Config>): Navig
 	]
 		.filter(filterLogsPageIfDisabled)
 		.filter(filterTreePageIfDisabled)
-		.filter(filterOusPageIfDisabled);
+		.filter(filterOusPageIfDisabled)
+		.filter(filterGroupsPageIfDisabled);
 };

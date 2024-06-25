@@ -19,7 +19,7 @@
 			<Tooltip.Content side="right">Console</Tooltip.Content>
 		</Tooltip.Root>
 		<hr class="w-full bg-muted" />
-		{#each getNavigationItems($page.data.config) as { href, icon, name }}
+		{#each getNavigationItems($page.data.config, $page.data.session.isAdmin) as { href, icon, name }}
 			<Tooltip.Root>
 				<Tooltip.Trigger asChild let:builder>
 					<NavigationItem {href} {builder}>

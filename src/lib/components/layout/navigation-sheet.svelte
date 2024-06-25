@@ -28,7 +28,7 @@
 				Console
 			</div>
 			<hr class="w-full bg-muted" />
-			{#each getNavigationItems($page.data.config) as { name, icon, href }}
+			{#each getNavigationItems($page.data.config, $page.data.session.isAdmin) as { name, icon, href }}
 				<SheetNavigationItem {href}>
 					<svelte:component this={icon} class="size-5" />
 					{name}
