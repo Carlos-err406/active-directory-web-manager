@@ -6,12 +6,13 @@
  */
 
 /**
- * Application configuration settings
+ * Configuration settings
  */
 export interface Config {
 	app?: AppConfig;
 	directory: DirectoryConfig;
 	system?: SystemConfig;
+	recyclebin?: RecycleBinConfig;
 	[k: string]: unknown;
 }
 /**
@@ -820,3 +821,7 @@ export interface LoggingConfig {
 	 */
 	useLogging?: boolean;
 }
+/**
+ * Recycle Bin configuration
+ */
+export interface RecycleBinConfig {}
