@@ -116,5 +116,6 @@
 	bind:open={isManageMembersSurveyDialogOpen}
 	on:open-add-members={() => (isAddMembersDialogOpen = true)}
 />
-
-<AddMembersDialog bind:open={isAddMembersDialogOpen} dn={createdGroup?.dn} />
+{#if createdGroup}
+	<AddMembersDialog bind:open={isAddMembersDialogOpen} bind:dn={createdGroup.dn} />
+{/if}
