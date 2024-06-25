@@ -6,6 +6,7 @@
 	import { getCNFromDN, getUserAccountControls } from '$lib/ldap/utils';
 	import { breadcrumbs } from '$lib/stores';
 	import { UserAccountControlTypes } from '$lib/types/user';
+	import Info from '$lucide/info.svelte';
 	import LockKeyhole from '$lucide/lock-keyhole.svelte';
 	import PencilLine from '$lucide/pencil-line.svelte';
 	import dayjs from 'dayjs';
@@ -29,6 +30,10 @@
 		};
 		isUpdateUserDialogOpen = true;
 	};
+
+	const canSelfEdit = $page.data.config.app.nonAdmin.allowSelfEdit || data.session.isAdmin;
+	const showGroupsAsLinks =
+		$page.data.session.isAdmin || $page.data.config.app.nonAdmin.allowAccessToGroupsPage;
 </script>
 
 <div class="flex h-full w-full flex-col py-12 md:py-16">
@@ -102,13 +107,15 @@
 					<span>{config.memberOf.label}:</span>
 					<div class="info-value flex flex-wrap space-y-2">
 						{#each (user.memberOf || []).sort( (a, b) => (a < b ? -1 : a > b ? 1 : 0) ) as groupDn, index}
-							<a
-								href="/groups/{groupDn}"
+							<svelte:element
+								this={showGroupsAsLinks ? 'a' : 'span'}
 								data-sveltekit-preload-data="hover"
-								class="text-primary hover:underline"
+								data-isLink={showGroupsAsLinks}
+								class="data-[isLink=true]:text-primary data-[isLink=true]:hover:underline"
+								href={showGroupsAsLinks ? `/groups/${groupDn}` : '#'}
 							>
 								{config.memberOf.shortMemberOf ? getCNFromDN(groupDn) : groupDn}
-							</a>
+							</svelte:element>
 							{#if config.memberOf.shortMemberOf && index < user.memberOf.length - 1}
 								<pre class="!mx-0 font-sans">, </pre>
 							{/if}
@@ -120,16 +127,25 @@
 			</div>
 		</div>
 	</div>
-	<div class="flex h-full w-full items-center justify-center gap-3 py-3">
-		<Button class="flex items-center gap-2" on:click={onOpenEditClick}>
+	<div class="mt-auto flex w-full items-center justify-center gap-3 py-3">
+		<Button disabled={!canSelfEdit} class="flex items-center gap-2" on:click={onOpenEditClick}>
 			<PencilLine class="size-4 flex-none" />
 			Edit
 		</Button>
-		<Button class="flex items-center gap-2" on:click={() => (isChangePasswordDialogOpen = true)}>
+		<Button
+			disabled={!canSelfEdit}
+			class="flex items-center gap-2"
+			on:click={() => (isChangePasswordDialogOpen = true)}
+		>
 			<LockKeyhole class="size-4 flex-none" />
 			Change password
 		</Button>
 	</div>
+	{#if !canSelfEdit}
+		<div class="flex w-full items-center justify-center gap-3 text-muted-foreground">
+			<Info /> Self update is disabled by configuration for non-admin users
+		</div>
+	{/if}
 </div>
 <UpdateUserDialog
 	dn={user.distinguishedName}

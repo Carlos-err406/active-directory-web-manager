@@ -14,13 +14,17 @@ import { SubstringFilter, type Filter } from 'ldapts';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { PageServerLoad } from './$types';
+import config from '$config';
 export * as actions from '$lib/actions/users';
 
 export const load: PageServerLoad = async ({ url, locals, depends }) => {
 	depends('protected:users');
 	const auth = await locals.auth();
 	if (!auth) throw redirect(302, '/');
-	const { ldap } = auth;
+	const { ldap, session } = auth;
+	if (!session.isAdmin && !config.app.nonAdmin.allowAccessToUsersPage)
+		throw redirect(302, '/users/me');
+
 	const { searchParams, pathname } = url;
 	const sAMAccountNameQuery = searchParams.get('q');
 	const page = Number(searchParams.get('page') || 1);

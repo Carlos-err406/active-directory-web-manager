@@ -14,16 +14,22 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ locals, params }) => {
 	const auth = await locals.auth();
 	if (!auth) throw redirect(302, '/');
+	const { ldap, session } = auth;
 	const { dn } = params;
+	if (!session.isAdmin && !config.app.nonAdmin.allowAccessToGroupsPage) {
+		appLog(
+			`User ${session.sAMAccountName} tried accessing /groups/${dn}, but Non-Admin access to this resource is disabled by configuration`
+		);
+		throw error(403, 'Non-Admin access to this resource is disabled by configuration.');
+	}
 	const { hide } = config.directory.groups;
 	if (hide.includes(dn) || hide.includes(getCNFromDN(dn))) {
 		appLog(
-			`User ${auth.session.sAMAccountName} tried to access group ${dn}, but is hiden by configuration`,
+			`User ${session.sAMAccountName} tried to access group ${dn}, but is hiden by configuration.`,
 			'Error'
 		);
 		throw error(403, 'This group is hidden by configuration');
 	}
-	const { ldap } = auth;
 
 	try {
 		const [group, setMembersForm, updateGroupForm, deleteGroupForm] = await Promise.all([

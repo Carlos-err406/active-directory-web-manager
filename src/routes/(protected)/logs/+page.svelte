@@ -9,8 +9,8 @@
 	export let data: PageData;
 </script>
 
-<div class="size-full">
-	<div class="flex w-full justify-end gap-2">
+<div class="size-full space-y-2">
+	<div class="flex w-full justify-end gap-2 pr-2">
 		<LogFilterReset />
 		<LogDateFilter />
 		<LogTypeFilter />
@@ -18,7 +18,7 @@
 	{#await data.promise.logs}
 		<LogsSkeleton />
 	{:then logs}
-		<ul class="flex w-full flex-col gap-1 text-xl">
+		<ul class="flex h-[calc(100svh-142px)] w-full flex-col gap-1 overflow-y-auto text-xl">
 			{#each logs as log, index}
 				{@const date = getLogDate(log)}
 				{@const prevDate = index !== 0 ? getLogDate(logs[index - 1]) : getLogDate(log)}

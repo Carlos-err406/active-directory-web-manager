@@ -19,14 +19,21 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 	depends('protected:groups');
 	const auth = await locals.auth();
 	if (!auth) throw redirect(302, '/');
+	const { ldap, session } = auth;
 	if (!config.app.views.groupsPage.show) {
 		appLog(
-			`User ${auth.session.sAMAccountName} tried accessing /groups page but is disabled by configuration`,
+			`User ${session.sAMAccountName} tried accessing /groups page but is disabled by configuration.`,
 			'Error'
 		);
 		throw error(403, 'This page is disabled in the app configuration');
 	}
-	const { ldap } = auth;
+	if (!session.isAdmin && !config.app.nonAdmin.allowAccessToGroupsPage) {
+		appLog(
+			`User ${session.sAMAccountName} tried accessing /groups page but Non-Admin access is disabled by configuration.`,
+			'Error'
+		);
+		throw error(403, 'Non-Admin access to this resource is disabled by configuration');
+	}
 	const { searchParams, pathname } = url;
 	const sAMAccountNameQuery = searchParams.get('q');
 	const page = Number(searchParams.get('page') || 1);

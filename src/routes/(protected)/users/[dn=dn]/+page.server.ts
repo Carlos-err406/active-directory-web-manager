@@ -16,7 +16,12 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	const auth = await locals.auth();
 	if (!auth) throw redirect(302, '/');
 	const { ldap, session } = auth;
-	if (!session.isAdmin) throw error(403, 'You dont have access to this resource');
+
+	if (session.dn === params.dn) throw redirect(302, '/users/me');
+
+	if (!session.isAdmin && !config.app.nonAdmin.allowAccessToUsersPage)
+		throw error(403, 'Non-Admin access to this resource is disabled by configuration');
+
 	const { dn } = params;
 	const { hide } = config.directory.users;
 	if (hide.includes(dn) || hide.includes(getCNFromDN(dn)))

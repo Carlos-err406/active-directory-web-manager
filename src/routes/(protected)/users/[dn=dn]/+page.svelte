@@ -19,7 +19,6 @@
 	const { details: config } = $page.data.config.app.views.usersPage;
 	$: ({ user, updateUserForm } = data);
 	$: ({ jpegPhoto, sAMAccountName } = user);
-
 	$: breadcrumbs.set([{ name: 'Users', link: '/users' }, { name: sAMAccountName }]);
 
 	const onOpenEditClick = () => {
@@ -31,6 +30,8 @@
 		};
 		isUpdateUserDialogOpen = true;
 	};
+	const showGroupsAsLinks =
+		$page.data.session.isAdmin || $page.data.config.app.nonAdmin.allowAccessToGroupsPage;
 </script>
 
 <div class="flex h-full w-full flex-col py-12 md:py-16">
@@ -104,13 +105,15 @@
 					<span>{config.memberOf.label}:</span>
 					<div class="info-value flex flex-wrap space-y-2">
 						{#each (user.memberOf || []).sort( (a, b) => (a < b ? -1 : a > b ? 1 : 0) ) as groupDn, index}
-							<a
-								href="/groups/{groupDn}"
+							<svelte:element
+								this={showGroupsAsLinks ? 'a' : 'span'}
 								data-sveltekit-preload-data="hover"
-								class="text-primary hover:underline"
+								data-isLink={showGroupsAsLinks}
+								class="data-[isLink=true]:text-primary data-[isLink=true]:hover:underline"
+								href={showGroupsAsLinks ? `/groups/${groupDn}` : '#'}
 							>
 								{config.memberOf.shortMemberOf ? getCNFromDN(groupDn) : groupDn}
-							</a>
+							</svelte:element>
 							{#if config.memberOf.shortMemberOf && index < user.memberOf.length - 1}
 								<pre class="!mx-0 font-sans">, </pre>
 							{/if}
@@ -122,24 +125,26 @@
 			</div>
 		</div>
 	</div>
-	<div class="flex h-full w-full items-center justify-center gap-3 py-3">
-		<Button class="flex items-center gap-2" on:click={onOpenEditClick}>
-			<PencilLine class="size-4 flex-none" />
-			Edit
-		</Button>
-		<Button class="flex items-center gap-2" on:click={() => (isChangePasswordDialogOpen = true)}>
-			<LockKeyhole class="size-4 flex-none" />
-			Change password
-		</Button>
-		<Button
-			variant="destructive"
-			class="flex items-center gap-2"
-			on:click={() => (isDeleteUserDialogOpen = true)}
-		>
-			<Trash2 class="size-4 flex-none" />
-			Delete user
-		</Button>
-	</div>
+	{#if $page.data.session.isAdmin}
+		<div class="flex h-full w-full items-center justify-center gap-3 py-3">
+			<Button class="flex items-center gap-2" on:click={onOpenEditClick}>
+				<PencilLine class="size-4 flex-none" />
+				Edit
+			</Button>
+			<Button class="flex items-center gap-2" on:click={() => (isChangePasswordDialogOpen = true)}>
+				<LockKeyhole class="size-4 flex-none" />
+				Change password
+			</Button>
+			<Button
+				variant="destructive"
+				class="flex items-center gap-2"
+				on:click={() => (isDeleteUserDialogOpen = true)}
+			>
+				<Trash2 class="size-4 flex-none" />
+				Delete user
+			</Button>
+		</div>
+	{/if}
 </div>
 <DeleteUserDialog dn={user.distinguishedName} bind:open={isDeleteUserDialogOpen} />
 <ChangePasswordDialog dn={user.distinguishedName} bind:open={isChangePasswordDialogOpen} />
