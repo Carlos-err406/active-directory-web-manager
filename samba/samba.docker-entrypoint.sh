@@ -3,7 +3,7 @@ set -e
 
 if [ ! -f /etc/samba/smb.conf ]; then
     samba-tool domain provision --domain="${SAMBA_DC_DOMAIN}" \
-        --adminpass="${SAMBA_DC_ADMIN_PASSWD}" \
+        --adminpass="${ADMIN_PASSWD}" \
         --server-role=dc \
         --realm="${SAMBA_DC_REALM}" \
         --dns-backend="${SAMBA_DC_DNS_BACKEND}" \

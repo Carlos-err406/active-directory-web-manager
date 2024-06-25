@@ -13,7 +13,7 @@ services:
     environment:
       SAMBA_DC_REALM: ${SAMBA_DC_REALM}
       SAMBA_DC_DOMAIN: ${SAMBA_DC_DOMAIN}
-      SAMBA_DC_ADMIN_PASSWD: ${SAMBA_DC_ADMIN_PASSWD}
+      SAMBA_DC_ADMIN_PASSWD: ${ADMIN_PASSWD}
       SAMBA_DC_DNS_BACKEND: ${SAMBA_DC_DNS_BACKEND}
     restart: unless-stopped
     ports:

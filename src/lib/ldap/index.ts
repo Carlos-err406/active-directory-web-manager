@@ -1,5 +1,5 @@
 import config from '$config';
-import { SAMBA_DC_ADMIN_PASSWD } from '$env/static/private';
+import { ADMIN_PASSWD } from '$env/static/private';
 import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
 import type { Group } from '$lib/types/group';
 import type { User } from '$lib/types/user';
@@ -117,7 +117,7 @@ export const isAdmin = (ldap: Client, dn: string) =>
 
 export const sudo = async (sudoOperation: (ldap: Client) => Promise<void>) => {
 	const ldap = getLDAPClient();
-	await ldap.bind(`administrator@${PUBLIC_LDAP_DOMAIN}`, SAMBA_DC_ADMIN_PASSWD);
+	await ldap.bind(`administrator@${PUBLIC_LDAP_DOMAIN}`, ADMIN_PASSWD);
 	await sudoOperation(ldap);
 	await ldap.unbind();
 };
