@@ -1,9 +1,10 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import type { PluginOption } from 'vite';
 import { defineConfig } from 'vitest/config';
+import { purgeCss } from 'vite-plugin-tailwind-purgecss';
 
 export default defineConfig({
-	plugins: [sveltekit(), hotReloadOnConfigFileChange()],
+	plugins: [sveltekit(), purgeCss(), hotReloadOnConfigFileChange()],
 	test: {
 		include: ['src/**/*.{test,spec}.{js,ts}']
 	}
