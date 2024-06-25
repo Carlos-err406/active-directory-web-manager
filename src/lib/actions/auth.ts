@@ -10,9 +10,9 @@ import {
 	setSessionCookie,
 	verifyCaptchaToken
 } from '$lib/server';
+import { appLog, errorLog } from '$lib/server/logs';
 import { SESSION_ENTRY_ATTRIBUTES } from '$lib/types/session';
 import type { User } from '$lib/types/user';
-import { appLog, errorLog } from '$lib/server/logs';
 import { error, redirect, type Action } from '@sveltejs/kit';
 import { InvalidCredentialsError } from 'ldapts';
 import { fail, setError, superValidate } from 'sveltekit-superforms';
@@ -39,7 +39,11 @@ export const signIn: Action = async (event) => {
 		const errorId = errorLog(e, { message: 'Sign in attempt failed for user ' + email });
 		if (e instanceof InvalidCredentialsError)
 			throw error(401, { message: 'Invalid Credentials', errorId });
-		else {
+		else if (e instanceof AggregateError) {
+			console.log({ e, errorId });
+			throw error(500, { message: 'Error trying to connect to directory', errorId });
+		} else {
+			console.log({ e, errorId });
 			throw error(500, { message: 'Something unexpected happened, try again later', errorId });
 		}
 	}
