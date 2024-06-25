@@ -1,10 +1,9 @@
 import { z } from 'zod';
-import { base, dn } from '../dn-schema';
+import { base } from '../dn-schema';
 import { ALLOWED_FILE_TYPES, MAX_FILE_SIZE_MB } from './create-user-schema';
 
 export const updateUserSchema = z
 	.object({
-		dn,
 		base,
 		jpegPhoto: z
 			.instanceof(File)

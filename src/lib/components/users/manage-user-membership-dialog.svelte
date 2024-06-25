@@ -75,7 +75,6 @@
 				}
 			}}
 		>
-			<input type="text" hidden value={dn} name="userDn" />
 			{#each groups as group}
 				<input hidden type="text" name="dns" value={group.dn} />
 			{/each}

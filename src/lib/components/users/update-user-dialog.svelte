@@ -58,7 +58,6 @@
 			}}
 		>
 			<input hidden name="base" value={base} />
-			<input hidden name="dn" value={dn} />
 			<div class="grid grid-cols-2 gap-4">
 				<div class="col-span-2">
 					<ImageInput
