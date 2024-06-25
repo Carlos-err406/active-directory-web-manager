@@ -60,7 +60,7 @@ const config = {
 			}
 		}
 	},
-	plugins: [require(tailwindcssAnimationDelay)]
+	plugins: [require(tailwindcssAnimationDelay), require('tailwind-scrollbar')]
 };
 
 export default config;
