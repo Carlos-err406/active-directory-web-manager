@@ -53,16 +53,11 @@ export const getEntryBySAMAccountName = async <T = Entry>(
 ) => getEntryByAttribute<T>(ldap, 'sAMAccountName', sAMAccountName, { ...opts });
 
 export const entryBelongsToGroup = async (ldap: Client, entryDn: string, groupName: string) => {
-	const entry = await getEntryByDn(ldap, entryDn);
-	if (!entry) return false;
-	const { memberOf } = entry;
-	if (!memberOf || memberOf.length === 0) return false;
-
-	const group = await getEntryBySAMAccountName(ldap, groupName);
-	if (!group) return false;
-	const { distinguishedName: groupDn } = group;
-
-	return (memberOf as string[]).includes(groupDn as string);
+	const group = await getEntryBySAMAccountName<Group>(ldap, groupName);
+	let { member } = group;
+	if (!member) return false;
+	else if (!Array.isArray(member)) member = [member as string];
+	return member.includes(entryDn);
 };
 
 export const getUserGroups = async (ldap: Client, dn: string) => {
