@@ -19,8 +19,38 @@ export interface Config {
  * Application configuration settings
  */
 export interface AppConfig {
+	nonAdmin?: AppNonAdminSchemaJson;
 	captcha?: CaptchaConfig;
 	views?: ViewsConfig;
+}
+/**
+ * Settings reggarding non-admin users
+ */
+export interface AppNonAdminSchemaJson {
+	/**
+	 * Allow non-admin users to edit their own profiles and change their passwords. In the server this is done using the administrator credentials since in a directory only administrators have edit access (administrator@{PUBLIC_LDAP_DOMAIN}, ADMIN_PASSWD, PUBLIC_LDAP_DOMAIN and ADMIN_PASSWD are .env variables). @default false
+	 */
+	allowSelfEdit?: boolean;
+	/**
+	 * Allow non-admin users to access the "/users" and "/users/[dn]" pages. @default false
+	 */
+	allowAccessToUsersPage?: boolean;
+	/**
+	 * Allow non-admin users to access the "/groups" and "/groups/[dn]" pages. @default false
+	 */
+	allowAccessToGroupsPage?: boolean;
+	/**
+	 * Allow non-admin users to access the "/ous" and "/ous/[dn]" pages. @default false
+	 */
+	allowAccessToOUsPage?: boolean;
+	/**
+	 * Allow non-admin users to access the "/tree" page. @default false
+	 */
+	allowAccessToTreePage?: boolean;
+	/**
+	 * Allow non-admin users to access the "/logs" page. @default false
+	 */
+	allowAccessToLogsPage?: boolean;
 }
 /**
  * Captcha personalization options. You can test these live in @link https://vanilla-captcha-demo.vercel.app/server-captcha

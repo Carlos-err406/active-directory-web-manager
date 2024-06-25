@@ -1,6 +1,14 @@
 {
 	"$schema": "src/config/schemas/index.schema.json",
 	"app": {
+		"nonAdmin": {
+			"allowSelfEdit": true,
+			"allowAccessToGroupsPage": true,
+			"allowAccessToLogsPage": true,
+			"allowAccessToOUsPage": true,
+			"allowAccessToTreePage": true,
+			"allowAccessToUsersPage": true
+		},
 		"captcha": { "length": 1 },
 		"views": {
 			"groupsPage": {
