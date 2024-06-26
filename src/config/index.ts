@@ -6,7 +6,7 @@ import defaults from './defaults';
 import Schema from './schemas/index.schema.json';
 
 //Load json config file
-if (!CONFIG_PATH) throw Error('Missing CONFIG_PATH enviroment varable!');
+if (!CONFIG_PATH) throw Error('Missing CONFIG_PATH environment variable!');
 const content = fs.readFileSync(CONFIG_PATH, { encoding: 'utf-8' });
 const Config = JSON.parse(content);
 
