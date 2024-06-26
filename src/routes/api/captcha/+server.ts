@@ -1,12 +1,17 @@
 import config from '$config';
 import { generateCaptchaToken, setCaptchaCookie } from '$lib/server';
 import type { RequestHandler } from '@sveltejs/kit';
-import generate from 'vanilla-captcha';
-
+import svgCaptcha from 'svg-captcha';
 export const GET: RequestHandler = async ({ cookies }) => {
-	const { length, ...captchaOptions } = config.app.captcha;
-	const { answer, captcha } = await generate(length, captchaOptions);
-	const captchaToken = generateCaptchaToken(answer);
+	const options = config.app.captcha;
+	const { text, data } = svgCaptcha.create(options);
+	const captchaToken = generateCaptchaToken(text);
 	setCaptchaCookie(cookies, captchaToken);
-	return new Response(captcha, { status: 200 });
+
+	return new Response(data, {
+		status: 200,
+		headers: {
+			'Content-Type': 'image/svg+xml'
+		}
+	});
 };

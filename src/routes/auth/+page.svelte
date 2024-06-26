@@ -14,20 +14,20 @@
 	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
 	export let data: PageData;
-	let captcha: HTMLImageElement;
+	let captcha: string;
 	let loadingCaptcha = true;
 
 	const getCaptcha = async () => {
 		loadingCaptcha = true;
-		const blob = await fetch('/api/captcha', {
+		const svg = await fetch('/api/captcha', {
 			headers: { Authorization: `Bearer ${PUBLIC_API_KEY}` }
-		}).then((response) => response.blob());
+		}).then((response) => response.text());
 		loadingCaptcha = false;
-		return blob;
+		return svg;
 	};
 
 	const refreshCaptcha = async () => {
-		captcha.src = await getCaptcha().then((b) => URL.createObjectURL(b));
+		captcha = await getCaptcha();
 	};
 	onMount(refreshCaptcha);
 </script>
@@ -77,7 +77,7 @@
 					data-loading={loadingCaptcha}
 					class="relative flex w-full flex-row data-[loading=true]:hidden"
 				>
-					<img bind:this={captcha} src="" class="rounded-lg" alt="captcha" />
+					<div class="rounded" contenteditable="false" bind:innerHTML={captcha} />
 					<Button
 						variant="outline"
 						type="button"
