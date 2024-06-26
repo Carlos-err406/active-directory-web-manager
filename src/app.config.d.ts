@@ -53,53 +53,45 @@ export interface AppNonAdminSchemaJson {
 	allowAccessToLogsPage?: boolean;
 }
 /**
- * Captcha personalization options. You can test these live in @link https://vanilla-captcha-demo.vercel.app/server-captcha
+ * Captcha personalization options. Uses @link https://www.npmjs.com/package/svg-captcha
  */
 export interface CaptchaConfig {
 	/**
-	 * CSS color of the captcha background. Can use other css variants other than hex. @default "#FFFFFF"
+	 * Length of the captcha shown in the authentication page, recommended to use a low value for development. @default 5
 	 */
-	backgroundColor?: string;
-	/**
-	 * Font of the characters in the captcha. @default "Arial"
-	 */
-	font?: string;
-	/**
-	 * CSS color of the captcha text. Can use other css variants other than hex. @default "#777777"
-	 */
-	fontColor?: string;
-	/**
-	 * Font size of the characters in the captcha. @default 30
-	 */
-	fontSize?: number;
-	/**
-	 * Font size of the characters in the captcha. @default 600
-	 */
-	fontWeight?: number;
+	size?: number;
 	/**
 	 * Height of the captcha image. @default 96
 	 */
 	height?: number;
 	/**
-	 * Length of the captcha shown in the authentication page, recommended to use a low value for development. @default 5
-	 */
-	length?: number;
-	/**
-	 * Number of lines that strike over the captcha. @default 10
-	 */
-	lineAmount?: number;
-	/**
-	 * CSS color of the lines that strike the captcha text. Can use other css variants other than hex. @default "#777777"
-	 */
-	lineColor?: string;
-	/**
-	 * Width of lines that strike over the captcha. @default 1
-	 */
-	lineWidth?: number;
-	/**
 	 * Width of the captcha image. @default 345
 	 */
 	width?: number;
+	/**
+	 * Font size of the characters in the captcha. @default 30
+	 */
+	fontSize?: number;
+	/**
+	 * Characters used to generate the random string in the captcha. @default "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+	 */
+	charPreset?: string;
+	/**
+	 * If false, captcha will be black and white otherwise, it will be randomly colorized @default false
+	 */
+	color?: boolean;
+	/**
+	 * Characters that will be ignored in the captcha. @default ""
+	 */
+	ignoreChars?: string;
+	/**
+	 * Number of noise lines in the captcha. @default 5
+	 */
+	noise?: number;
+	/**
+	 * CSS color of the captcha background. Can use other css variants other than hex. @default "#FFFFFF"
+	 */
+	background?: string;
 }
 /**
  * Configuration regarding de different pages of the web app
@@ -772,7 +764,20 @@ export interface DirectoryConfig {
 		limit?: number | null;
 	};
 	/**
-	 * Directory settings reggarding user management
+	 * Directory settings regarding ou management
+	 */
+	ous?: {
+		/**
+		 * The list of ou distinguishedNames or sAMAccountNames that should not be shown in the /ous view dropdowns and search. Accessing directly to /ous/[dn] of a ou that is listed here will result on a '403 This ou is hidden by configuration' error. @default []
+		 */
+		hide?: string[];
+		/**
+		 * The maximum amount of ous allowed in the directory. If set to null the limit will be ignored. Default ous are included in the count. @default null
+		 */
+		limit?: number | null;
+	};
+	/**
+	 * Directory settings regarding user management
 	 */
 	users?: {
 		/**

@@ -10,5 +10,19 @@
 		}
 	],
 	"cSpell.enabled": true,
-	"cSpell.words": ["ldaps", "ldapts", "recyclebin"]
+	"cSpell.words": [
+		"clsx",
+		"cmdk",
+		"deepmerge",
+		"formsnap",
+		"ldaps",
+		"ldapts",
+		"legos",
+		"lucide",
+		"purgecss",
+		"recyclebin",
+		"sonner",
+		"tailwindcss",
+		"vaul"
+	]
 }

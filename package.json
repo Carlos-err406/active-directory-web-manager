@@ -32,7 +32,6 @@
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
 		"@types/eslint": "^8.56.0",
 		"@types/jsonwebtoken": "^9.0.6",
-		"@types/ldapjs": "^3.0.6",
 		"@types/uuid": "^9.0.8",
 		"@typescript-eslint/eslint-plugin": "^7.0.0",
 		"@typescript-eslint/parser": "^7.0.0",
@@ -58,6 +57,7 @@
 		"svelte-headless-table": "^0.18.2",
 		"svelte-legos": "^0.2.2",
 		"sveltekit-logger-hook": "^2.2.2",
+		"svg-captcha": "^1.4.0",
 		"tailwind-scrollbar": "^3.1.0",
 		"tailwindcss": "^3.3.6",
 		"tslib": "^2.4.1",
@@ -82,7 +82,6 @@
 		"tailwind-merge": "^2.2.2",
 		"tailwind-variants": "^0.2.1",
 		"tailwindcss-animation-delay": "^1.2.0",
-		"vanilla-captcha": "^2.0.16",
 		"vaul-svelte": "^0.3.0",
 		"zod": "^3.23.5"
 	},

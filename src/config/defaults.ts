@@ -4,16 +4,14 @@ import type { RecursiveRequired } from '@sveltejs/kit';
 const defaults: RecursiveRequired<App.Config> = {
 	app: {
 		captcha: {
-			backgroundColor: '#FFFFFF',
-			font: 'Arial',
-			fontColor: '#777777',
-			fontSize: 30,
-			fontWeight: 600,
+			background: '#FFFFFF',
+			charPreset: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+			color: false,
+			fontSize: 90,
 			height: 96,
-			length: 5,
-			lineAmount: 10,
-			lineColor: '#777777',
-			lineWidth: 1,
+			ignoreChars: '',
+			noise: 5,
+			size: 5,
 			width: 345
 		},
 		nonAdmin: {
@@ -237,6 +235,10 @@ const defaults: RecursiveRequired<App.Config> = {
 				rejectUnauthorized: true,
 				requestCert: false
 			}
+		},
+		ous: {
+			hide: [],
+			limit: null
 		},
 		users: {
 			hide: [],

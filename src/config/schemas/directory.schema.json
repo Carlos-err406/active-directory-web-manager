@@ -35,6 +35,28 @@
 			},
 			"additionalProperties": false
 		},
+		"ous": {
+			"description": "Directory settings regarding ou management",
+			"type": "object",
+			"properties": {
+				"hide": {
+					"description": "The list of ou distinguishedNames or sAMAccountNames that should not be shown in the /ous view dropdowns and search. Accessing directly to /ous/[dn] of a ou that is listed here will result on a '403 This ou is hidden by configuration' error. @default []",
+					"type": "array",
+					"default": [],
+					"items": {
+						"type": "string"
+					},
+					"uniqueItems": true
+				},
+				"limit": {
+					"minimum": 0,
+					"description": "The maximum amount of ous allowed in the directory. If set to null the limit will be ignored. Default ous are included in the count. @default null",
+					"type": ["integer", "null"],
+					"default": null
+				}
+			},
+			"additionalProperties": false
+		},
 		"users": {
 			"description": "Directory settings regarding user management",
 			"type": "object",
