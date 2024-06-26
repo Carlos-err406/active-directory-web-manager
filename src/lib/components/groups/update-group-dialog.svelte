@@ -79,7 +79,7 @@
 					<div transition:slide={{ axis: 'y' }}>
 						<Input name="mail" inputProps={{ required: true }} {methods}>
 							<svelte:fragment slot="label">mail</svelte:fragment>
-							<svelte:fragment slot="addornment-left">
+							<svelte:fragment slot="adornment-left">
 								<Mail />
 							</svelte:fragment>
 							<svelte:fragment slot="description">Distribution list email</svelte:fragment>
@@ -88,7 +88,7 @@
 				{/if}
 				<Input name="description" {methods}>
 					<svelte:fragment slot="label">description</svelte:fragment>
-					<svelte:fragment slot="addornment-left">
+					<svelte:fragment slot="adornment-left">
 						<Captions />
 					</svelte:fragment>
 				</Input>

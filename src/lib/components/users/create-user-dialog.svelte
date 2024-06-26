@@ -71,7 +71,7 @@
 						name="jpegPhoto"
 						b64Name="jpegPhotoBase64"
 						{methods}
-						addornmentRightClasses={cn('self-end')}
+						adornmentRightClasses={cn('self-end')}
 						inputProps={{ accept: ALLOWED_FILE_TYPES.join(',') }}
 					>
 						<svelte:fragment slot="label">jpegPhoto</svelte:fragment>
@@ -92,14 +92,14 @@
 				</Input>
 				<Input name="mail" inputProps={{ required: true }} {methods}>
 					<svelte:fragment slot="label">mail</svelte:fragment>
-					<svelte:fragment slot="addornment-left">
+					<svelte:fragment slot="adornment-left">
 						<Mail />
 					</svelte:fragment>
 				</Input>
 				<div class="col-span-2">
 					<Input name="description" {methods}>
 						<svelte:fragment slot="label">description</svelte:fragment>
-						<svelte:fragment slot="addornment-left">
+						<svelte:fragment slot="adornment-left">
 							<Captions />
 						</svelte:fragment>
 					</Input>

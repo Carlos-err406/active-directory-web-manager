@@ -63,7 +63,7 @@
 					name="email"
 				>
 					<svelte:fragment slot="label">Email</svelte:fragment>
-					<svelte:fragment slot="addornment-left">
+					<svelte:fragment slot="adornment-left">
 						<Mail />
 					</svelte:fragment>
 				</Input>
@@ -96,7 +96,7 @@
 					inputProps={{ type: 'text', required: true, placeholder: 'Enter captcha challenge' }}
 				>
 					<svelte:fragment slot="label">Captcha</svelte:fragment>
-					<svelte:fragment slot="addornment-left"><Bot /></svelte:fragment>
+					<svelte:fragment slot="adornment-left"><Bot /></svelte:fragment>
 					<svelte:fragment slot="description">Proof you are not a robot</svelte:fragment>
 				</Input>
 			</Card.Content>

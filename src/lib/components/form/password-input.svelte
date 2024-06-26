@@ -44,12 +44,12 @@
 	<svelte:fragment slot="label">
 		<slot name="label">Password</slot>
 	</svelte:fragment>
-	<svelte:fragment slot="addornment-left">
-		<slot name="addornment-left">
+	<svelte:fragment slot="adornment-left">
+		<slot name="adornment-left">
 			<LockKeyhole />
 		</slot>
 	</svelte:fragment>
-	<svelte:fragment slot="addornment-right">
+	<svelte:fragment slot="adornment-right">
 		<Button
 			tabindex={-1}
 			variant="ghost"

@@ -29,15 +29,15 @@
 	<Form.Control let:attrs>
 		<Form.Label class={cn(required && 'required')}><slot name="label" /></Form.Label>
 		<div class="relative">
-			<div class="addornment absolute left-2 top-2.5">
-				<slot name="addornment-left" />
+			<div class="adornment absolute left-2 top-2.5">
+				<slot name="adornment-left" />
 			</div>
 			<Select.Root {name} bind:selected onSelectedChange={(v) => v && ($form[name] = v.value)}>
 				<Select.Trigger
 					{...attrs}
 					class={cn(
-						!!$$slots['addornment-left'] && 'pl-10',
-						!!$$slots['addornment-right'] && 'pr-10',
+						!!$$slots['adornment-left'] && 'pl-10',
+						!!$$slots['adornment-right'] && 'pr-10',
 						'w-full'
 					)}
 				>
@@ -52,8 +52,8 @@
 				</Select.Content>
 			</Select.Root>
 			<input hidden bind:value={$form[name]} name={attrs.name} />
-			<div class="addornment absolute right-2 top-2.5">
-				<slot name="addornment-right" />
+			<div class="adornment absolute right-2 top-2.5">
+				<slot name="adornment-right" />
 			</div>
 		</div>
 	</Form.Control>

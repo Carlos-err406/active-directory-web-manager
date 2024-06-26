@@ -22,9 +22,9 @@
 	export let name: keyof typeof $form;
 	export let inputProps: InputProps = {};
 	export let imgClasses: ClassValue = '';
-	export let addornmentClasses: ClassValue = '';
-	export let addornmentRightClasses: ClassValue = '';
-	export let addornmentLeftClasses: ClassValue = '';
+	export let adornmentClasses: ClassValue = '';
+	export let adornmentRightClasses: ClassValue = '';
+	export let adornmentLeftClasses: ClassValue = '';
 
 	const { form } = methods;
 	let fileList: FileList;
@@ -79,8 +79,8 @@
 		</slot>
 		<input hidden type="text" name={b64Name} value={src} />
 		<div class="flex items-center">
-			<div class={cn('addornment', addornmentClasses, addornmentLeftClasses)}>
-				<slot name="addornment-left" />
+			<div class={cn('adornment', adornmentClasses, adornmentLeftClasses)}>
+				<slot name="adornment-left" />
 			</div>
 			<div>
 				{#if src}
@@ -100,9 +100,9 @@
 					</div>
 				{/if}
 			</div>
-			<div class={cn('addornment', addornmentClasses, addornmentRightClasses)}>
+			<div class={cn('adornment', adornmentClasses, adornmentRightClasses)}>
 				{#if src}
-					<slot name="addornment-right">
+					<slot name="adornment-right">
 						<div in:slide={{ axis: 'y' }} class="ml-2 flex flex-col gap-3">
 							<Button on:click={() => fileInput.click()} class="w-fit">
 								<Image />

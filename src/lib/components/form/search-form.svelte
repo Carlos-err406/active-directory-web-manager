@@ -45,7 +45,7 @@
 </script>
 
 <div class="relative">
-	<div class="addornment absolute left-2 top-2.5">
+	<div class="adornment absolute left-2 top-2.5">
 		<Search />
 	</div>
 	<Input
@@ -62,7 +62,7 @@
 			}
 		}}
 	/>
-	<div class="addornment absolute right-2 top-2.5">
+	<div class="adornment absolute right-2 top-2.5">
 		{#if showTimer}
 			<Timer timeout={1000} />
 		{/if}

@@ -19,13 +19,13 @@
 	<Form.Control let:attrs>
 		<Form.Label class={cn(inputProps.required && 'required')}><slot name="label" /></Form.Label>
 		<div class="relative">
-			<div class="addornment absolute left-2 top-2.5">
-				<slot name="addornment-left" />
+			<div class="adornment absolute left-2 top-2.5">
+				<slot name="adornment-left" />
 			</div>
 			<Input
 				class={cn(
-					!!$$slots['addornment-left'] && 'pl-10',
-					!!$$slots['addornment-right'] && 'pr-10',
+					!!$$slots['adornment-left'] && 'pl-10',
+					!!$$slots['adornment-right'] && 'pr-10',
 					'w-full'
 				)}
 				on:input
@@ -37,8 +37,8 @@
 				{...inputProps}
 				{...attrs}
 			/>
-			<div class="addornment absolute right-2 top-2.5">
-				<slot name="addornment-right" />
+			<div class="adornment absolute right-2 top-2.5">
+				<slot name="adornment-right" />
 			</div>
 		</div>
 	</Form.Control>
