@@ -15,7 +15,7 @@ declare global {
 		}
 		interface Locals {
 			/**
-			 * authorization function setted by the authenticationSetterHandler hook
+			 * authorization function set by the authenticationSetterHandler hook
 			 *
 			 * @returns a Promise with the session object and the binded ldap client, or null if session is invalid
 			 */
