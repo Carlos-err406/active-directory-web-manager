@@ -1,25 +1,39 @@
 import { CONFIG_PATH } from '$env/static/private';
+import $RefParser from '@apidevtools/json-schema-ref-parser';
 import type { RecursiveRequired } from '@sveltejs/kit';
 import merge from 'deepmerge';
 import fs from 'fs';
+import path from 'path';
 import defaults from './defaults';
-import Schema from './schemas/index.schema.json';
 
 //Load json config file
 if (!CONFIG_PATH) throw Error('Missing CONFIG_PATH environment variable!');
 const content = fs.readFileSync(CONFIG_PATH, { encoding: 'utf-8' });
 const Config = JSON.parse(content);
 
+/**Resolves the json schema file, dereferencing all $refs to correctly use it for validation  */
+const resolveSchema = () => {
+	const schemaDir = path.resolve('src/config/schemas');
+	try {
+		return $RefParser.dereference(path.resolve(schemaDir, 'index.schema.json'), {
+			mutateInputSchema: false
+		});
+	} catch (e) {
+		console.log(e);
+		throw new Error('Error resolving Schema');
+	}
+};
+
 /**Validate config file against the json schema */
 const validateConfig = async () => {
 	console.log('Validating config file...');
+	const schema = await resolveSchema();
+
 	// Use dynamic import with require to handle CommonJS module
 	const pkg = await import('json-schema-library').then((module) => module.default || module);
 	const { Draft07 } = pkg;
-
-	const validator = new Draft07(Schema);
-	const errors = validator.validate(Config);
-
+	const validator = new Draft07(schema);
+	const errors = validator.validate(Config, schema);
 	if (errors.length) {
 		errors.map(console.error);
 		throw new Error('Invalid config file. See errors above.', { cause: 'Invalid config file' });

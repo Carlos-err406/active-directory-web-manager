@@ -11,10 +11,12 @@
 	],
 	"cSpell.enabled": true,
 	"cSpell.words": [
+		"apidevtools",
 		"clsx",
 		"cmdk",
 		"deepmerge",
 		"formsnap",
+		"krbtgt",
 		"ldaps",
 		"ldapts",
 		"legos",

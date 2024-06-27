@@ -9,7 +9,7 @@
 			"allowAccessToTreePage": true,
 			"allowAccessToUsersPage": true
 		},
-		"captcha": { "length": 1 },
+		"captcha": { "size": 1 },
 		"views": {
 			"groupsPage": {
 				"table": {
