@@ -1,7 +1,6 @@
 export * as actions from '$lib/actions/users';
 import config from '$config';
 import { getEntryByDn } from '$lib/ldap';
-import { getCNFromDN } from '$lib/ldap/utils';
 import { changePasswordSchema } from '$lib/schemas/user/change-password-schema';
 import { deleteUserSchema } from '$lib/schemas/user/delete-user-schema';
 import { updateUserSchema } from '$lib/schemas/user/update-user-schema';
@@ -23,18 +22,13 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		throw error(403, 'Non-Admin access to this resource is disabled by configuration');
 
 	const { dn } = params;
-	const { hide } = config.directory.users;
-	if (hide.includes(dn) || hide.includes(getCNFromDN(dn)))
-		throw error(403, 'This user is hidden by configuration');
-	const user = await getEntryByDn<User>(ldap, dn).then(jpegPhotoToB64);
-	if (!user) throw error(404, 'User not found');
-
-	const [changePasswordForm, updateUserForm, deleteUserForm] = await Promise.all([
+	const [user, changePasswordForm, updateUserForm, deleteUserForm] = await Promise.all([
+		getEntryByDn<User>(ldap, dn).then(jpegPhotoToB64),
 		superValidate(zod(changePasswordSchema)),
 		superValidate(zod(updateUserSchema)),
 		superValidate(zod(deleteUserSchema))
 	]);
-	if (!Array.isArray(user.memberOf) && user.memberOf !== undefined) user.memberOf = [user.memberOf];
+	if (!user) throw error(404, 'User not found');
 	return {
 		user,
 		searchForm: null,
@@ -43,5 +37,3 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		deleteUserForm
 	};
 };
-
-// export const actions = { deleteUser, updateUser };

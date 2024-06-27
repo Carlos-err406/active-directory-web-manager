@@ -1,5 +1,5 @@
-import { UserAccountControlTypes, type UserAccountControl } from '$lib/types/user';
 import { GroupTypes, type GroupType } from '$lib/types/group';
+import { UserAccountControlTypes, type UserAccountControl } from '$lib/types/user';
 
 export const getGroupTypes = (groupType: number | string) => {
 	const types = Object.keys(GroupTypes).map(Number);
@@ -21,3 +21,6 @@ export const getUserAccountControls = (userAccountControl: number | string) => {
 };
 
 export const getCNFromDN = (dn: string) => dn.split(',')[0].split('=')[1];
+
+/** If an entry has any of these attributes it should be an array. LDAP sets them as a string if attribute.length === 1 */
+export const ARRAY_ATTRIBUTES = ['objectClass', 'member', 'memberOf'];

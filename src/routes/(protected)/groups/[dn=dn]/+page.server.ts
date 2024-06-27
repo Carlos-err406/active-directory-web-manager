@@ -41,8 +41,6 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 		if (!group) {
 			throw error(404, { message: 'Group not found' });
 		}
-		if (!Array.isArray(group.member) && group.member !== undefined) group.member = [group.member];
-
 		return { group, setMembersForm, updateGroupForm, deleteGroupForm };
 	} catch (e) {
 		const errorId = errorLog(e, { message: `Error loading group ${dn} page` });

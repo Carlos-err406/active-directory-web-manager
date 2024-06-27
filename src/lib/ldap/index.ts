@@ -17,6 +17,7 @@ import {
 	type SearchOptions
 } from 'ldapts';
 import { getLDAPClient } from './client';
+import { ARRAY_ATTRIBUTES } from './utils';
 /**
  * Encodes password for ldap unicodePwd attribute
  * @param password
@@ -40,7 +41,18 @@ export const getEntryByAttribute = async <T = Entry>(
 	if (extraFilters) filters = filters.concat(...extraFilters);
 	const filter = new AndFilter({ filters }).toString();
 	const { searchEntries } = await ldap.search(base, { filter, ...searchOpts });
-	return searchEntries[0] as T;
+	return setArrayAttributes(searchEntries[0]) as T;
+};
+
+const setArrayAttributes = (entry: Entry): Entry => {
+	const copy = Object.entries(entry).map(([key, value]) => {
+		if (ARRAY_ATTRIBUTES.includes(key)) {
+			if (value && !Array.isArray(value)) return { [key]: [value] };
+		}
+		return { [key]: value };
+	});
+
+	return Object.assign({}, ...copy);
 };
 
 export const getEntryByDn = async <T = Entry>(ldap: Client, dn: string, opts?: GetEntryOpts) =>
@@ -54,27 +66,23 @@ export const getEntryBySAMAccountName = async <T = Entry>(
 
 export const entryBelongsToGroup = async (ldap: Client, entryDn: string, groupName: string) => {
 	const group = await getEntryBySAMAccountName<Group>(ldap, groupName);
-	let { member } = group;
+	const { member } = group;
 	if (!member) return false;
-	else if (!Array.isArray(member)) member = [member as string];
 	return member.includes(entryDn);
 };
 
 export const getUserGroups = async (ldap: Client, dn: string) => {
 	const entry = await getEntryByDn(ldap, dn);
-	if (!entry) return [];
+	if (!entry) return [] as string[];
 	const { memberOf } = entry;
-	if (!memberOf || memberOf.length === 0) return [];
-	else return Array.isArray(memberOf) ? memberOf : [memberOf];
+	return memberOf as string[];
 };
 
 export const getGroupMembers = async (ldap: Client, groupDn: string) => {
 	const group = await getEntryByDn<{ dn: string; member: string[] }>(ldap, groupDn, {
 		searchOpts: { attributes: ['member'] }
 	});
-	if (!group?.member?.length) return [];
-
-	return Array.isArray(group.member) ? group.member : [group.member];
+	return group?.member ?? [];
 };
 
 export const replaceAttribute = (opts: AttributeOptions) =>
