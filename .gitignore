@@ -11,3 +11,6 @@ vite.config.ts.timestamp-*
 .gitignore
 logs/app
 logs/system
+
+app.config.*.json
+!app.config.example.json

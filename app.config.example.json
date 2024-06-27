@@ -1,5 +1,5 @@
 {
-	"$schema": "src/config/schemas/index.schema.json",
+	"$schema": "https://carlos-err406.github.io/active-directory-web-manager/schemas/index.schema.json",
 	"app": {
 		"nonAdmin": {
 			"allowSelfEdit": true,
@@ -63,12 +63,6 @@
 			"tlsOptions": {
 				"rejectUnauthorized": false
 			}
-		},
-		"groups": {
-			"hide": ["CN=Administrators,CN=Builtin,DC=local,DC=com"]
-		},
-		"users": {
-			"hide": ["CN=krbtgt,CN=Users,DC=local,DC=com", "CN=carlosd.vilaseca,DC=local,DC=com"]
 		}
 	},
 	"system": {
