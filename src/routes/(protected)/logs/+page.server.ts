@@ -1,23 +1,14 @@
-import config, { LOGGING_APP_BASE } from '$config';
+import { LOGGING_APP_BASE } from '$config';
 import { getLogDate, isErrorLog, isInfoLog } from '$lib/components/logs/utils';
-import { appLog } from '$lib/server/logs';
-import { error, redirect } from '@sveltejs/kit';
+import { protectedAccessControl } from '$lib/server/utils';
 import dayjs from 'dayjs';
 import fs from 'fs';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ url, depends, locals }) => {
-	const auth = await locals.auth();
-	if (!auth) throw redirect(302, '/auth');
-	if (!config.app.views.logsPage.show) {
-		appLog(
-			`User ${auth.session.sAMAccountName} tried accessing /logs page but is disabled by configuration`,
-			'Error'
-		);
-		throw error(403, 'This page is disabled in the app configuration');
-	}
-
 	depends('protected:logs');
+	await protectedAccessControl({ locals, url });
+
 	const q = url.searchParams.get('q');
 	const filterType = url.searchParams.get('type') || 'all';
 

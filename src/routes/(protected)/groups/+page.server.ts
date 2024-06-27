@@ -1,4 +1,3 @@
-import config from '$config';
 import { getFilteredGroups } from '$lib/ldap';
 import { extractPagination, type PaginationWithUrls } from '$lib/pagination';
 import { deleteManySchema } from '$lib/schemas/delete-many-schema';
@@ -6,9 +5,10 @@ import { createGroupSchema } from '$lib/schemas/group/create-group-schema';
 import { deleteGroupSchema } from '$lib/schemas/group/delete-group-schema';
 import { setMembersSchema } from '$lib/schemas/group/set-members-schema';
 import { updateGroupSchema } from '$lib/schemas/group/update-group-schema';
-import { appLog, errorLog } from '$lib/server/logs';
+import { errorLog } from '$lib/server/logs';
+import { protectedAccessControl } from '$lib/server/utils';
 import type { Group } from '$lib/types/group';
-import { error, redirect } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import { EqualityFilter, SubstringFilter, type Filter } from 'ldapts';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -17,23 +17,7 @@ export * as actions from '$lib/actions/groups';
 
 export const load: PageServerLoad = async ({ url, locals, depends }) => {
 	depends('protected:groups');
-	const auth = await locals.auth();
-	if (!auth) throw redirect(302, '/auth');
-	const { ldap, session } = auth;
-	if (!config.app.views.groupsPage.show) {
-		appLog(
-			`User ${session.sAMAccountName} tried accessing /groups page but is disabled by configuration.`,
-			'Error'
-		);
-		throw error(403, 'This page is disabled in the app configuration');
-	}
-	if (!session.isAdmin && !config.app.nonAdmin.allowAccessToGroupsPage) {
-		appLog(
-			`User ${session.sAMAccountName} tried accessing /groups page but Non-Admin access is disabled by configuration.`,
-			'Error'
-		);
-		throw error(403, 'Non-Admin access to this resource is disabled by configuration');
-	}
+	const { ldap } = await protectedAccessControl({ locals, url });
 	const { searchParams, pathname } = url;
 	const sAMAccountNameQuery = searchParams.get('q');
 	const page = Number(searchParams.get('page') || 1);

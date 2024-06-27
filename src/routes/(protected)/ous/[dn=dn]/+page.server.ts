@@ -13,6 +13,7 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ locals, url, params }) => {
 	const { dn } = params;
 	const { ldap } = await specificResourceAccessControl({ locals, url, dn });
+
 	try {
 		const [group, setMembersForm, updateGroupForm, deleteGroupForm] = await Promise.all([
 			getEntryByDn<Group>(ldap, dn),

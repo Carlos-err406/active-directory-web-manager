@@ -24,8 +24,8 @@
 				},
 				"show": true
 			},
-			"ousPage": { "show": false },
-			"treePage": { "show": false },
+			"ousPage": { "show": true },
+			"treePage": { "show": true },
 			"usersPage": {
 				"details": {
 					"description": { "label": "Description" },
@@ -64,8 +64,11 @@
 				"rejectUnauthorized": false
 			}
 		},
+		"groups": {
+			"hide": ["CN=Administrators,CN=Builtin,DC=local,DC=com"]
+		},
 		"users": {
-			"hide": ["CN=krbtgt,CN=Users,DC=local,DC=com"]
+			"hide": ["CN=krbtgt,CN=Users,DC=local,DC=com", "CN=carlosd.vilaseca,DC=local,DC=com"]
 		}
 	},
 	"system": {
