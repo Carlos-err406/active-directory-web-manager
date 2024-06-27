@@ -93,7 +93,7 @@ export const inferChange = <T>(entry: T, attribute: keyof T, value?: string | st
 	if (value && !entry[attribute]) return addAttribute({ type: att, values });
 	//if no value is passed but the entry has the attribute
 	else if (!value && entry[attribute]) return deleteAttribute(att);
-	//if a value is passed but is different from the one pressent on the entrie's attribute
+	//if a value is passed but is different from the one present on the entry's attribute
 	else if (value) {
 		if (typeof value === 'string' && value !== entry[attribute])
 			return replaceAttribute({ type: att, values });
