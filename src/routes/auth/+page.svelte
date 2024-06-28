@@ -39,7 +39,7 @@
 		bind:form={data.form}
 		schema={signUpSchema}
 		loadingText="Signing in..."
-		formProps={{ action: '?/signIn' }}
+		formProps={{ action: '?/signIn', 'data-test': 'signInForm' }}
 		formOptions={{
 			resetForm: false,
 			onError: ({ result }) => {
@@ -57,7 +57,8 @@
 					inputProps={{
 						placeholder: 'example@mail.com',
 						type: 'email',
-						required: true
+						required: true,
+						'data-test': 'emailInput'
 					}}
 					{methods}
 					name="email"
@@ -67,9 +68,9 @@
 						<Mail />
 					</svelte:fragment>
 				</Input>
-				<PasswordInput inputProps={{ required: true }} {methods} />
+				<PasswordInput inputProps={{ required: true, 'data-test': 'passwordInput' }} {methods} />
 				{#if loadingCaptcha}
-					<div class="my-10 flex w-full justify-center">
+					<div data-test="captchaLoader" class="my-10 flex w-full justify-center">
 						<Loader size={'md'} />
 					</div>
 				{/if}
@@ -77,8 +78,14 @@
 					data-loading={loadingCaptcha}
 					class="relative flex w-full flex-row data-[loading=true]:hidden"
 				>
-					<div class="rounded" contenteditable="false" bind:innerHTML={captcha} />
+					<div
+						data-test="captcha"
+						class="rounded"
+						contenteditable="false"
+						bind:innerHTML={captcha}
+					/>
 					<Button
+						data-test="captcha-reload"
 						variant="outline"
 						type="button"
 						class="absolute -bottom-3 -right-3 size-8 rounded-full p-0 transition-transform hover:-rotate-45"
@@ -93,7 +100,12 @@
 				<Input
 					{methods}
 					name="captcha"
-					inputProps={{ type: 'text', required: true, placeholder: 'Enter captcha challenge' }}
+					inputProps={{
+						type: 'text',
+						required: true,
+						placeholder: 'Enter captcha challenge',
+						'data-test': 'captchaInput'
+					}}
 				>
 					<svelte:fragment slot="label">Captcha</svelte:fragment>
 					<svelte:fragment slot="adornment-left"><Bot /></svelte:fragment>
@@ -101,7 +113,9 @@
 				</Input>
 			</Card.Content>
 			<Card.Footer>
-				<Button type="submit" class="w-full" disabled={loading}>Sign in</Button>
+				<Button data-test="signInButton" type="submit" class="w-full" disabled={loading}
+					>Sign in</Button
+				>
 			</Card.Footer>
 		</Card.Root>
 	</Form>

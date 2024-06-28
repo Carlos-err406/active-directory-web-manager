@@ -12,6 +12,7 @@ describe('pagination test', () => {
 			page: 2,
 			pageSize: 3,
 			data: [4, 5, 6],
+			totalEntries: 10,
 			totalPages: 4
 		});
 	});
@@ -26,6 +27,7 @@ describe('pagination test', () => {
 			page: 3,
 			pageSize: 3,
 			data: [],
+			totalEntries: 5,
 			totalPages: 2
 		});
 	});

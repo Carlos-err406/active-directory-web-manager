@@ -76,3 +76,7 @@ const isLogRoutes = (url: URL) => url.pathname.startsWith('/logs');
 const isGroupRoutes = (url: URL) => url.pathname.startsWith('/groups');
 const isUserRoutes = (url: URL) => url.pathname.startsWith('/users');
 const isOuRoutes = (url: URL) => url.pathname.startsWith('/ous');
+
+export const isTestEnvironment = () => {
+	return process.env.NODE_ENV === 'test';
+};

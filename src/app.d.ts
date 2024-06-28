@@ -5,6 +5,7 @@ import type { Session } from '$lib/types/session';
 import type { RecursiveRequired } from '@sveltejs/kit';
 import type { Client, FilterParser } from 'ldapts';
 import type { ExternalToast } from 'svelte-sonner';
+import type { HTMLAttributes as OriginalHTMLAttributes } from 'svelte/elements';
 import type { Config as AppConfigType } from './app.config';
 // for information about these interfaces
 declare global {
@@ -44,6 +45,12 @@ declare module 'svelte' {
 		key: T,
 		context: K
 	): void;
+}
+
+declare module 'svelte/elements' {
+	interface HTMLAttributes<T> extends OriginalHTMLAttributes<T> {
+		[x: `data-${string}`]: unknown;
+	}
 }
 
 declare module '@sveltejs/kit' {

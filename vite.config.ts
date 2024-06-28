@@ -6,7 +6,10 @@ import { purgeCss } from 'vite-plugin-tailwind-purgecss';
 export default defineConfig({
 	plugins: [sveltekit(), purgeCss(), hotReloadOnConfigFileChange()],
 	test: {
-		include: ['src/**/*.{test,spec}.{js,ts}']
+		env: {
+			NODE_ENV: 'test'
+		},
+		include: ['tests/unit/**/*.{test,spec}.{js,ts}']
 	}
 });
 function hotReloadOnConfigFileChange(): PluginOption {

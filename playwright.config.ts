@@ -1,11 +1,26 @@
-import type { PlaywrightTestConfig } from '@playwright/test';
+import { type PlaywrightTestConfig } from '@playwright/test';
+
+import dotenv from 'dotenv';
+import path from 'path';
+
+// Read from ".env" file.
+dotenv.config({ path: path.resolve('.env') });
 
 const config: PlaywrightTestConfig = {
+	testDir: 'tests/integration',
+	outputDir: 'tests/integration/test-results/',
+	snapshotDir: 'tests/integration/snapshots/',
+
 	webServer: {
-		command: 'npm run build && npm run preview',
-		port: 4173
+		env: {
+			NODE_ENV: 'test'
+		},
+
+		command: 'npm run dev',
+		port: 5173,
+		reuseExistingServer: true,
+		stdout: 'pipe'
 	},
-	testDir: 'tests',
 	testMatch: /(.+\.)?(test|spec)\.[jt]s/
 };
 

@@ -45,6 +45,7 @@ export const getEntryByAttribute = async <T = Entry>(
 };
 
 const setArrayAttributes = (entry: Entry): Entry => {
+	if (!entry) return entry;
 	const copy = Object.entries(entry).map(([key, value]) => {
 		if (ARRAY_ATTRIBUTES.includes(key)) {
 			if (value && !Array.isArray(value)) return { [key]: [value] };

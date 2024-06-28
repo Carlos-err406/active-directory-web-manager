@@ -15,3 +15,4 @@ logs/system
 app.config.*.json
 !app.config.example.json
 test-results/
+snapshots/
