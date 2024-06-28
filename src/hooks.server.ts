@@ -23,7 +23,7 @@ const apiProtectionHandler: Handle = ({ event, resolve }) => {
 };
 
 /**
- * sets the auth function in the locals, wich returns the session and a binded ldap client instance
+ * sets the auth function in the locals, which returns the session and a binded ldap client instance
  */
 const authenticationSetHandler: Handle = async ({ event, resolve }) => {
 	const auth = async ({ cookies }: typeof event) => {
@@ -69,10 +69,10 @@ const ldapUnbindHandler: Handle = async ({ event, resolve }) => {
 };
 
 const { decodeSearchParams, logDateTemplate, logTemplate, useLogging } = config.system.logging;
-/** hander hook for logging all requests
+/** handler hook for logging all requests
  *
- * if LOGGER enviroment variable is 1 the `logHandler` hook is included on the sequence
- * else `logHadler` is not included
+ * if LOGGER environment variable is 1 the `logHandler` hook is included on the sequence
+ * else `logHandler` is not included
  */
 const logHandler = getLoggerHook({
 	template: logTemplate,
