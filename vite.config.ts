@@ -13,7 +13,7 @@ export default defineConfig({
 	}
 });
 function hotReloadOnConfigFileChange(): PluginOption {
-	const configFileRegex = new RegExp(/^.*(app\.config(.*).json)$/);
+	const configFileRegex = new RegExp(/^.*(app\.config(.*).(yaml|yml|json))$/);
 	return {
 		name: 'custom-hmr',
 		enforce: 'post',

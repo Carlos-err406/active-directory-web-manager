@@ -4,12 +4,22 @@ import type { RecursiveRequired } from '@sveltejs/kit';
 import merge from 'deepmerge';
 import fs from 'fs';
 import path from 'path';
+import YAML from 'yaml';
 import defaults from './defaults';
 
 //Load json config file
 if (!CONFIG_PATH) throw Error('Missing CONFIG_PATH environment variable!');
 const content = fs.readFileSync(CONFIG_PATH, { encoding: 'utf-8' });
-const Config = JSON.parse(content);
+
+const configPathExtension = path.extname(CONFIG_PATH);
+
+const isYAML = ['.yml', '.yaml'].includes(configPathExtension);
+let Config = {};
+if (isYAML) {
+	Config = YAML.parse(content);
+} else {
+	Config = JSON.parse(content);
+}
 
 /**Resolves the json schema file, dereferencing all $refs to correctly use it for validation  */
 const resolveSchema = () => {
@@ -30,8 +40,9 @@ const validateConfig = async () => {
 	const schema = await resolveSchema();
 
 	// Use dynamic import with require to handle CommonJS module
-	const pkg = await import('json-schema-library').then((module) => module.default || module);
-	const { Draft07 } = pkg;
+	const { Draft07 } = await import('json-schema-library').then(
+		(module) => module.default || module
+	);
 	const validator = new Draft07(schema);
 	const errors = validator.validate(Config, schema);
 	if (errors.length) {

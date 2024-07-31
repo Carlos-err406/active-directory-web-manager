@@ -3,7 +3,6 @@
 	"description": "Directory management configuration settings",
 	"title": "DirectoryConfig",
 	"type": "object",
-	"required": ["ldap"],
 	"properties": {
 		"ldap": {
 			"$ref": "directory-ldap.schema.json"

@@ -7,7 +7,6 @@ export const GET: RequestHandler = async ({ cookies }) => {
 	const { charPreset, ...options } = config.app.captcha;
 	const chars = isTestEnvironment() ? 'A' : charPreset;
 	const { text, data } = svgCaptcha.create({ ...options, charPreset: chars });
-	console.log(process.env.NODE_ENV, text);
 	const captchaToken = generateCaptchaToken(text);
 	setCaptchaCookie(cookies, captchaToken);
 

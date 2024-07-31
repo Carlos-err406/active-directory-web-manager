@@ -65,7 +65,8 @@
 		"typescript": "^5.0.0",
 		"uuid": "^9.0.1",
 		"vite-plugin-tailwind-purgecss": "^0.3.3",
-		"vitest": "^1.2.0"
+		"vitest": "^1.2.0",
+		"yaml": "^2.4.5"
 	},
 	"dependencies": {
 		"@apidevtools/json-schema-ref-parser": "^11.6.4",

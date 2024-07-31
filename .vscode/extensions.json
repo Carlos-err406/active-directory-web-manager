@@ -1,3 +1,7 @@
 {
-	"recommendations": ["fengtan.ldap-explorer", "streetsidesoftware.code-spell-checker"]
+	"recommendations": [
+		"fengtan.ldap-explorer",
+		"streetsidesoftware.code-spell-checker",
+		"redhat.vscode-yaml"
+	]
 }

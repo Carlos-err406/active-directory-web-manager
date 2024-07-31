@@ -3,7 +3,6 @@
 	"description": "Configuration settings",
 	"title": "Config",
 	"type": "object",
-	"required": ["directory"],
 	"properties": {
 		"app": {
 			"$ref": "app.schema.json"

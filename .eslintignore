@@ -18,3 +18,5 @@ keypair.pem
 publickey.crt
 README.md
 *.pcss
+
+app.config.example.yaml
