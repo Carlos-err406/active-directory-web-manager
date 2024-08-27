@@ -1,3 +1,11 @@
+<script lang="ts" context="module">
+	export type Entry = {
+		dn: string;
+		distinguishedName: string;
+		[index: string]: unknown;
+	};
+</script>
+
 <script lang="ts">
 	import { PUBLIC_API_KEY } from '$env/static/public';
 	import { Input } from '$lib/components/ui/input';
@@ -6,7 +14,6 @@
 	import { arrowNavigation } from '$lib/utils';
 	import Loading from '$lucide/loader.svelte';
 	import Search from '$lucide/search.svelte';
-	import type { Entry } from 'ldapts';
 	import { createEventDispatcher } from 'svelte';
 	import { flip } from 'svelte/animate';
 	import { slide } from 'svelte/transition';
@@ -93,7 +100,7 @@
 				id={entry.dn}
 				transition:slide={{ duration: 200, axis: 'y' }}
 				animate:flip={{ duration: 200 }}
-				class="relative flex cursor-default select-none items-center gap-3 rounded-sm px-2 py-1.5 text-start text-sm outline-none hover:bg-accent focus:bg-accent disabled:pointer-events-none disabled:opacity-50 data-[highlighted]:text-accent-foreground"
+				class="relative flex cursor-default select-none items-center gap-3 rounded-sm px-2 py-1.5 text-start text-sm outline-none data-[highlighted]:text-accent-foreground hover:bg-accent focus:bg-accent disabled:pointer-events-none disabled:opacity-50"
 				type="button"
 				on:click={() => {
 					dispatch('select', entry);
