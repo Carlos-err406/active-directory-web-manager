@@ -1,7 +1,7 @@
 import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
 import { getEntryBySAMAccountName } from '$lib/ldap';
 import { getLDAPClient } from '$lib/ldap/client';
-import { signUpSchema } from '$lib/schemas/signup-schema';
+import { signInSchema } from '$lib/schemas/sign-in-schema';
 import {
 	generateAccessToken,
 	generateSessionToken,
@@ -19,7 +19,7 @@ import { fail, setError, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 
 export const signIn: Action = async (event) => {
-	const form = await superValidate(event, zod(signUpSchema));
+	const form = await superValidate(event, zod(signInSchema));
 	if (!form.valid) return fail(400, { form });
 	const { cookies } = event;
 	const captchaToken = getCaptchaToken(cookies);

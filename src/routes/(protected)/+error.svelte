@@ -8,13 +8,16 @@
 
 <div
 	class="flex size-full flex-col items-center justify-center overflow-hidden bg-gray-100 dark:bg-gray-800"
+	data-test="errorCard"
 >
 	<div class="w-full max-w-md rounded-lg bg-white p-6 shadow-md dark:bg-gray-900">
 		<div class="z-10 flex flex-col items-center space-y-4">
 			<TriangleAlert class="size-12 text-red-500" />
 			<div class="text-center">
 				<h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200">Something went wrong</h2>
-				<p class="text-gray-600 dark:text-gray-400">Error code: {$page.status}</p>
+				<p class="text-gray-600 dark:text-gray-400" data-test="errorStatus">
+					Error code: {$page.status}
+				</p>
 			</div>
 			<p class="font-semibold text-gray-600 dark:text-gray-400">
 				{#if $page.error?.message}

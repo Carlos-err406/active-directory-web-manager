@@ -25,7 +25,7 @@ declare global {
 		interface PageData {
 			config: RecursiveRequired<AppConfigType>;
 			/** only defined inside the (protected) route group */
-			session: Session;
+			session?: Session;
 		}
 		interface PageState {
 			toast?: {

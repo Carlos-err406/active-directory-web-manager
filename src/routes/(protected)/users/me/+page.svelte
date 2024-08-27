@@ -12,6 +12,7 @@
 	import dayjs from 'dayjs';
 	import type { PageData } from './$types';
 	export let data: PageData;
+	$: session = data.session;
 
 	let isChangePasswordDialogOpen = false;
 	let isUpdateUserDialogOpen = false;
@@ -33,15 +34,15 @@
 
 	const canSelfEdit = $page.data.config.app.nonAdmin.allowSelfEdit || data.session.isAdmin;
 	const showGroupsAsLinks =
-		$page.data.session.isAdmin || $page.data.config.app.nonAdmin.allowAccessToGroupsPage;
+		session?.isAdmin || $page.data.config.app.nonAdmin.allowAccessToGroupsPage;
 </script>
 
-<div class="flex h-full w-full flex-col py-12 md:py-16">
+<div class="flex h-full w-full flex-col py-12 md:py-16" data-test="usersMePage">
 	<div class="container px-4 md:px-6">
 		<div class="mx-auto max-w-3xl space-y-6">
 			<div class="flex w-full items-center justify-center gap-10">
 				{#if config.jpegPhoto.show}
-					<Avatar class="size-40 overflow-clip">
+					<Avatar class="size-40 overflow-clip" data-test="userAvatar">
 						<AvatarWithPreview alt="jpegPhoto" bind:src={jpegPhoto} />
 						<AvatarFallback
 							class="flex h-full w-full items-center justify-center rounded-full bg-gray-800 text-6xl font-bold uppercase text-gray-100 dark:bg-gray-100 dark:text-gray-800"
@@ -50,38 +51,38 @@
 						</AvatarFallback>
 					</Avatar>
 				{/if}
-				<h1 class="text-3xl font-bold tracking-tight md:text-4xl">
+				<h1 class="text-3xl font-bold tracking-tight md:text-4xl" data-test="userName">
 					{user.displayName || user.sAMAccountName}
 				</h1>
 			</div>
 			<div class="user-info grid grid-cols-2 gap-y-3">
 				{#if config.sAMAccountName.show}
 					<span>{config.sAMAccountName.label}:</span>
-					<span class="info-value">{user.sAMAccountName}</span>
+					<span class="info-value" data-test="sAMAccountName">{user.sAMAccountName}</span>
 				{/if}
 				{#if config.displayName.show && user.displayName}
 					<span>{config.displayName.label}:</span>
-					<span class="info-value">{user.displayName}</span>
+					<span class="info-value" data-test="displayName">{user.displayName}</span>
 				{/if}
 				{#if config.givenName.show && user.givenName}
 					<span>{config.givenName.label}:</span>
-					<span class="info-value">{user.givenName}</span>
+					<span class="info-value" data-test="givenName">{user.givenName}</span>
 				{/if}
 				{#if config.sn.show && user.sn}
 					<span> {config.sn.label}:</span>
-					<span class="info-value">{user.sn}</span>
+					<span class="info-value" data-test="sn">{user.sn}</span>
 				{/if}
 				{#if config.mail.show && user.mail}
 					<span>{config.mail.label}:</span>
-					<span class="info-value">{user.mail}</span>
+					<span class="info-value" data-test="mail">{user.mail}</span>
 				{/if}
 				{#if config.description.show && user.description}
 					<span>{config.description.label}:</span>
-					<span class="info-value">{user.description}</span>
+					<span class="info-value" data-test="description">{user.description}</span>
 				{/if}
 				{#if config.userAccountControl.show}
 					<span>{config.userAccountControl.label}:</span>
-					<span class="info-value">
+					<span class="info-value" data-test="userAccountControl">
 						{getUserAccountControls(user.userAccountControl)
 							.map((uac) => UserAccountControlTypes[uac])
 							.join(', ')}
@@ -89,23 +90,23 @@
 				{/if}
 				{#if config.whenCreated.show}
 					<span>{config.whenCreated.label}:</span>
-					<span class="info-value">
+					<span class="info-value" data-test="whenCreated">
 						{dayjs(user.whenCreated.replace('Z', '')).format('MMMM D, YYYY hh:mm:ss A')}
 					</span>
 				{/if}
 				{#if config.whenChanged.show}
 					<span>{config.whenChanged.label}:</span>
-					<span class="info-value">
+					<span class="info-value" data-test="whenChanged">
 						{dayjs(user.whenChanged.replace('Z', '')).format('MMMM D, YYYY hh:mm:ss A')}
 					</span>
 				{/if}
 				{#if config.distinguishedName.show}
 					<span>{config.distinguishedName.label}:</span>
-					<span class="info-value">{user.distinguishedName}</span>
+					<span class="info-value" data-test="distinguishedName">{user.distinguishedName}</span>
 				{/if}
 				{#if config.memberOf.show}
 					<span>{config.memberOf.label}:</span>
-					<div class="info-value flex flex-wrap space-y-2">
+					<div class="info-value flex flex-wrap space-y-2" data-test="memberOf">
 						{#each (user.memberOf || []).sort( (a, b) => (a < b ? -1 : a > b ? 1 : 0) ) as groupDn, index}
 							<svelte:element
 								this={showGroupsAsLinks ? 'a' : 'span'}
@@ -128,7 +129,12 @@
 		</div>
 	</div>
 	<div class="mt-auto flex w-full items-center justify-center gap-3 py-3">
-		<Button disabled={!canSelfEdit} class="flex items-center gap-2" on:click={onOpenEditClick}>
+		<Button
+			disabled={!canSelfEdit}
+			class="flex items-center gap-2"
+			on:click={onOpenEditClick}
+			data-test="userEdit"
+		>
 			<PencilLine class="size-4 flex-none" />
 			Edit
 		</Button>
@@ -136,13 +142,17 @@
 			disabled={!canSelfEdit}
 			class="flex items-center gap-2"
 			on:click={() => (isChangePasswordDialogOpen = true)}
+			data-test="userChangePassword"
 		>
 			<LockKeyhole class="size-4 flex-none" />
 			Change password
 		</Button>
 	</div>
 	{#if !canSelfEdit}
-		<div class="flex w-full items-center justify-center gap-3 text-muted-foreground">
+		<div
+			class="flex w-full items-center justify-center gap-3 text-muted-foreground"
+			data-test="disabledSelfUpdate"
+		>
 			<Info /> Self update is disabled by configuration for non-admin users
 		</div>
 	{/if}

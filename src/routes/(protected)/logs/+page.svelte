@@ -9,8 +9,8 @@
 	export let data: PageData;
 </script>
 
-<div class="size-full space-y-2">
-	<div class="flex w-full justify-end gap-2 pr-2">
+<div class="size-full space-y-2" data-test="logsPage">
+	<div class="flex w-full flex-wrap justify-end gap-2 pr-2">
 		<LogFilterReset />
 		<LogDateFilter />
 		<LogTypeFilter />
@@ -28,6 +28,12 @@
 					</p>
 				{/if}
 				<Log {log} />
+			{:else}
+				<div class="flex size-full justify-center pt-10">
+					<p class="text-center font-light text-4xl text-muted-foreground">
+						There are no logs to show
+					</p>
+				</div>
 			{/each}
 		</ul>
 	{/await}

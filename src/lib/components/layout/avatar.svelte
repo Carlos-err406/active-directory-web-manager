@@ -18,12 +18,12 @@
 			builders={[builder]}
 			variant="outline"
 			size="icon"
-			class="h-fit w-fit overflow-hidden rounded-full"
+			class="h-fit w-fit flex-none overflow-hidden rounded-full"
 		>
 			<Avatar class="flex size-10 items-center justify-center">
 				<AvatarImage class="size-full" src={jpegPhoto} />
 				<AvatarFallback
-					class="flex h-full w-full items-center justify-center rounded-full bg-gray-800 text-xl font-bold text-gray-100 dark:bg-gray-100 dark:text-gray-800"
+					class="flex h-full w-full flex-none items-center justify-center rounded-full bg-gray-800 text-xl font-bold text-gray-100 dark:bg-gray-100 dark:text-gray-800"
 				>
 					{session.sAMAccountName.slice(0, 2).toUpperCase()}
 				</AvatarFallback>

@@ -43,5 +43,5 @@
 		</div>
 	</Form.Control>
 	<Form.Description><slot name="description" /></Form.Description>
-	<Form.FieldErrors />
+	<Form.FieldErrors data-test={name + '-error'} />
 </Form.Field>

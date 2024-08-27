@@ -7,7 +7,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import Loader from '$lib/components/ui/loader.svelte';
-	import { signUpSchema } from '$lib/schemas/signup-schema';
+	import { signInSchema } from '$lib/schemas/sign-in-schema';
 	import Bot from '$lucide/bot.svelte';
 	import Mail from '$lucide/mail.svelte';
 	import RefreshCcw from '$lucide/refresh-ccw.svelte';
@@ -37,7 +37,7 @@
 		let:methods
 		let:loading
 		bind:form={data.form}
-		schema={signUpSchema}
+		schema={signInSchema}
 		loadingText="Signing in..."
 		formProps={{ action: '?/signIn', 'data-test': 'signInForm' }}
 		formOptions={{

@@ -1,7 +1,8 @@
 import config from '$config';
+import { TESTING } from '$env/static/private';
+import type { Session } from '$lib/types/session';
 import { error, redirect } from '@sveltejs/kit';
 import { appLog } from './logs';
-import type { Session } from '$lib/types/session';
 
 type AccessControlOpts = {
 	locals: App.Locals;
@@ -9,19 +10,20 @@ type AccessControlOpts = {
 	beforeError?: (session: Session) => void;
 	beforeLog?: (session: Session) => void;
 };
-const {
-	allowAccessToGroupsPage,
-	allowAccessToLogsPage,
-	allowAccessToOUsPage,
-	allowAccessToTreePage,
-	allowAccessToUsersPage
-} = config.app.nonAdmin;
+const getNonAdminConfig = () => config.app.nonAdmin;
+
 export const protectedAccessControl = async (accessControlOpts: AccessControlOpts) => {
 	const { locals, url, beforeError, beforeLog } = accessControlOpts;
 	const auth = await locals.auth();
 	if (!auth) throw redirect(302, '/auth');
 	const { session } = auth;
-
+	const {
+		allowAccessToGroupsPage,
+		allowAccessToLogsPage,
+		allowAccessToOUsPage,
+		allowAccessToTreePage,
+		allowAccessToUsersPage
+	} = getNonAdminConfig();
 	const canAccessOuRoutes = () => session.isAdmin || allowAccessToOUsPage;
 	const canAccessUserRoutes = () => session.isAdmin || allowAccessToUsersPage;
 	const canAccessGroupRoutes = () => session.isAdmin || allowAccessToGroupsPage;
@@ -49,12 +51,12 @@ export const protectedAccessControl = async (accessControlOpts: AccessControlOpt
 type HiddenResourceAccessControlOpts = AccessControlOpts & {
 	dn: string;
 };
-const { groups, users, ous } = config.directory;
 
 export const specificResourceAccessControl = async (opts: HiddenResourceAccessControlOpts) => {
 	const { locals, url, beforeError, beforeLog, dn } = opts;
 	const auth = await protectedAccessControl({ locals, url, beforeError });
 	const { session } = auth;
+	const { groups, users, ous } = config.directory;
 	if (
 		(isGroupRoutes(url) && groups.hide.includes(dn)) ||
 		(isUserRoutes(url) && users.hide.includes(dn)) ||
@@ -74,9 +76,10 @@ export const specificResourceAccessControl = async (opts: HiddenResourceAccessCo
 const isTreeRoutes = (url: URL) => url.pathname.startsWith('/tree');
 const isLogRoutes = (url: URL) => url.pathname.startsWith('/logs');
 const isGroupRoutes = (url: URL) => url.pathname.startsWith('/groups');
-const isUserRoutes = (url: URL) => url.pathname.startsWith('/users');
+const isUserRoutes = (url: URL) =>
+	url.pathname.startsWith('/users') && !url.pathname.endsWith('/me');
 const isOuRoutes = (url: URL) => url.pathname.startsWith('/ous');
 
 export const isTestEnvironment = () => {
-	return process.env.NODE_ENV === 'test';
+	return [process.env.TESTING, TESTING].includes('1');
 };

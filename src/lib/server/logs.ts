@@ -14,7 +14,7 @@ type ErrorLogOpts = {
 
 export const errorLog = (e: unknown, extra?: ErrorLogOpts) => {
 	const errorId = extra?.errorId ?? v4();
-	if (config.system.logging.useLogging) return errorId;
+	if (!config.system.logging.useLogging) return errorId;
 	const message = extra?.message ?? 'No error description';
 	const errorName = extra?.errorName ?? errorId;
 

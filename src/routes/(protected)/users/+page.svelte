@@ -172,7 +172,7 @@
 		.filter(Boolean) as string[];
 </script>
 
-<div class="w-full">
+<div class="w-full" data-test="usersPage">
 	<div class="my-2 flex w-full justify-end gap-4">
 		<ResetFiltersDropdown />
 		<ColumnsDropdown hidableCols={hidableCols.map(String)} {flatColumns} />

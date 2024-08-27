@@ -4,7 +4,7 @@
 	import Loader from '$lib/components/ui/loader.svelte';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { globalLoader } from '$lib/stores';
-	import { ModeWatcher } from 'mode-watcher';
+	import { ModeWatcher, setMode } from 'mode-watcher';
 	import { toast } from 'svelte-sonner';
 	import '../app.pcss';
 
@@ -14,13 +14,14 @@
 			toast[toastState.type](toastState.message, toastState.data);
 		}
 	});
+	setMode('light');
 </script>
 
 <svelte:head>
 	<title>Open Active Directory Manager</title>
 </svelte:head>
 
-<ModeWatcher defaultMode="light" />
+<ModeWatcher defaultMode="light" track={false} disableTransitions={true} />
 <Toaster richColors theme="light" />
 
 {#if $globalLoader}

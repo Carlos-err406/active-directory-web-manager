@@ -10,7 +10,7 @@
  */
 export interface Config {
 	app?: AppConfig;
-	directory: DirectoryConfig;
+	directory?: DirectoryConfig;
 	system?: SystemConfig;
 	recyclebin?: RecycleBinConfig;
 	[k: string]: unknown;
@@ -745,7 +745,7 @@ export interface UsersTableConfig {
  * Directory management configuration settings
  */
 export interface DirectoryConfig {
-	ldap: LDAPClientConfig;
+	ldap?: LDAPClientConfig;
 	/**
 	 * CN of the directory's administrators group. @default Domain Admins
 	 */
@@ -809,7 +809,7 @@ export interface LDAPClientConfig {
  */
 export interface TLSOptions {
 	/**
-	 * Name of an OpenSSL engine which can provide the client certificate.
+	 * Name of an OpenSSL engine which can provide the client certificate. @default null
 	 */
 	clientCertEngine?: string | null;
 	/**
@@ -817,7 +817,7 @@ export interface TLSOptions {
 	 */
 	enableTrace?: boolean;
 	/**
-	 * If true the server will reject any connection which is not authorized with the list of supplied CAs. This option only has an effect if requestCert is true. @default true
+	 * If true the server will reject any connection which is not authorized with the list of supplied CAs. This option only has an effect if requestCert is true. @default false
 	 */
 	rejectUnauthorized?: boolean;
 	/**

@@ -7,12 +7,14 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { createUserSchema } from '$lib/schemas/user/create-user-schema';
+	import type { Session } from '$lib/types/session';
 	import { toast } from 'svelte-sonner';
 	export let open = false;
 	export let dn: string;
 	export let action = '/users?/changePassword';
+	$: session = $page.data.session as Session;
 	$: form = $page.data.changePasswordForm;
-	$: isSelf = $page.data.session.dn === dn;
+	$: isSelf = session.dn === dn;
 </script>
 
 <Dialog.Root bind:open>
@@ -51,7 +53,7 @@
 				value="{dn.split('=')[1].split(',')[0].toLowerCase()}@{PUBLIC_LDAP_DOMAIN}"
 			/>
 			<div class="grid grid-cols-1 gap-4">
-				{#if !$page.data.session.isAdmin}
+				{#if !session.isAdmin}
 					<PasswordInput name="oldPassword" inputProps={{ required: true }} {methods}>
 						<svelte:fragment slot="label">Old password</svelte:fragment>
 					</PasswordInput>

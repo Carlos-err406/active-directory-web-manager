@@ -15,7 +15,7 @@ export interface NavigationItemType {
 
 export const getNavigationItems = (
 	config: RecursiveRequired<App.Config>,
-	isAdmin: boolean
+	isAdmin = false
 ): NavigationItemType[] => {
 	const filterLogsPageIfDisabled = (item: NavigationItemType) => {
 		const canAccess = config.app.nonAdmin.allowAccessToLogsPage || isAdmin;

@@ -50,6 +50,7 @@
 	</div>
 	<Input
 		class={cn('pl-10', 'pr-10', 'w-full')}
+		data-test="searchInput"
 		name="q"
 		bind:value={q}
 		placeholder="Search"

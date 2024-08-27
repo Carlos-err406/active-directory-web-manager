@@ -1,25 +1,17 @@
-import { CONFIG_PATH } from '$env/static/private';
-import { isTestEnvironment } from '$lib/server/utils';
 import $RefParser from '@apidevtools/json-schema-ref-parser';
 import type { RecursiveRequired } from '@sveltejs/kit';
 import merge from 'deepmerge';
 import fs from 'fs';
 import path from 'path';
 import YAML from 'yaml';
-import defaults from './defaults';
+import defaults from '../src/config/defaults';
 
-if (!isTestEnvironment() && !CONFIG_PATH) {
-	throw Error('Missing CONFIG_PATH environment variable!');
-}
-let configPath = CONFIG_PATH;
-
-if (isTestEnvironment()) {
-	const testConfigPath = 'app.config.test.yaml';
-	console.log(
-		`Test environment detected. Overriding CONFIG_PATH configuration for '${testConfigPath}'`
+if (process.env.TESTING !== '1') {
+	throw Error(
+		'Not in test environment!. Set the "TESTING" environment variable to 1 to use the testing config.'
 	);
-	configPath = testConfigPath;
 }
+const configPath = 'app.config.test.yaml';
 
 const rawConfig = fs.readFileSync(configPath, { encoding: 'utf-8' });
 

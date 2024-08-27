@@ -1,0 +1,10 @@
+export const sAMAccountName = 'tony.stark';
+export const cn = sAMAccountName;
+export const password = 'myRedSuitKeepsMeWarm123*';
+export const dn = `CN=${sAMAccountName},${process.env.PUBLIC_BASE_DN}`;
+export const givenName = 'Tony';
+export const sn = 'Stark';
+export const displayName = `${givenName} ${sn}`;
+export const description = 'Im Iron Man';
+export const streetAddress = 'The Marvel Universe';
+export const mail = `${sAMAccountName}@${process.env.PUBLIC_DOMAIN}`;

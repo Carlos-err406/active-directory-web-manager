@@ -16,9 +16,8 @@ app.config.*.json
 app.config.*.yaml
 app.config.*.yml
 
-!app.config.example.json
-!app.config.example.yaml
-!app.config.example.yml
+!app.config.example.*
+!app.config.test.*
 
 test-results/
 snapshots/

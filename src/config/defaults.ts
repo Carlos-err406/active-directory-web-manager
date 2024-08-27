@@ -232,7 +232,7 @@ const defaults: RecursiveRequired<App.Config> = {
 			tlsOptions: {
 				clientCertEngine: null,
 				enableTrace: false,
-				rejectUnauthorized: true,
+				rejectUnauthorized: false,
 				requestCert: false
 			}
 		},

@@ -25,10 +25,12 @@
 		"legos",
 		"lucide",
 		"networkidle",
+		"pcss",
 		"purgecss",
 		"recyclebin",
 		"sonner",
 		"tailwindcss",
 		"vaul"
-	]
+	],
+	"todo-tree.tree.showBadges": true
 }

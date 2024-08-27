@@ -1,0 +1,31 @@
+# yaml-language-server: $schema=src/config/schemas/index.schema.json
+app:
+  captcha:
+    size: 8
+    height: 96
+    width: 345
+    fontSize: 90
+    charPreset: '*'
+    color: false
+    noise: 5
+    background: white
+  views:
+    usersPage:
+      details:
+        memberOf:
+          label: memberOf
+          shortMemberOf: false
+          show: false
+system:
+  logging:
+    useLogging: false
+directory:
+  adminGroup: Domain Admins
+  ldap:
+    ldapURL: ldaps://localhost:636
+    strictDN: true
+    tlsOptions:
+      requestCert: false
+      clientCertEngine: null
+      enableTrace: false
+      rejectUnauthorized: false
