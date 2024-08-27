@@ -39,7 +39,7 @@ export const createUserSchema = z
 			.regex(/[0-9]/, 'Password must contain at least one number')
 			.regex(
 				/[!@#$%^&*()_+\-=[\]{}|;':",./<>?]/,
-				'Password must contain at leat one special character'
+				'Password must contain at least one special character'
 			),
 		passwordConfirmation: z.string().min(1, 'Password confirmation is required')
 	})
