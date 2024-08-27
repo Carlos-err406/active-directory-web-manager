@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { applyAction } from '$app/forms';
 	import { invalidate } from '$app/navigation';
 	import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
 	import { toastError } from '$lib';
@@ -26,6 +27,33 @@
 			else set('mail', '');
 		}
 	};
+	let toastId: string | number = NaN;
+
+	const onSubmit: FormOptions<UpdateUserSchema>['onSubmit'] = () => {
+		toastId = toast.loading('Updating user...', { duration: 30_000 });
+	};
+
+	const onResult: FormOptions<UpdateUserSchema>['onResult'] = async ({ result }) => {
+		switch (result.type) {
+			case 'success':
+				invalidate('protected:users');
+				toastId = toast.success('User updated successfully!', {
+					id: toastId,
+					duration: undefined
+				});
+				open = false;
+				break;
+			case 'error':
+				toastError(result.error, toastId);
+				open = false;
+				break;
+			case 'redirect':
+				toast.dismiss(toastId);
+				applyAction(result);
+				break;
+		}
+	};
+
 	// TODO: UAC flags!
 </script>
 
@@ -40,21 +68,12 @@
 			let:loading
 			bind:form
 			schema={updateUserSchema}
-			loadingText="Updating user..."
 			formProps={{ action, enctype: 'multipart/form-data' }}
 			formOptions={{
 				resetForm: false,
 				onChange,
-				onError: ({ result }) => {
-					toastError(result.error);
-				},
-				onResult: ({ result }) => {
-					if (result.type === 'success') {
-						invalidate('protected:users');
-						open = false;
-						toast.success('User updated successfully');
-					}
-				}
+				onResult,
+				onSubmit
 			}}
 		>
 			<input hidden name="base" value={base} />

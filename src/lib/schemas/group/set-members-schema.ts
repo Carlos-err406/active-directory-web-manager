@@ -6,4 +6,4 @@ export const setMembersSchema = z.object({
 	dns: z.array(dn)
 });
 
-export type SetMembersShema = typeof setMembersSchema;
+export type SetMembersSchema = typeof setMembersSchema;

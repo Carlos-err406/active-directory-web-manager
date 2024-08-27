@@ -1,12 +1,16 @@
 <script lang="ts">
-	import { invalidate } from '$app/navigation';
+	import { goto, invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { PUBLIC_API_KEY } from '$env/static/public';
-	import Form from '$lib/components/form/form.svelte';
+	import { toastError } from '$lib';
+	import Form, { type FormOptions } from '$lib/components/form/form.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { getCNFromDN } from '$lib/ldap/utils';
-	import { updateUserSchema } from '$lib/schemas/user/update-user-schema';
+	import {
+		updateMembershipSchema,
+		type UpdateMembershipSchema
+	} from '$lib/schemas/user/update-membership';
 	import type { Group } from '$lib/types/group';
 	import Loader from '$lucide/loader.svelte';
 	import { toast } from 'svelte-sonner';
@@ -30,6 +34,40 @@
 	};
 
 	$: open && onOpen();
+
+	let toastId: string | number = NaN;
+
+	const onSubmit: FormOptions<UpdateMembershipSchema>['onSubmit'] = () => {
+		toastId = toast.loading('Updating user membership...', { duration: 30_000 });
+	};
+
+	const onResult: FormOptions<UpdateMembershipSchema>['onResult'] = async ({ result }) => {
+		switch (result.type) {
+			case 'success':
+				invalidate('protected:users');
+				invalidate('protected:groups');
+				toastId = toast.success('User membership updated successfully!', {
+					id: toastId,
+					duration: undefined
+				});
+				open = false;
+				break;
+			case 'error':
+				toastError(result.error, toastId);
+				open = false;
+				break;
+			case 'redirect':
+				await goto(result.location, {
+					state: {
+						toast: {
+							type: 'success',
+							message: 'Group deleted successfully!'
+						}
+					}
+				});
+				break;
+		}
+	};
 </script>
 
 <Dialog.Root bind:open>
@@ -57,22 +95,12 @@
 		<Form
 			let:loading
 			bind:form
-			schema={updateUserSchema}
-			loadingText="Updating user membership..."
-			formProps={{ action, enctype: 'multipart/form-data' }}
+			schema={updateMembershipSchema}
+			formProps={{ action }}
 			formOptions={{
 				resetForm: true,
-				onError: ({ result }) => {
-					toast.error(result.error.message);
-				},
-				onResult: ({ result }) => {
-					if (result.type === 'success') {
-						open = false;
-						toast.success('User membership updated');
-						invalidate('protected:groups');
-						invalidate('protected:users');
-					}
-				}
+				onSubmit,
+				onResult
 			}}
 		>
 			{#each groups as group}

@@ -1,15 +1,44 @@
 <script lang="ts">
+	import { applyAction } from '$app/forms';
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { toastError } from '$lib';
-	import Form from '$lib/components/form/form.svelte';
+	import Form, { type FormOptions } from '$lib/components/form/form.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
-	import { deleteManySchema } from '$lib/schemas/delete-many-schema';
+	import { deleteManySchema, type DeleteManySchema } from '$lib/schemas/delete-many-schema';
 	import { toast } from 'svelte-sonner';
 	let open: boolean;
 	export let dns: string[] = [];
 	$: form = $page.data.deleteManyUsersForm;
+
+	let toastId: string | number = NaN;
+
+	const onSubmit: FormOptions<DeleteManySchema>['onSubmit'] = () => {
+		toastId = toast.loading('Deleting user...', { duration: 30_000 });
+	};
+
+	const onResult: FormOptions<DeleteManySchema>['onResult'] = async ({ result }) => {
+		switch (result.type) {
+			case 'success':
+				toastId = toast.success('Users deleted successfully!', {
+					id: toastId,
+					duration: undefined
+				});
+				break;
+			case 'error':
+				toastError(result.error, toastId);
+				break;
+			case 'redirect':
+				toast.success('User deleted successfully!', {
+					id: toastId,
+					duration: undefined
+				});
+				applyAction(result);
+		}
+		open = false;
+		invalidate('protected:users');
+	};
 </script>
 
 <Dialog.Root bind:open>
@@ -30,21 +59,11 @@
 			let:loading
 			bind:form
 			schema={deleteManySchema}
-			loadingText="Deleting users..."
 			formProps={{ action: '/users?/deleteManyUsers' }}
 			formOptions={{
 				resetForm: false,
-				onError: ({ result }) => {
-					toastError(result.error);
-					invalidate('protected:users');
-				},
-				onResult: ({ result }) => {
-					invalidate('protected:users');
-					if (result.type === 'success') {
-						open = false;
-						toast.success('Users deleted successfully');
-					}
-				}
+				onSubmit,
+				onResult
 			}}
 		>
 			{#each dns as dn}

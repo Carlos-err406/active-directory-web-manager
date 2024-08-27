@@ -1,13 +1,14 @@
 <script lang="ts">
+	import { applyAction } from '$app/forms';
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { PUBLIC_API_KEY } from '$env/static/public';
 	import { toastError } from '$lib';
-	import Form from '$lib/components/form/form.svelte';
+	import Form, { type FormOptions } from '$lib/components/form/form.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { getCNFromDN } from '$lib/ldap/utils';
-	import { setMembersSchema } from '$lib/schemas/group/set-members-schema';
+	import { setMembersSchema, type SetMembersSchema } from '$lib/schemas/group/set-members-schema';
 	import type { User } from '$lib/types/user';
 	import Loader from '$lucide/loader.svelte';
 	import { toast } from 'svelte-sonner';
@@ -29,15 +30,42 @@
 		initializing = false;
 	};
 	$: open && onOpen();
+
+	let toastId: string | number = NaN;
+
+	const onSubmit: FormOptions<SetMembersSchema>['onSubmit'] = () => {
+		toastId = toast.loading('Deleting group...', { duration: 30_000 });
+	};
+
+	const onResult: FormOptions<SetMembersSchema>['onResult'] = async ({ result }) => {
+		switch (result.type) {
+			case 'success':
+				toastId = toast.success('Group members updated successfully!', {
+					id: toastId,
+					duration: undefined
+				});
+				invalidate('protected:groups');
+				invalidate('protected:users');
+				open = false;
+				break;
+			case 'error':
+				toastError(result.error, toastId);
+				break;
+			case 'redirect':
+				toast.dismiss(toastId);
+				open = false;
+				applyAction(result);
+		}
+	};
 </script>
 
 <Dialog.Root bind:open>
 	<Dialog.Content>
 		<Dialog.Header>
 			<Dialog.Title>Manage group members</Dialog.Title>
-			<Dialog.Description
-				>Add or remove members in this group ({getCNFromDN(dn)})</Dialog.Description
-			>
+			<Dialog.Description>
+				Add or remove members in this group ({getCNFromDN(dn)})
+			</Dialog.Description>
 		</Dialog.Header>
 		<UsersSelect selected={users} on:select={({ detail }) => (users = [...users, detail])} />
 		<UserChipList bind:users>
@@ -56,21 +84,11 @@
 			let:loading
 			bind:form
 			schema={setMembersSchema}
-			loadingText="Updating group members..."
 			formProps={{ action }}
 			formOptions={{
 				resetForm: true,
-				onError: ({ result }) => {
-					toastError(result.error);
-				},
-				onResult: ({ result }) => {
-					if (result.type === 'success') {
-						open = false;
-						toast.success('Group members updated');
-						invalidate('protected:groups');
-						invalidate('protected:users');
-					}
-				}
+				onResult,
+				onSubmit
 			}}
 		>
 			<input type="text" hidden value={dn} name="groupDn" />

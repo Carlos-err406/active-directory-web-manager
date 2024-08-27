@@ -13,7 +13,6 @@ import { EqualityFilter, SubstringFilter, type Filter } from 'ldapts';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { PageServerLoad } from './$types';
-export * as actions from '$lib/actions/groups';
 
 export const load: PageServerLoad = async ({ url, locals, depends }) => {
 	depends('protected:groups');
@@ -91,3 +90,5 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 		});
 	}
 };
+
+export * as actions from '$lib/actions/groups';

@@ -1,6 +1,8 @@
 <script lang="ts">
+	import { applyAction } from '$app/forms';
 	import { invalidate } from '$app/navigation';
 	import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
+	import { toastError } from '$lib';
 	import Form, { type Data, type FormOptions } from '$lib/components/form/form.svelte';
 	import Input from '$lib/components/form/input.svelte';
 	import { Button } from '$lib/components/ui/button';
@@ -16,7 +18,6 @@
 	import { slide } from 'svelte/transition';
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import SelectInput from '../form/select-input.svelte';
-	import { toastError } from '$lib';
 	export let open = false;
 	export let base = PUBLIC_BASE_DN;
 	export let dn: string;
@@ -28,6 +29,31 @@
 			if (sAMAccountName)
 				set('mail', `${sAMAccountName.split(' ').join('.').toLowerCase()}@${PUBLIC_LDAP_DOMAIN}`);
 			else set('mail', '');
+		}
+	};
+
+	let toastId: string | number = NaN;
+
+	const onSubmit: FormOptions<UpdateGroupSchema>['onSubmit'] = () => {
+		toastId = toast.loading('Updating group...', { duration: 30_000 });
+	};
+	const onResult: FormOptions<UpdateGroupSchema>['onResult'] = async ({ result }) => {
+		invalidate('protected:groups');
+		switch (result.type) {
+			case 'success':
+				toastId = toast.success('Group updated successfully!', {
+					id: toastId,
+					duration: undefined
+				});
+				open = false;
+				break;
+			case 'error':
+				toastError(result.error, toastId);
+				break;
+			case 'redirect':
+				toast.dismiss(toastId);
+				open = false;
+				applyAction(result);
 		}
 	};
 </script>
@@ -44,21 +70,12 @@
 			let:values
 			bind:form
 			schema={updateGroupSchema}
-			loadingText="Updating group..."
 			formProps={{ action }}
 			formOptions={{
 				resetForm: true,
 				onChange,
-				onError: ({ result }) => {
-					toastError(result.error);
-				},
-				onResult: ({ result }) => {
-					invalidate('protected:groups');
-					if (result.type === 'success') {
-						open = false;
-						toast.success('Group updated successfully');
-					}
-				}
+				onSubmit,
+				onResult
 			}}
 		>
 			<input hidden name="base" value={base} />

@@ -2,15 +2,48 @@
 	import { goto, invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { toastError } from '$lib';
-	import Form from '$lib/components/form/form.svelte';
+	import Form, { type FormOptions } from '$lib/components/form/form.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
-	import { deleteUserSchema } from '$lib/schemas/user/delete-user-schema';
+	import { deleteUserSchema, type DeleteUserSchema } from '$lib/schemas/user/delete-user-schema';
 	import { toast } from 'svelte-sonner';
 	export let open = false;
 	export let dn: string;
 	const action = `/users/${dn}?/deleteUser`;
 	$: form = $page.data.deleteUserForm;
+
+	let toastId: string | number = NaN;
+
+	const onSubmit: FormOptions<DeleteUserSchema>['onSubmit'] = () => {
+		toastId = toast.loading('Deleting user...', { duration: 30_000 });
+	};
+
+	const onResult: FormOptions<DeleteUserSchema>['onResult'] = async ({ result }) => {
+		switch (result.type) {
+			case 'success':
+				invalidate('protected:users');
+				toastId = toast.success('User deleted successfully!', {
+					id: toastId,
+					duration: undefined
+				});
+				open = false;
+				break;
+			case 'error':
+				toastError(result.error, toastId);
+				open = false;
+				break;
+			case 'redirect':
+				await goto(result.location, {
+					state: {
+						toast: {
+							type: 'success',
+							message: 'User deleted successfully!'
+						}
+					}
+				});
+				break;
+		}
+	};
 </script>
 
 <Dialog.Root bind:open>
@@ -23,32 +56,12 @@
 			let:loading
 			bind:form
 			schema={deleteUserSchema}
-			loadingText="Deleting user..."
 			formProps={{ action }}
 			formOptions={{
 				resetForm: false,
 				applyAction: false,
-				onError: ({ result }) => {
-					toastError(result.error);
-					open = false;
-				},
-				onResult: ({ result }) => {
-					open = false;
-					if (result.type === 'success') {
-						invalidate('protected:users');
-						toast.success('User deleted successfully');
-					} else if (result.type === 'redirect') {
-						goto(result.location, {
-							invalidateAll: true,
-							state: {
-								toast: {
-									type: 'success',
-									message: 'User deleted successfully'
-								}
-							}
-						});
-					}
-				}
+				onResult,
+				onSubmit
 			}}
 		>
 			<input hidden name="dn" value={dn} />

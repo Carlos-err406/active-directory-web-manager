@@ -1,17 +1,19 @@
 <script lang="ts">
+	import { applyAction } from '$app/forms';
 	import { PUBLIC_API_KEY } from '$env/static/public';
 	import { toastError } from '$lib';
-	import Form from '$lib/components/form/form.svelte';
+	import Form, { type FormOptions } from '$lib/components/form/form.svelte';
 	import Input from '$lib/components/form/input.svelte';
 	import PasswordInput from '$lib/components/form/password-input.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import Loader from '$lib/components/ui/loader.svelte';
-	import { signInSchema } from '$lib/schemas/sign-in-schema';
+	import { signInSchema, type SignInSchema } from '$lib/schemas/sign-in-schema';
 	import Bot from '$lucide/bot.svelte';
 	import Mail from '$lucide/mail.svelte';
 	import RefreshCcw from '$lucide/refresh-ccw.svelte';
 	import { onMount } from 'svelte';
+	import { toast } from 'svelte-sonner';
 	import type { PageData } from './$types';
 	export let data: PageData;
 	let captcha: string;
@@ -30,6 +32,26 @@
 		captcha = await getCaptcha();
 	};
 	onMount(refreshCaptcha);
+
+	let toastId: number | string = NaN;
+
+	const onSubmit: FormOptions<SignInSchema>['onSubmit'] = () => {
+		toastId = toast.loading('Signing in...', { duration: 30_000 });
+	};
+
+	const onResult: FormOptions<SignInSchema>['onResult'] = async ({ result }) => {
+		switch (result.type) {
+			case 'success':
+				break;
+			case 'error':
+				toastError(result.error, toastId);
+				break;
+			case 'redirect':
+				toastId = toast.success('Signed in successfully!', { id: toastId, duration: undefined });
+				await applyAction(result);
+				break;
+		}
+	};
 </script>
 
 <main class="flex h-screen w-full items-center justify-center">
@@ -38,13 +60,11 @@
 		let:loading
 		bind:form={data.form}
 		schema={signInSchema}
-		loadingText="Signing in..."
 		formProps={{ action: '?/signIn', 'data-test': 'signInForm' }}
 		formOptions={{
 			resetForm: false,
-			onError: ({ result }) => {
-				toastError(result.error);
-			}
+			onSubmit,
+			onResult
 		}}
 	>
 		<Card.Root class="w-full min-w-96 max-w-sm">

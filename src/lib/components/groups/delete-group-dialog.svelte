@@ -2,15 +2,50 @@
 	import { goto, invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { toastError } from '$lib';
-	import Form from '$lib/components/form/form.svelte';
+	import Form, { type FormOptions } from '$lib/components/form/form.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
-	import { deleteGroupSchema } from '$lib/schemas/group/delete-group-schema';
+	import {
+		deleteGroupSchema,
+		type DeleteGroupSchema
+	} from '$lib/schemas/group/delete-group-schema';
 	import { toast } from 'svelte-sonner';
 	export let open = false;
 	export let dn: string;
 	export let action = '/groups?/deleteGroup';
 	$: form = $page.data.deleteGroupForm;
+	let toastId: string | number = NaN;
+
+	const onSubmit: FormOptions<DeleteGroupSchema>['onSubmit'] = () => {
+		toastId = toast.loading('Deleting group...', { duration: 30_000 });
+	};
+
+	const onResult: FormOptions<DeleteGroupSchema>['onResult'] = async ({ result }) => {
+		switch (result.type) {
+			case 'success':
+				invalidate('protected:groups');
+				toastId = toast.success('Group deleted successfully!', {
+					id: toastId,
+					duration: undefined
+				});
+				open = false;
+				break;
+			case 'error':
+				toastError(result.error, toastId);
+				open = false;
+				break;
+			case 'redirect':
+				await goto(result.location, {
+					state: {
+						toast: {
+							type: 'success',
+							message: 'Group deleted successfully!'
+						}
+					}
+				});
+				break;
+		}
+	};
 </script>
 
 <Dialog.Root bind:open>
@@ -23,31 +58,12 @@
 			let:loading
 			bind:form
 			schema={deleteGroupSchema}
-			loadingText="Deleting group..."
 			formProps={{ action }}
 			formOptions={{
 				resetForm: false,
 				applyAction: false,
-				onError: ({ result }) => {
-					toastError(result.error);
-					open = false;
-				},
-				onResult: async ({ result }) => {
-					if (result.type === 'success') {
-						invalidate('protected:groups');
-						toast.success('Group deleted successfully');
-						open = false;
-					} else if (result.type === 'redirect') {
-						goto(result.location, {
-							state: {
-								toast: {
-									type: 'success',
-									message: 'Group deleted successfully'
-								}
-							}
-						});
-					}
-				}
+				onSubmit,
+				onResult
 			}}
 		>
 			<input hidden name="dn" value={dn} />

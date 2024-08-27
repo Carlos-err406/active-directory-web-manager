@@ -1,12 +1,16 @@
 <script lang="ts">
+	import { applyAction } from '$app/forms';
 	import { page } from '$app/stores';
 	import { PUBLIC_LDAP_DOMAIN } from '$env/static/public';
 	import { toastError } from '$lib';
-	import Form from '$lib/components/form/form.svelte';
+	import Form, { type FormOptions } from '$lib/components/form/form.svelte';
 	import PasswordInput from '$lib/components/form/password-input.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
-	import { createUserSchema } from '$lib/schemas/user/create-user-schema';
+	import {
+		changePasswordSchema,
+		type ChangePasswordSchema
+	} from '$lib/schemas/user/change-password-schema';
 	import type { Session } from '$lib/types/session';
 	import { toast } from 'svelte-sonner';
 	export let open = false;
@@ -15,6 +19,30 @@
 	$: session = $page.data.session as Session;
 	$: form = $page.data.changePasswordForm;
 	$: isSelf = session.dn === dn;
+
+	let toastId: number | string = NaN;
+
+	const onSubmit: FormOptions<ChangePasswordSchema>['onSubmit'] = () => {
+		toastId = toast.loading('Changing password...', { duration: 30_000 });
+	};
+	const onResult: FormOptions<ChangePasswordSchema>['onResult'] = async ({ result }) => {
+		switch (result.type) {
+			case 'success':
+				toastId = toast.success('Password changed successfully!', {
+					id: toastId,
+					duration: undefined
+				});
+				open = false;
+				break;
+			case 'error':
+				toastError(result.error, toastId);
+				break;
+			case 'redirect':
+				toast.dismiss(toastId);
+				open = false;
+				applyAction(result);
+		}
+	};
 </script>
 
 <Dialog.Root bind:open>
@@ -29,20 +57,12 @@
 			let:methods
 			let:loading
 			bind:form
-			schema={createUserSchema}
-			loadingText="Changing password..."
+			schema={changePasswordSchema}
 			formProps={{ action }}
 			formOptions={{
 				resetForm: false,
-				onError: ({ result }) => {
-					toastError(result.error);
-				},
-				onResult: ({ result }) => {
-					if (result.type === 'success') {
-						open = false;
-						toast.success('Password changed successfully');
-					}
-				}
+				onSubmit,
+				onResult
 			}}
 		>
 			<input hidden name="dn" value={dn} />

@@ -1,7 +1,9 @@
 <script lang="ts">
+	import { applyAction } from '$app/forms';
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
+	import { toastError } from '$lib';
 	import Form, { type FormOptions } from '$lib/components/form/form.svelte';
 	import Input from '$lib/components/form/input.svelte';
 	import SelectInput from '$lib/components/form/select-input.svelte';
@@ -18,7 +20,6 @@
 	import { slide } from 'svelte/transition';
 	import AddMembersDialog from './add-members-dialog.svelte';
 	import AddMembersSurveyDialog from './add-members-survey-dialog.svelte';
-	import { toastError } from '$lib';
 
 	let open: boolean;
 	let isManageMembersSurveyDialogOpen = false;
@@ -26,6 +27,12 @@
 	let createdGroup: Group;
 	export let base = PUBLIC_BASE_DN;
 	$: form = $page.data.createGroupForm;
+
+	let toastId: number | string = NaN;
+
+	const onSubmit: FormOptions['onSubmit'] = () => {
+		toastId = toast.loading('Creating group...', { duration: 30_000 });
+	};
 
 	const onChange: FormOptions<CreateGroupSchema>['onChange'] = ({ get, set, target }) => {
 		if (target?.name === 'sAMAccountName') {
@@ -36,13 +43,24 @@
 		}
 	};
 
-	const onResult: FormOptions<CreateGroupSchema, { group: Group }>['onResult'] = ({ result }) => {
-		if (result.type === 'success') {
-			createdGroup = result.data!.group;
-			open = false;
-			isManageMembersSurveyDialogOpen = true;
-			toast.success('Group created successfully');
-			invalidate('protected:groups');
+	const onResult: FormOptions<CreateGroupSchema, { group: Group }>['onResult'] = async ({
+		result
+	}) => {
+		switch (result.type) {
+			case 'success':
+				createdGroup = result.data!.group;
+				open = false;
+				isManageMembersSurveyDialogOpen = true;
+				toast.success('Group created successfully');
+				invalidate('protected:groups');
+				break;
+			case 'error':
+				toastError(result.error, toastId);
+				break;
+			case 'redirect':
+				toast.dismiss(toastId);
+				await applyAction(result);
+				break;
 		}
 	};
 </script>
@@ -62,15 +80,12 @@
 			let:values
 			bind:form
 			schema={createGroupSchema}
-			loadingText="Creating group..."
 			formProps={{ action: '/groups?/createGroup' }}
 			formOptions={{
 				resetForm: true,
 				onChange,
-				onResult,
-				onError: ({ result }) => {
-					toastError(result.error);
-				}
+				onSubmit,
+				onResult
 			}}
 		>
 			<input hidden name="base" value={base} />

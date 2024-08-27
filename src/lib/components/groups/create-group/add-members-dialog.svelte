@@ -1,12 +1,13 @@
 <script lang="ts">
+	import { applyAction } from '$app/forms';
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { toastError } from '$lib';
-	import Form from '$lib/components/form/form.svelte';
+	import Form, { type FormOptions } from '$lib/components/form/form.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { UserChipList, UsersSelect } from '$lib/components/users';
-	import { createGroupSchema } from '$lib/schemas/group/create-group-schema';
+	import { setMembersSchema, type SetMembersSchema } from '$lib/schemas/group/set-members-schema';
 	import type { User } from '$lib/types/user';
 	import { toast } from 'svelte-sonner';
 
@@ -15,6 +16,32 @@
 	const action = `/groups/${dn}?/setMembers`;
 	let users: User[] = [];
 	$: form = $page.data.setMembersForm;
+	let toastId: string | number = NaN;
+
+	const onSubmit: FormOptions<SetMembersSchema>['onSubmit'] = () => {
+		toastId = toast.loading('Adding members to group...', { duration: 30_000 });
+	};
+
+	const onResult: FormOptions<SetMembersSchema>['onResult'] = async ({ result }) => {
+		switch (result.type) {
+			case 'success':
+				toastId = toast.success('Selected users were added to the group!', {
+					id: toastId,
+					duration: undefined
+				});
+				invalidate('protected:groups');
+				invalidate('protected:users');
+				open = false;
+				break;
+			case 'error':
+				toastError(result.error, toastId);
+				break;
+			case 'redirect':
+				toast.dismiss(toastId);
+				open = false;
+				applyAction(result);
+		}
+	};
 </script>
 
 <Dialog.Root bind:open>
@@ -33,21 +60,12 @@
 		<Form
 			let:loading
 			bind:form
-			schema={createGroupSchema}
-			loadingText="Adding members to group..."
+			schema={setMembersSchema}
 			formProps={{ action }}
 			formOptions={{
 				resetForm: true,
-				onError: ({ result }) => {
-					toastError(result.error);
-				},
-				onResult: ({ result }) => {
-					if (result.type === 'success') {
-						open = false;
-						toast.success('Selected users were added to group!');
-						invalidate('protected:groups');
-					}
-				}
+				onSubmit,
+				onResult
 			}}
 		>
 			<input hidden value={dn} name="groupDn" />

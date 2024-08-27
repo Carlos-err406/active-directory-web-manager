@@ -1,4 +1,3 @@
-export * as actions from '$lib/actions/users';
 import { getEntryByDn } from '$lib/ldap';
 import { changePasswordSchema } from '$lib/schemas/user/change-password-schema';
 import { deleteUserSchema } from '$lib/schemas/user/delete-user-schema';
@@ -37,3 +36,5 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
 		deleteUserForm
 	};
 };
+
+export * as actions from '$lib/actions/users';

@@ -1,15 +1,44 @@
 <script lang="ts">
+	import { applyAction } from '$app/forms';
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { toastError } from '$lib';
-	import Form from '$lib/components/form/form.svelte';
+	import Form, { type FormOptions } from '$lib/components/form/form.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
-	import { deleteManySchema } from '$lib/schemas/delete-many-schema';
+	import { deleteManySchema, type DeleteManySchema } from '$lib/schemas/delete-many-schema';
 	import { toast } from 'svelte-sonner';
 	let open: boolean;
 	export let dns: string[] = [];
 	$: form = $page.data.deleteManyGroupsForm;
+
+	let toastId: string | number = NaN;
+
+	const onSubmit: FormOptions<DeleteManySchema>['onSubmit'] = () => {
+		toastId = toast.loading('Deleting group...', { duration: 30_000 });
+	};
+
+	const onResult: FormOptions<DeleteManySchema>['onResult'] = async ({ result }) => {
+		switch (result.type) {
+			case 'success':
+				toastId = toast.success('Groups deleted successfully!', {
+					id: toastId,
+					duration: undefined
+				});
+				break;
+			case 'error':
+				toastError(result.error, toastId);
+				break;
+			case 'redirect':
+				toast.success('Group deleted successfully!', {
+					id: toastId,
+					duration: undefined
+				});
+				applyAction(result);
+		}
+		open = false;
+		invalidate('protected:groups');
+	};
 </script>
 
 <Dialog.Root bind:open>
@@ -31,21 +60,11 @@
 			let:loading
 			bind:form
 			schema={deleteManySchema}
-			loadingText="Deleting groups..."
 			formProps={{ action: '/groups?/deleteManyGroups' }}
 			formOptions={{
 				resetForm: false,
-				onError: ({ result }) => {
-					toastError(result.error);
-					invalidate('protected:groups');
-				},
-				onResult: ({ result }) => {
-					invalidate('protected:groups');
-					if (result.type === 'success') {
-						open = false;
-						toast.success('Groups deleted successfully');
-					}
-				}
+				onSubmit,
+				onResult
 			}}
 		>
 			{#each dns as dn}

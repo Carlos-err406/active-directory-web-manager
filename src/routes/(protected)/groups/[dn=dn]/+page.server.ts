@@ -1,4 +1,3 @@
-export * as actions from '$lib/actions/groups';
 import { getEntryByDn } from '$lib/ldap';
 import { deleteGroupSchema } from '$lib/schemas/group/delete-group-schema';
 import { setMembersSchema } from '$lib/schemas/group/set-members-schema';
@@ -10,6 +9,7 @@ import { error } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { PageServerLoad } from './$types';
+
 export const load: PageServerLoad = async ({ locals, url, params }) => {
 	const { dn } = params;
 	const { ldap } = await specificResourceAccessControl({ locals, url, dn });
@@ -29,3 +29,5 @@ export const load: PageServerLoad = async ({ locals, url, params }) => {
 		throw error(500, { message: 'Something went wrong while loading the page', errorId });
 	}
 };
+
+export * as actions from '$lib/actions/groups';

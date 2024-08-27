@@ -1,4 +1,3 @@
-// import * as userActions from '$lib/actions/users';
 import { getFilteredUsers } from '$lib/ldap';
 import { extractPagination, type PaginationWithUrls } from '$lib/pagination';
 import { deleteManySchema } from '$lib/schemas/delete-many-schema';
@@ -15,7 +14,6 @@ import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { PageServerLoad } from './$types';
 import config from '$config';
-export * as actions from '$lib/actions/users';
 
 export const load: PageServerLoad = async ({ url, locals, depends }) => {
 	depends('protected:users');
@@ -101,3 +99,5 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 		});
 	}
 };
+
+export * as actions from '$lib/actions/users';

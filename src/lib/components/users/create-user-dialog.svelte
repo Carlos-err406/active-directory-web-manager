@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { applyAction } from '$app/forms';
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
@@ -31,6 +32,32 @@
 			else set('mail', '');
 		}
 	};
+
+	let toastId: number | string = NaN;
+
+	const onSubmit: FormOptions<CreateUserSchema>['onSubmit'] = () => {
+		toastId = toast.loading('Creating user...', { duration: 30_000 });
+	};
+
+	const onResult: FormOptions<CreateUserSchema>['onResult'] = async ({ result }) => {
+		switch (result.type) {
+			case 'success':
+				toastId = toast.success('User created successfully!', {
+					id: toastId,
+					duration: undefined
+				});
+				invalidate('protected:users');
+				open = false;
+				break;
+			case 'error':
+				toastError(result.error, toastId);
+				break;
+			case 'redirect':
+				toast.dismiss(toastId);
+				open = false;
+				applyAction(result);
+		}
+	};
 </script>
 
 <Dialog.Root bind:open>
@@ -47,20 +74,11 @@
 			let:loading
 			bind:form
 			schema={createUserSchema}
-			loadingText="Creating user..."
 			formProps={{ action: '/users?/createUser', enctype: 'multipart/form-data' }}
 			formOptions={{
 				resetForm: true,
-				onError: ({ result }) => {
-					toastError(result.error);
-				},
-				onResult: ({ result }) => {
-					if (result.type === 'success') {
-						open = false;
-						toast.success('User created successfully');
-						invalidate('protected:users');
-					}
-				},
+				onSubmit,
+				onResult,
 				onChange
 			}}
 		>
