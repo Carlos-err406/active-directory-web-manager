@@ -1,7 +1,7 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import type { PluginOption } from 'vite';
-import { defineConfig } from 'vitest/config';
 import { purgeCss } from 'vite-plugin-tailwind-purgecss';
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
 	plugins: [sveltekit(), purgeCss(), hotReloadOnConfigFileChange()],
@@ -17,13 +17,10 @@ function hotReloadOnConfigFileChange(): PluginOption {
 	return {
 		name: 'custom-hmr',
 		enforce: 'post',
-		handleHotUpdate({ file, server }) {
+		handleHotUpdate: async ({ file, server }) => {
 			if (configFileRegex.test(file)) {
 				console.log('reloading because config file changed...');
-				server.ws.send({
-					type: 'full-reload',
-					path: '*'
-				});
+				await server.restart();
 			}
 		}
 	};
