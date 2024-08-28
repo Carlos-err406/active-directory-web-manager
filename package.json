@@ -47,6 +47,7 @@
 		"json-schema-to-typescript": "^14.0.5",
 		"jsonwebtoken": "^9.0.2",
 		"lint-staged": "^15.2.2",
+		"lodash": "^4.17.21",
 		"lucide-svelte": "^0.365.0",
 		"postcss": "^8.4.32",
 		"postcss-load-config": "^5.0.2",

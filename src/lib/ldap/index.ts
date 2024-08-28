@@ -16,6 +16,7 @@ import {
 	type Filter,
 	type SearchOptions
 } from 'ldapts';
+import _ from 'lodash';
 import { getLDAPClient } from './client';
 import { ARRAY_ATTRIBUTES } from './utils';
 /**
@@ -44,7 +45,7 @@ export const getEntryByAttribute = async <T = Entry>(
 	return setArrayAttributes(searchEntries[0]) as T;
 };
 
-const setArrayAttributes = (entry: Entry): Entry => {
+export const setArrayAttributes = (entry: Entry): Entry => {
 	if (!entry) return entry;
 	const copy = Object.entries(entry).map(([key, value]) => {
 		if (ARRAY_ATTRIBUTES.includes(key)) {
@@ -79,9 +80,9 @@ export const getUserGroups = async (ldap: Client, dn: string) => {
 	return memberOf as string[];
 };
 
-export const getGroupMembers = async (ldap: Client, groupDn: string) => {
+export const getGroupMembers = async (ldap: Client, groupDn: string, opts?: GetEntryOpts) => {
 	const group = await getEntryByDn<{ dn: string; member: string[] }>(ldap, groupDn, {
-		searchOpts: { attributes: ['member'] }
+		searchOpts: { attributes: ['member'], ...opts?.searchOpts }
 	});
 	return group?.member ?? [];
 };
@@ -103,11 +104,8 @@ export const inferChange = <T>(entry: T, attribute: keyof T, value?: string | st
 	//if no value is passed but the entry has the attribute
 	else if (!value && entry[attribute]) return deleteAttribute(att);
 	//if a value is passed but is different from the one present on the entry's attribute
-	else if (value) {
-		if (typeof value === 'string' && value !== entry[attribute])
-			return replaceAttribute({ type: att, values });
-		else if (JSON.stringify(value) !== JSON.stringify(entry[attribute]))
-			return replaceAttribute({ type: att, values });
+	else if (value && !_.isEqual(value, entry[attribute])) {
+		return replaceAttribute({ type: att, values });
 	}
 };
 

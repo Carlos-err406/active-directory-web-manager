@@ -6,22 +6,18 @@ import { createUserSchema } from '$lib/schemas/user/create-user-schema';
 import { deleteUserSchema } from '$lib/schemas/user/delete-user-schema';
 import { updateUserSchema } from '$lib/schemas/user/update-user-schema';
 import { errorLog } from '$lib/server/logs';
+import { protectedAccessControl } from '$lib/server/utils';
 import { jpegPhotoToB64 } from '$lib/transforms';
 import type { User } from '$lib/types/user';
-import { error, redirect } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import { SubstringFilter, type Filter } from 'ldapts';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { PageServerLoad } from './$types';
-import config from '$config';
 
 export const load: PageServerLoad = async ({ url, locals, depends }) => {
 	depends('protected:users');
-	const auth = await locals.auth();
-	if (!auth) throw redirect(302, '/auth');
-	const { ldap, session } = auth;
-	if (!session.isAdmin && !config.app.nonAdmin.allowAccessToUsersPage)
-		throw redirect(302, '/users/me');
+	const { ldap } = await protectedAccessControl({ locals, url });
 
 	const { searchParams, pathname } = url;
 	const sAMAccountNameQuery = searchParams.get('q');

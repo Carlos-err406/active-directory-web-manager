@@ -7,7 +7,7 @@
 	<Navigation />
 	<div class="flex h-full w-full flex-col sm:gap-4 sm:py-4 sm:pl-14">
 		<Header />
-		<main class="flex h-full w-full rounded p-3">
+		<main class="flex h-[calc(100svh-4rem-10px)] w-full rounded p-3">
 			<slot />
 		</main>
 	</div>
