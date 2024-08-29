@@ -19,6 +19,7 @@
 		isUser
 	} from '../utils';
 	import PanelItemActions from './panel-item-actions.svelte';
+	import { page } from '$app/stores';
 
 	export let entry: TreeEntry;
 
@@ -40,7 +41,9 @@
 		if (mayHaveChildren()) {
 			const parts = distinguishedName.split(',');
 			const RDNs = parts.reverse().slice(2); //removing PUBLIC_BASE_DN
-			await goto(`/tree/${encodeURIComponent(RDNs.join('/'))}`, { invalidateAll: true });
+			await goto(`/tree/${encodeURIComponent(RDNs.join('/'))}?${$page.url.searchParams}`, {
+				invalidateAll: true
+			});
 		} else {
 			if (isUser(entry)) {
 				await goto(`/users/${encodeURIComponent(distinguishedName)}`, { invalidateAll: true });

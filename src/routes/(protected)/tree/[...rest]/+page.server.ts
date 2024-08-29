@@ -1,5 +1,6 @@
+import config from '$config';
 import { PUBLIC_BASE_DN } from '$env/static/public';
-import { getEntryByDn, getGroupMembers } from '$lib/ldap';
+import { getGroupMembers, getHideFilters } from '$lib/ldap';
 import { deleteManySchema } from '$lib/schemas/delete-many-schema';
 import { createGroupSchema } from '$lib/schemas/group/create-group-schema';
 import { deleteGroupSchema } from '$lib/schemas/group/delete-group-schema';
@@ -11,25 +12,33 @@ import { deleteUserSchema } from '$lib/schemas/user/delete-user-schema';
 import { updateUserSchema } from '$lib/schemas/user/update-user-schema';
 import { protectedAccessControl } from '$lib/server/utils';
 import type { TreeEntry } from '$lib/types/tree';
-import { Client, EqualityFilter, OrFilter } from 'ldapts';
+import { AndFilter, Client } from 'ldapts';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { PageServerLoad } from './$types';
+import {
+	getBaseEntry,
+	getMembersFilter,
+	getObjectClassFilter,
+	getQueryFilter,
+	throwIfIsHiddenEntry,
+	treeSearch
+} from './utils.server';
 
-export const load: PageServerLoad = async ({ url, locals, params }) => {
+export const load = async ({ url, locals, params }: Parameters<PageServerLoad>[0]) => {
 	const auth = await protectedAccessControl({ locals, url });
-	const { ldap } = auth;
+	const { ldap, session } = auth;
 	const splittedDn = params.rest.split('/').filter(Boolean).reverse();
 	const activeDns = splittedDn
-		.map((_, index) => splittedDn.slice(index).join(',') + `,${PUBLIC_BASE_DN}`)
+		.map((_, index) => `${splittedDn.slice(index).join(',')},${PUBLIC_BASE_DN}`)
 		.reverse();
+	throwIfIsHiddenEntry(`${splittedDn.join(',')},${PUBLIC_BASE_DN}`, session, url);
 	const dns = [PUBLIC_BASE_DN, ...activeDns];
-	// const q = url.searchParams.get('q');
-	// console.log({ tree: q });
+	const q = url.searchParams.get('q');
 	return {
 		searchForm: true,
 		withoutPages: true,
-		entries: dns.map((dn) => getTreeEntries(ldap, dn)),
+		entries: dns.map((dn) => getChildren(ldap, dn, q)),
 		activeDns,
 		deleteManyUsersForm: await superValidate(zod(deleteManySchema)),
 		deleteUserForm: await superValidate(zod(deleteUserSchema)),
@@ -44,52 +53,32 @@ export const load: PageServerLoad = async ({ url, locals, params }) => {
 	};
 };
 
-const TREE_ENTRY_ATTRIBUTES = [
-	'dn',
-	'distinguishedName',
-	'sAMAccountName',
-	'cn',
-	'objectClass',
-	'name'
-];
-
-const getTreeEntries = async (ldap: Client, base = PUBLIC_BASE_DN): Promise<TreeEntry[]> => {
+const getChildren = async (
+	ldap: Client,
+	base = PUBLIC_BASE_DN,
+	query: string | null = null
+): Promise<TreeEntry[]> => {
 	let treeEntries: Promise<TreeEntry[]> = Promise.resolve([]);
-	const entry = await getEntryByDn<{ objectClass: string[]; distinguishedName: string }>(
-		ldap,
-		base,
-		{
-			searchOpts: { attributes: ['objectClass', 'dn', 'distinguishedName'] }
-		}
-	);
+	const mainFilter: AndFilter = new AndFilter({
+		filters: [
+			...getHideFilters(config.directory.groups.hide),
+			...getHideFilters(config.directory.users.hide),
+			...getHideFilters(config.directory.ous.hide),
+			...getHideFilters(config.directory.tree.hide)
+		]
+	});
+
+	if (query) {
+		mainFilter.filters.push(getQueryFilter(query));
+	}
+	const entry = await getBaseEntry(ldap, base);
 	if (entry?.objectClass.includes('group')) {
 		const members = await getGroupMembers(ldap, entry.distinguishedName);
-		treeEntries = ldap
-			.search(PUBLIC_BASE_DN, {
-				attributes: TREE_ENTRY_ATTRIBUTES,
-				filter: new OrFilter({
-					filters: members.map(
-						(dn) => new EqualityFilter({ attribute: 'distinguishedName', value: dn })
-					)
-				})
-			})
-			.then(({ searchEntries }) => searchEntries as TreeEntry[]);
+		mainFilter.filters.push(getObjectClassFilter(), getMembersFilter(members));
+		treeEntries = treeSearch(ldap, PUBLIC_BASE_DN, mainFilter, 'sub');
 	} else {
-		treeEntries = ldap
-			.search(base, {
-				scope: 'one',
-				attributes: TREE_ENTRY_ATTRIBUTES,
-				filter: new OrFilter({
-					filters: [
-						new EqualityFilter({ attribute: 'objectClass', value: 'organizationalUnit' }),
-						new EqualityFilter({ attribute: 'objectClass', value: 'organizationalPerson' }),
-						new EqualityFilter({ attribute: 'objectClass', value: 'container' }),
-						new EqualityFilter({ attribute: 'objectClass', value: 'computer' }),
-						new EqualityFilter({ attribute: 'objectClass', value: 'group' })
-					]
-				})
-			})
-			.then(({ searchEntries }) => searchEntries as TreeEntry[]);
+		mainFilter.filters.push(getObjectClassFilter());
+		treeEntries = treeSearch(ldap, base, mainFilter, 'one');
 	}
 	return treeEntries;
 };

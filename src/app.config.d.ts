@@ -763,7 +763,7 @@ export interface DirectoryConfig {
 	 */
 	groups?: {
 		/**
-		 * The list of group distinguishedNames or sAMAccountNames that should not be shown in the /groups view dropdowns and search. Accessing directly to /groups/[dn] of a group that is listed here will result on a '403 This group is hidden by configuration' error. @default []
+		 * The list of group distinguishedNames, sAMAccountNames, or cn that should not be shown in the /groups view dropdowns and search. Accessing directly to /groups/[dn] of a group that is listed here will result on a '403 This group is hidden by configuration' error. @default []
 		 */
 		hide?: string[];
 		/**
@@ -776,7 +776,7 @@ export interface DirectoryConfig {
 	 */
 	ous?: {
 		/**
-		 * The list of ou distinguishedNames or sAMAccountNames that should not be shown in the /ous view dropdowns and search. Accessing directly to /ous/[dn] of a ou that is listed here will result on a '403 This ou is hidden by configuration' error. @default []
+		 * The list of ou distinguishedNames, sAMAccountNames, or cn that should not be shown in the /ous view dropdowns and search. Accessing directly to /ous/[dn] of a ou that is listed here will result on a '403 This ou is hidden by configuration' error. @default []
 		 */
 		hide?: string[];
 		/**
@@ -785,11 +785,20 @@ export interface DirectoryConfig {
 		limit?: number | null;
 	};
 	/**
+	 * Directory settings regarding tree view
+	 */
+	tree?: {
+		/**
+		 * The list of entry distinguishedNames, sAMAccountNames, or cn that should not be shown in the /tree view panels and search. Accessing directly to /tree/[dn] of an entry that is listed here will result on a '403 This resource is hidden by configuration' error. Hiding containers or ous will also throw the error if trying to access any of the children directly. All hidden entries from users, groups, and ous will also be hidden in the tree view. Hiding the root entry will hide the whole tree, throwing the error always. @default []
+		 */
+		hide?: string[];
+	};
+	/**
 	 * Directory settings regarding user management
 	 */
 	users?: {
 		/**
-		 * The list of user distinguishedNames or sAMAccountNames that should not be shown in the /users view dropdowns and search. Accessing directly to /users/[dn] of a user that is listed here will result on a '403 This user is hidden by configuration' error, however, signing in as a listed user will not result in error. @default []
+		 * The list of user distinguishedNames, sAMAccountNames, or cn that should not be shown in the /users view dropdowns and search. Accessing directly to /users/[dn] of a user that is listed here will result on a '403 This user is hidden by configuration' error, however, signing in as a listed user will not result in error. @default []
 		 */
 		hide?: string[];
 		/**

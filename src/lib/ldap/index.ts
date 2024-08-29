@@ -177,7 +177,8 @@ export const getHideFilters = (hide: string[] = []) =>
 				filter: new OrFilter({
 					filters: [
 						new EqualityFilter({ attribute: 'distinguishedName', value: q }),
-						new EqualityFilter({ attribute: 'sAMAccountName', value: q })
+						new EqualityFilter({ attribute: 'sAMAccountName', value: q }),
+						new EqualityFilter({ attribute: 'cn', value: q })
 					]
 				})
 			})

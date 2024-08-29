@@ -228,6 +228,9 @@ const defaults: RecursiveRequired<App.Config> = {
 			hide: [],
 			limit: null
 		},
+		tree: {
+			hide: []
+		},
 		ldap: {
 			ldapURL: 'ldaps://localhost:636',
 			strictDN: true,

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import type { TreeEntry } from '$lib/types/tree';
 	import { cn } from '$lib/utils';
 	import PanelItem from './panel-item.svelte';
@@ -19,7 +20,13 @@
 			<PanelItem {entry} />
 		{:else}
 			<div class="flex h-full items-center">
-				<p class="text-center text-xl font-light">Empty</p>
+				<p class="text-center text-xl font-light">
+					{#if $page.url.searchParams.get('q')}
+						No entries match your search query: "{$page.url.searchParams.get('q')}"
+					{:else}
+						Empty
+					{/if}
+				</p>
 			</div>
 		{/each}
 	</slot>
