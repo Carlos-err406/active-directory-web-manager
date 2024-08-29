@@ -26,9 +26,6 @@
 					duration: undefined
 				});
 				break;
-			case 'error':
-				toastError(result.error, toastId);
-				break;
 			case 'redirect':
 				toast.success('User deleted successfully!', {
 					id: toastId,
@@ -38,6 +35,10 @@
 		}
 		open = false;
 		invalidate('protected:users');
+	};
+
+	const onError: FormOptions<DeleteManySchema>['onError'] = ({ result }) => {
+		toastError(result.error, toastId);
 	};
 </script>
 
@@ -63,6 +64,7 @@
 			formOptions={{
 				resetForm: false,
 				onSubmit,
+				onError,
 				onResult
 			}}
 		>

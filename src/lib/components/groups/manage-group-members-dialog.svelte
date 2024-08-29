@@ -57,6 +57,9 @@
 				applyAction(result);
 		}
 	};
+	const onError: FormOptions<SetMembersSchema>['onError'] = ({ result }) => {
+		toastError(result.error, toastId);
+	};
 </script>
 
 <Dialog.Root bind:open>
@@ -88,6 +91,7 @@
 			formOptions={{
 				resetForm: true,
 				onResult,
+				onError,
 				onSubmit
 			}}
 		>

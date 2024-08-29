@@ -68,7 +68,8 @@ const ldapUnbindHandler: Handle = async ({ event, resolve }) => {
 	return response;
 };
 
-const { decodeSearchParams, logDateTemplate, logTemplate, useLogging } = config.system.logging;
+const { decodeSearchParams, logDateTemplate, logTemplate, useLogging, decodePathname } =
+	config.system.logging;
 /** handler hook for logging all requests
  *
  * if LOGGER environment variable is 1 the `logHandler` hook is included on the sequence
@@ -78,7 +79,8 @@ const logHandler = getLoggerHook({
 	template: logTemplate,
 	dateTemplate: logDateTemplate,
 	fileOptions: { basePath: LOGGING_SYSTEM_BASE },
-	decodeSearchParams: decodeSearchParams,
+	decodeSearchParams,
+	decodePathname,
 	colorOptions: {
 		date: ({ status }) => (status >= 400 ? 'redBold' : 'yellow'),
 		method: ({ status }) => (status >= 400 ? 'redBold' : 'green'),

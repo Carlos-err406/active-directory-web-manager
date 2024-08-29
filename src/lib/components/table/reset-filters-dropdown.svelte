@@ -72,28 +72,28 @@
 	{#if open}
 		<DropdownMenu.Content>
 			{#if $page.url.searchParams.has('q')}
-				<DropdownMenu.LinkItem href={$noQ} class="flex gap-2 hover:no-underline">
+				<DropdownMenu.Item href={$noQ} class="flex gap-2 hover:no-underline">
 					<Search class="size-4 flex-none" />
 					<span>Clear Search</span>
-				</DropdownMenu.LinkItem>
+				</DropdownMenu.Item>
 			{/if}
 			{#if $page.url.searchParams.has('sort') || $page.url.searchParams.has('order')}
-				<DropdownMenu.LinkItem href={$noSortAndOrder} class="flex gap-2 hover:no-underline">
+				<DropdownMenu.Item href={$noSortAndOrder} class="flex gap-2 hover:no-underline">
 					<ArrowUpDown class="size-4 flex-none" />
 					<span>Clear Sort</span>
-				</DropdownMenu.LinkItem>
+				</DropdownMenu.Item>
 			{/if}
 			{#if $page.url.searchParams.has('pageSize') || $page.url.searchParams.has('page')}
-				<DropdownMenu.LinkItem href={$noPagePageSize} class="flex gap-2 hover:no-underline">
+				<DropdownMenu.Item href={$noPagePageSize} class="flex gap-2 hover:no-underline">
 					<BookOpenText class="size-4 flex-none" />
 					<span>Clear Page and Page size</span>
-				</DropdownMenu.LinkItem>
+				</DropdownMenu.Item>
 			{/if}
 			{#if $page.url.searchParams.has('hide')}
-				<DropdownMenu.LinkItem href={$noHide} class="flex gap-2 hover:no-underline">
+				<DropdownMenu.Item href={$noHide} class="flex gap-2 hover:no-underline">
 					<EyeOff class="size-4 flex-none" />
 					<span>Clear Hidden columns</span>
-				</DropdownMenu.LinkItem>
+				</DropdownMenu.Item>
 			{/if}
 		</DropdownMenu.Content>
 	{/if}

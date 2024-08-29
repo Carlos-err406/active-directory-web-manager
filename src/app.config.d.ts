@@ -193,6 +193,10 @@ export interface GroupDetailsConfig {
 		 */
 		label?: string;
 		/**
+		 * Show group members as links to each member description
+		 */
+		asLinks?: boolean;
+		/**
 		 * If false the attribute "member" of the group will be shown as the full distinguishedName, else only the CN is shown. @default false
 		 */
 		shortMember?: boolean;
@@ -491,6 +495,10 @@ export interface UserDetailsConfig {
 		 */
 		shortMemberOf?: boolean;
 		/**
+		 * Show groups as links to each group description
+		 */
+		asLinks?: boolean;
+		/**
 		 * Wether or not to show the "memberOf" attribute in the detail pages ("/users/[dn]" or "/users/me"). If false "shortMemberOf" will be ignored @default true
 		 */
 		show?: boolean;
@@ -785,6 +793,10 @@ export interface DirectoryConfig {
 		 */
 		hide?: string[];
 		/**
+		 * Wether or not to automatically create new users under the CN=Users container. If false new users will be created un the root. @default true
+		 */
+		createUsersInUsersContainer?: boolean;
+		/**
 		 * The maximum amount of users allowed in the directory. If set to null the limit will be ignored. Default users are included in the count. @default null
 		 */
 		limit?: number | null;
@@ -843,6 +855,10 @@ export interface LoggingConfig {
 	 * Enable or disable url search params decoding. @default false
 	 */
 	decodeSearchParams?: boolean;
+	/**
+	 * Enable or disable pathname decoding. @default false
+	 */
+	decodePathname?: boolean;
 	/**
 	 * Log date template as indicated by @link https://day.js.org/docs/en/display/format @default "YYYY-MM-DD HH:mm:ss A"
 	 */

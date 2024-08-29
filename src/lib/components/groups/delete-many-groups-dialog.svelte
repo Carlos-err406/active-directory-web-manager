@@ -26,9 +26,6 @@
 					duration: undefined
 				});
 				break;
-			case 'error':
-				toastError(result.error, toastId);
-				break;
 			case 'redirect':
 				toast.success('Group deleted successfully!', {
 					id: toastId,
@@ -38,6 +35,10 @@
 		}
 		open = false;
 		invalidate('protected:groups');
+	};
+	const onError: FormOptions<DeleteManySchema>['onError'] = ({ result }) => {
+		toastError(result.error, toastId);
+		open = false;
 	};
 </script>
 
@@ -64,6 +65,7 @@
 			formOptions={{
 				resetForm: false,
 				onSubmit,
+				onError,
 				onResult
 			}}
 		>

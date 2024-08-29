@@ -12,7 +12,6 @@
 	import dayjs from 'dayjs';
 	import type { PageData } from './$types';
 	export let data: PageData;
-	$: session = data.session;
 
 	let isChangePasswordDialogOpen = false;
 	let isUpdateUserDialogOpen = false;
@@ -31,10 +30,8 @@
 		};
 		isUpdateUserDialogOpen = true;
 	};
-
 	const canSelfEdit = $page.data.config.app.nonAdmin.allowSelfEdit || data.session.isAdmin;
-	const showGroupsAsLinks =
-		session?.isAdmin || $page.data.config.app.nonAdmin.allowAccessToGroupsPage;
+	const showGroupsAsLinks = config.memberOf.asLinks;
 </script>
 
 <div class="flex h-full w-full flex-col py-12 md:py-16" data-test="usersMePage">
@@ -109,16 +106,17 @@
 					<div class="info-value flex flex-wrap space-y-2" data-test="memberOf">
 						{#each (user.memberOf || []).sort( (a, b) => (a < b ? -1 : a > b ? 1 : 0) ) as groupDn, index}
 							<svelte:element
-								this={showGroupsAsLinks ? 'a' : 'span'}
+								this={showGroupsAsLinks ? 'a' : 'p'}
 								data-sveltekit-preload-data="hover"
 								data-isLink={showGroupsAsLinks}
-								class="data-[isLink=true]:text-primary data-[isLink=true]:hover:underline"
+								data-isShort={config.memberOf.shortMemberOf}
+								class="data-[isShort=true]:!mt-0 data-[isLink=true]:text-primary data-[isLink=true]:hover:underline"
 								href={showGroupsAsLinks ? `/groups/${groupDn}` : '#'}
 							>
 								{config.memberOf.shortMemberOf ? getCNFromDN(groupDn) : groupDn}
 							</svelte:element>
 							{#if config.memberOf.shortMemberOf && index < user.memberOf.length - 1}
-								<pre class="!mx-0 font-sans">, </pre>
+								<pre class="!m-0 font-sans">, </pre>
 							{/if}
 						{:else}
 							<span> - </span>

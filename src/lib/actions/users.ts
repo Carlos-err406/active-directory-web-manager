@@ -80,7 +80,10 @@ export const createUser: Action = async (event) => {
 		const [, content] = jpegPhotoBase64.split('base64,');
 		attributes['jpegPhoto'] = Buffer.from(content, 'base64').toString('base64');
 	}
-	const dn = `CN=${sAMAccountName},${base}`;
+	const dn = config.directory.users.createUsersInUsersContainer
+		? `CN=${sAMAccountName},CN=Users,${base}`
+		: `CN=${sAMAccountName},${base}`;
+
 	try {
 		await ldap.add(dn, attributes);
 	} catch (e) {

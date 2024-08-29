@@ -77,7 +77,7 @@ export const getUserGroups = async (ldap: Client, dn: string) => {
 	const entry = await getEntryByDn(ldap, dn);
 	if (!entry) return [] as string[];
 	const { memberOf } = entry;
-	return memberOf as string[];
+	return (memberOf || []) as string[];
 };
 
 export const getGroupMembers = async (ldap: Client, groupDn: string, opts?: GetEntryOpts) => {

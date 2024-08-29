@@ -48,7 +48,8 @@ const defaults: RecursiveRequired<App.Config> = {
 					member: {
 						label: 'member',
 						shortMember: false,
-						show: true
+						show: true,
+						asLinks: false
 					},
 					sAMAccountName: {
 						label: 'sAMAccountName',
@@ -140,7 +141,8 @@ const defaults: RecursiveRequired<App.Config> = {
 					memberOf: {
 						label: 'memberOf',
 						shortMemberOf: false,
-						show: true
+						show: true,
+						asLinks: false
 					},
 					sAMAccountName: {
 						label: 'sAMAccountName',
@@ -242,6 +244,7 @@ const defaults: RecursiveRequired<App.Config> = {
 		},
 		users: {
 			hide: [],
+			createUsersInUsersContainer: false,
 			limit: null
 		}
 	},
@@ -249,6 +252,7 @@ const defaults: RecursiveRequired<App.Config> = {
 	system: {
 		logging: {
 			basePath: './logs',
+			decodePathname: false,
 			decodeSearchParams: false,
 			logDateTemplate: 'YYYY-MM-DD HH:mm:ss A',
 			logTemplate: '[{date}] {url}{urlSearchParams} {method} {status}',

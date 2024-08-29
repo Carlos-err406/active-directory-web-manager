@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto, invalidate } from '$app/navigation';
+	import { goto, invalidate, invalidateAll } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { toastError } from '$lib';
 	import Form, { type FormOptions } from '$lib/components/form/form.svelte';
@@ -28,21 +28,27 @@
 				});
 				open = false;
 				break;
-			case 'error':
-				toastError(result.error, toastId);
-				open = false;
-				break;
 			case 'redirect':
-				await goto(result.location, {
-					state: {
-						toast: {
-							type: 'success',
-							message: 'User deleted successfully!'
+				if ($page.url.pathname.startsWith('/tree')) {
+					toast.success('User deleted successfully!', { id: toastId });
+					await invalidateAll();
+				} else {
+					await goto(result.location, {
+						state: {
+							toast: {
+								data: { id: toastId },
+								type: 'success',
+								message: 'User deleted successfully!'
+							}
 						}
-					}
-				});
+					});
+				}
 				break;
 		}
+	};
+	const onError: FormOptions<DeleteUserSchema>['onError'] = ({ result }) => {
+		toastError(result.error, toastId);
+		open = false;
 	};
 </script>
 
@@ -61,6 +67,7 @@
 				resetForm: false,
 				applyAction: false,
 				onResult,
+				onError,
 				onSubmit
 			}}
 		>

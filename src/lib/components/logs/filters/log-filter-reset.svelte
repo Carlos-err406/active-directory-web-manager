@@ -72,28 +72,28 @@
 	{#if open}
 		<DropdownMenu.Content>
 			{#if $page.url.searchParams.has('q')}
-				<DropdownMenu.LinkItem href={$noQ} class="flex gap-2 hover:no-underline">
+				<DropdownMenu.Item href={$noQ} class="flex gap-2 hover:no-underline">
 					<Search class="size-4 flex-none" />
 					<span>Clear Search</span>
-				</DropdownMenu.LinkItem>
+				</DropdownMenu.Item>
 			{/if}
 			{#if $page.url.searchParams.has('pageSize') || $page.url.searchParams.has('page')}
-				<DropdownMenu.LinkItem href={$noPagePageSize} class="flex gap-2 hover:no-underline">
+				<DropdownMenu.Item href={$noPagePageSize} class="flex gap-2 hover:no-underline">
 					<BookOpenText class="size-4 flex-none" />
 					<span>Clear Page and Page size</span>
-				</DropdownMenu.LinkItem>
+				</DropdownMenu.Item>
 			{/if}
 			{#if $page.url.searchParams.has('type')}
-				<DropdownMenu.LinkItem href={$noType} class="flex gap-2 hover:no-underline">
+				<DropdownMenu.Item href={$noType} class="flex gap-2 hover:no-underline">
 					<Captions class="size-4 flex-none" />
 					<span>Clear type filter</span>
-				</DropdownMenu.LinkItem>
+				</DropdownMenu.Item>
 			{/if}
 			{#if $page.url.searchParams.has('toDate') || $page.url.searchParams.has('fromDate')}
-				<DropdownMenu.LinkItem href={$noDate} class="flex gap-2 hover:no-underline">
+				<DropdownMenu.Item href={$noDate} class="flex gap-2 hover:no-underline">
 					<Calendar class="size-4 flex-none" />
 					<span>Clear date filter</span>
-				</DropdownMenu.LinkItem>
+				</DropdownMenu.Item>
 			{/if}
 		</DropdownMenu.Content>
 	{/if}

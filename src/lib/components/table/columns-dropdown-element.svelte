@@ -3,7 +3,7 @@
 	import Check from '$lucide/check.svelte';
 	import type { FlatColumn } from 'svelte-headless-table';
 	import { derived } from 'svelte/store';
-	import { LinkItem } from '../ui/dropdown-menu';
+	import { DropdownMenuItem } from '$lib/components/ui/dropdown-menu';
 	//eslint-disable-next-line @typescript-eslint/no-explicit-any
 	export let col: FlatColumn<any>;
 
@@ -32,7 +32,7 @@
 	});
 </script>
 
-<LinkItem class="flex gap-3" href={$element.href}>
+<DropdownMenuItem class="flex gap-3" href={$element.href}>
 	<span class="size-3.5">
 		{#if !$element.isHidden}
 			<Check class="size-full" />
@@ -41,4 +41,4 @@
 	<span>
 		{$element.header}
 	</span>
-</LinkItem>
+</DropdownMenuItem>

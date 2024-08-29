@@ -17,6 +17,7 @@ function hotReloadOnConfigFileChange(): PluginOption {
 	return {
 		name: 'custom-hmr',
 		enforce: 'post',
+
 		handleHotUpdate: async ({ file, server }) => {
 			if (configFileRegex.test(file)) {
 				console.log('reloading because config file changed...');

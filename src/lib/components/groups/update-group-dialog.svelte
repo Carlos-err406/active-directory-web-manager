@@ -41,20 +41,20 @@
 		invalidate('protected:groups');
 		switch (result.type) {
 			case 'success':
+				open = false;
 				toastId = toast.success('Group updated successfully!', {
 					id: toastId,
 					duration: undefined
 				});
-				open = false;
-				break;
-			case 'error':
-				toastError(result.error, toastId);
 				break;
 			case 'redirect':
-				toast.dismiss(toastId);
 				open = false;
+				toast.dismiss(toastId);
 				applyAction(result);
 		}
+	};
+	const onError: FormOptions<UpdateGroupSchema>['onError'] = ({ result }) => {
+		toastError(result.error, toastId);
 	};
 </script>
 
@@ -75,6 +75,7 @@
 				resetForm: true,
 				onChange,
 				onSubmit,
+				onError,
 				onResult
 			}}
 		>

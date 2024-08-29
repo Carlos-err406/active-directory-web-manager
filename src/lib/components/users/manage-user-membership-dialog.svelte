@@ -50,11 +50,6 @@
 					id: toastId,
 					duration: undefined
 				});
-				open = false;
-				break;
-			case 'error':
-				toastError(result.error, toastId);
-				open = false;
 				break;
 			case 'redirect':
 				await goto(result.location, {
@@ -67,6 +62,11 @@
 				});
 				break;
 		}
+		open = false;
+	};
+
+	const onError: FormOptions<UpdateMembershipSchema>['onError'] = ({ result }) => {
+		toastError(result.error, toastId);
 	};
 </script>
 
@@ -100,6 +100,7 @@
 			formOptions={{
 				resetForm: true,
 				onSubmit,
+				onError,
 				onResult
 			}}
 		>

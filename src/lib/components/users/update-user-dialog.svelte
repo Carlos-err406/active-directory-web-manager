@@ -45,15 +45,18 @@
 				break;
 			case 'error':
 				toastError(result.error, toastId);
-				open = false;
 				break;
 			case 'redirect':
 				toast.dismiss(toastId);
-				applyAction(result);
+				open = false;
+				await applyAction(result);
 				break;
 		}
 	};
 
+	const onError: FormOptions<UpdateUserSchema>['onError'] = ({ result }) => {
+		toastError(result.error, toastId);
+	};
 	// TODO: UAC flags!
 </script>
 
@@ -73,6 +76,7 @@
 				resetForm: false,
 				onChange,
 				onResult,
+				onError,
 				onSubmit
 			}}
 		>

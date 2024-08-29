@@ -33,9 +33,9 @@
 	<DropdownMenu.Content align="end">
 		<DropdownMenu.Label>My Account</DropdownMenu.Label>
 		<DropdownMenu.Separator />
-		<DropdownMenu.LinkItem href={'/users/me'} disabled={$page.url.pathname === '/users/me'}>
+		<DropdownMenu.Item href="/users/me" disabled={$page.url.pathname === '/users/me'}>
 			See profile
-		</DropdownMenu.LinkItem>
+		</DropdownMenu.Item>
 		<DropdownMenu.Separator class="my-2" />
 		<DropdownMenu.Item class="justify-center p-0">
 			<form method="post" action={'/auth?/signOut'} class="w-full" use:enhance>

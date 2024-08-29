@@ -11,8 +11,14 @@
 			"type": "string"
 		},
 		"decodeSearchParams": {
-			"$comment": "Converts %20 to whitespace, and so on using decodeUriComponent",
+			"$comment": "Converts %20 to whitespace, and so on using decodeUriComponent in the search parameters",
 			"description": "Enable or disable url search params decoding. @default false",
+			"type": "boolean",
+			"default": false
+		},
+		"decodePathname": {
+			"$comment": "Converts %20 to whitespace, and so on using decodeUriComponent in the pathname",
+			"description": "Enable or disable pathname decoding. @default false",
 			"type": "boolean",
 			"default": false
 		},

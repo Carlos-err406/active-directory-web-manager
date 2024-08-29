@@ -12,7 +12,6 @@
 	import dayjs from 'dayjs';
 	import type { PageData } from './$types';
 	export let data: PageData;
-	$: session = data.session;
 
 	let isChangePasswordDialogOpen = false;
 	let isUpdateUserDialogOpen = false;
@@ -32,7 +31,7 @@
 		isUpdateUserDialogOpen = true;
 	};
 	const showGroupsAsLinks =
-		session.isAdmin || $page.data.config.app.nonAdmin.allowAccessToGroupsPage;
+		data.session.isAdmin || $page.data.config.app.nonAdmin.allowAccessToGroupsPage;
 </script>
 
 <div class="flex h-full w-full flex-col py-12 md:py-16" data-test="usersDnPage">
@@ -126,7 +125,7 @@
 			</div>
 		</div>
 	</div>
-	{#if session.isAdmin}
+	{#if data.session.isAdmin}
 		<div class="flex h-full w-full items-center justify-center gap-3 py-3">
 			<Button class="flex items-center gap-2" on:click={onOpenEditClick}>
 				<PencilLine class="size-4 flex-none" />

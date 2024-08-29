@@ -23,7 +23,7 @@ export const load: PageServerLoad = async ({ locals, url, params }) => {
 		if (!group) {
 			throw error(404, { message: 'Group not found' });
 		}
-		return { group, setMembersForm, updateGroupForm, deleteGroupForm };
+		return { group, setMembersForm, updateGroupForm, deleteGroupForm, searchForm: false };
 	} catch (e) {
 		const errorId = errorLog(e, { message: `Error loading group ${dn} page` });
 		throw error(500, { message: 'Something went wrong while loading the page', errorId });

@@ -18,7 +18,7 @@
 		const { searchParams: search } = $page.url;
 		if (q) {
 			search.set('q', q);
-			search.set('page', '1');
+			if (!$page.data.withoutPages) search.set('page', '1');
 		} else search.delete('q');
 		await goto(`${$page.url.pathname}?${search}`, { invalidateAll: true });
 	};
@@ -49,7 +49,7 @@
 		<Search />
 	</div>
 	<Input
-		class={cn('pl-10', 'pr-10', 'w-full')}
+		class={cn('px-10', 'w-full')}
 		data-test="searchInput"
 		name="q"
 		bind:value={q}

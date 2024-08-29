@@ -29,9 +29,10 @@
 		};
 		isUpdateGroupDialogOpen = true;
 	};
+	const showMembersAsLinks = config.member.asLinks;
 </script>
 
-<div class="flex h-full w-full flex-col py-12 md:py-16" data-test="groupsDnPage">
+<div class="flex h-full w-full flex-col gap-4 py-12 md:p-16" data-test="groupsDnPage">
 	<div class="container px-4 md:px-6">
 		<div class="mx-auto max-w-3xl space-y-6">
 			<div class="flex w-full items-center justify-center gap-10">
@@ -84,18 +85,19 @@
 				{/if}
 				{#if config.member.show}
 					<span>{config.member.label}:</span>
-					<div
-						data-isShort={config.member.shortMember}
-						class="info-value flex flex-wrap data-[isShort=false]:gap-2"
-					>
+
+					<div class="info-value flex flex-wrap space-y-2" data-test="member">
 						{#each (group.member || []).sort( (a, b) => (a < b ? -1 : a > b ? 1 : 0) ) as userDn, index}
-							<a
-								href="/users/{userDn}"
+							<svelte:element
+								this={showMembersAsLinks ? 'a' : 'p'}
 								data-sveltekit-preload-data="hover"
-								class="text-primary hover:underline"
+								data-isLink={showMembersAsLinks}
+								data-isShort={config.member.shortMember}
+								class="data-[isShort=true]:!mt-0 data-[isLink=true]:text-primary data-[isLink=true]:hover:underline"
+								href="/users/{userDn}"
 							>
 								{config.member.shortMember ? getCNFromDN(userDn) : userDn}
-							</a>
+							</svelte:element>
 							{#if config.member.shortMember && index < group.member.length - 1}
 								<pre class="!mx-0 font-sans">, </pre>
 							{/if}
@@ -107,7 +109,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="flex h-full w-full items-center justify-center gap-3">
+	<div class="flex h-full w-full items-center justify-center gap-3 py-5">
 		<Button class="flex items-center gap-2" on:click={onOpenEditClick}>
 			<PencilLine class="size-4 flex-none" />
 			Edit

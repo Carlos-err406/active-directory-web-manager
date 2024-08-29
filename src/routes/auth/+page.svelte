@@ -43,14 +43,15 @@
 		switch (result.type) {
 			case 'success':
 				break;
-			case 'error':
-				toastError(result.error, toastId);
-				break;
 			case 'redirect':
 				toastId = toast.success('Signed in successfully!', { id: toastId, duration: undefined });
 				await applyAction(result);
 				break;
 		}
+	};
+
+	const onError: FormOptions<SignInSchema>['onError'] = ({ result }) => {
+		toastError(result.error, toastId);
 	};
 </script>
 
@@ -64,7 +65,8 @@
 		formOptions={{
 			resetForm: false,
 			onSubmit,
-			onResult
+			onResult,
+			onError
 		}}
 	>
 		<Card.Root class="w-full min-w-96 max-w-sm">

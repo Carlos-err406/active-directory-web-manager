@@ -34,14 +34,14 @@
 				});
 				open = false;
 				break;
-			case 'error':
-				toastError(result.error, toastId);
-				break;
 			case 'redirect':
 				toast.dismiss(toastId);
 				open = false;
 				applyAction(result);
 		}
+	};
+	const onError: FormOptions<ChangePasswordSchema>['onError'] = ({ result }) => {
+		toastError(result.error, toastId);
 	};
 </script>
 
@@ -61,6 +61,7 @@
 			formProps={{ action }}
 			formOptions={{
 				resetForm: false,
+				onError,
 				onSubmit,
 				onResult
 			}}

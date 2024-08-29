@@ -5,6 +5,7 @@
 	import { getGroupTypes } from '$lib/ldap/utils';
 	import { GroupFlags, type Group } from '$lib/types/group';
 	import Ellipsis from '$lucide/ellipsis.svelte';
+	import EllipsisVertical from '$lucide/ellipsis-vertical.svelte';
 	import Eye from '$lucide/eye.svelte';
 	import PencilLine from '$lucide/pencil-line.svelte';
 	import Trash from '$lucide/trash-2.svelte';
@@ -41,17 +42,20 @@
 	<DropdownMenu.Trigger asChild let:builder>
 		<Button variant="ghost" builders={[builder]} size="icon" class="relative size-8 p-0">
 			<span class="sr-only">Open menu</span>
-			<Ellipsis class="size-4" />
+			<svelte:component
+				this={$page.url.pathname.startsWith('/tree') ? EllipsisVertical : Ellipsis}
+				class="size-4"
+			/>
 		</Button>
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content>
 		<DropdownMenu.Group>
 			<DropdownMenu.Label>Actions</DropdownMenu.Label>
 			<DropdownMenu.Separator />
-			<DropdownMenu.LinkItem href={`/groups/${id}`} class="flex flex-nowrap gap-2">
+			<DropdownMenu.Item href="/groups/{id}" class="flex flex-nowrap gap-2">
 				<Eye class="size-5" />
 				View group details
-			</DropdownMenu.LinkItem>
+			</DropdownMenu.Item>
 			<DropdownMenu.Item class="flex flex-nowrap gap-2" on:click={onOpenEditClick}>
 				<PencilLine class="size-5" />
 				Edit

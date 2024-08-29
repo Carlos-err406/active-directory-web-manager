@@ -12,17 +12,16 @@ import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params, url, locals }) => {
 	const { dn } = params;
+	const paramDN = decodeURIComponent(dn);
 	const auth = await specificResourceAccessControl({
 		locals,
 		url,
-		dn,
-		beforeLog: (session) => {
-			if (session.dn === params.dn) throw redirect(302, '/users/me');
-		}
+		dn: paramDN
 	});
-	const { ldap } = auth;
+	const { ldap, session } = auth;
+	if (session.dn === paramDN) throw redirect(303, '/users/me');
 	const [user, changePasswordForm, updateUserForm, deleteUserForm] = await Promise.all([
-		getEntryByDn<User>(ldap, dn).then(jpegPhotoToB64),
+		getEntryByDn<User>(ldap, paramDN).then(jpegPhotoToB64),
 		superValidate(zod(changePasswordSchema)),
 		superValidate(zod(updateUserSchema)),
 		superValidate(zod(deleteUserSchema))

@@ -15,14 +15,11 @@
 	});
 </script>
 
-<DropdownMenu.LinkItem
-	href={$filter.href}
-	class="flex gap-2 capitalize transition-all duration-200"
->
+<DropdownMenu.Item href={$filter.href} class="flex gap-2 capitalize transition-all duration-200">
 	{#if $filter.activeFilter === filterType || (!$filter.activeFilter && filterType === 'all')}
 		<Check class="size-5 flex-none" />
 	{:else}
 		<span class="size-5"></span>
 	{/if}
 	<span>{filterType}</span>
-</DropdownMenu.LinkItem>
+</DropdownMenu.Item>

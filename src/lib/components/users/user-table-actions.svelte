@@ -3,6 +3,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import type { User } from '$lib/types/user';
+	import EllipsisVertical from '$lucide/ellipsis-vertical.svelte';
 	import Ellipsis from '$lucide/ellipsis.svelte';
 	import Eye from '$lucide/eye.svelte';
 	import LockKeyholeOpen from '$lucide/lock-keyhole-open.svelte';
@@ -37,17 +38,20 @@
 	<DropdownMenu.Trigger asChild let:builder>
 		<Button variant="ghost" builders={[builder]} size="icon" class="relative size-8 p-0">
 			<span class="sr-only">Open menu</span>
-			<Ellipsis class="size-4" />
+			<svelte:component
+				this={$page.url.pathname.startsWith('/tree') ? EllipsisVertical : Ellipsis}
+				class="size-4"
+			/>
 		</Button>
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content>
 		<DropdownMenu.Group>
 			<DropdownMenu.Label>Actions</DropdownMenu.Label>
 			<DropdownMenu.Separator />
-			<DropdownMenu.LinkItem href="/users/{id}" class="flex flex-nowrap gap-2">
+			<DropdownMenu.Item href="/users/{id}" class="flex flex-nowrap gap-2">
 				<Eye class="size-5" />
 				View user details
-			</DropdownMenu.LinkItem>
+			</DropdownMenu.Item>
 			<DropdownMenu.Item
 				class="flex flex-nowrap gap-2"
 				on:click={() => (isManageMembershipDialogOpen = true)}

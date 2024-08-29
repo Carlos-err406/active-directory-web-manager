@@ -98,6 +98,11 @@
 					"description": "@default \"member\"",
 					"type": "string"
 				},
+				"asLinks": {
+					"description": "Show group members as links to each member description",
+					"type": "boolean",
+					"default": false
+				},
 				"shortMember": {
 					"description": "If false the attribute \"member\" of the group will be shown as the full distinguishedName, else only the CN is shown. @default false",
 					"type": "boolean",

@@ -49,19 +49,19 @@
 		switch (result.type) {
 			case 'success':
 				createdGroup = result.data!.group;
-				open = false;
 				isManageMembersSurveyDialogOpen = true;
-				toast.success('Group created successfully');
+				toast.success('Group created successfully', { id: toastId });
 				invalidate('protected:groups');
-				break;
-			case 'error':
-				toastError(result.error, toastId);
 				break;
 			case 'redirect':
 				toast.dismiss(toastId);
 				await applyAction(result);
 				break;
 		}
+		open = false;
+	};
+	const onError: FormOptions<CreateGroupSchema>['onError'] = ({ result }) => {
+		toastError(result.error, toastId);
 	};
 </script>
 
@@ -84,6 +84,7 @@
 			formOptions={{
 				resetForm: true,
 				onChange,
+				onError,
 				onSubmit,
 				onResult
 			}}

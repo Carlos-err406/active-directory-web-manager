@@ -49,14 +49,15 @@
 				invalidate('protected:users');
 				open = false;
 				break;
-			case 'error':
-				toastError(result.error, toastId);
-				break;
 			case 'redirect':
 				toast.dismiss(toastId);
 				open = false;
 				applyAction(result);
 		}
+	};
+
+	const onError: FormOptions<CreateUserSchema>['onError'] = ({ result }) => {
+		toastError(result.error, toastId);
 	};
 </script>
 
@@ -79,6 +80,7 @@
 				resetForm: true,
 				onSubmit,
 				onResult,
+				onError,
 				onChange
 			}}
 		>

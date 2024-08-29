@@ -30,10 +30,7 @@
 				});
 				open = false;
 				break;
-			case 'error':
-				toastError(result.error, toastId);
-				open = false;
-				break;
+
 			case 'redirect':
 				await goto(result.location, {
 					state: {
@@ -45,6 +42,10 @@
 				});
 				break;
 		}
+	};
+	const onError: FormOptions<DeleteGroupSchema>['onError'] = ({ result }) => {
+		toastError(result.error, toastId);
+		open = false;
 	};
 </script>
 
@@ -62,6 +63,7 @@
 			formOptions={{
 				resetForm: false,
 				applyAction: false,
+				onError,
 				onSubmit,
 				onResult
 			}}
