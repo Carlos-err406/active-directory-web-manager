@@ -30,7 +30,7 @@
 				break;
 			case 'redirect':
 				if ($page.url.pathname.startsWith('/tree')) {
-					toast.success('User deleted successfully!', { id: toastId });
+					toast.success('User deleted successfully!', { id: toastId, duration: undefined });
 					await invalidateAll();
 				} else {
 					await goto(result.location, {

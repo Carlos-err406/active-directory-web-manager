@@ -7,11 +7,8 @@
 	import _lodash from 'lodash';
 	import { tick } from 'svelte';
 	import type { PageData } from './$types';
-	import { writable } from 'svelte/store';
-	import { setContext } from 'svelte';
 	export let data: PageData;
-	const toastId = writable<string | number>(NaN);
-	setContext('inspection-toast', toastId);
+
 	$: breadcrumbs.set([
 		{ name: 'Root', link: '/tree' },
 		...data.activeDns.map((dn) => ({ name: getCNFromDN(dn), link: buildTreeUrl(dn) }))

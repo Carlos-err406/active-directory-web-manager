@@ -19,12 +19,7 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ url, locals, params }) => {
 	const auth = await protectedAccessControl({ locals, url });
 	const { ldap } = auth;
-	const splittedDn = params.rest
-		// CN=System / CN=Policies / CN={31B2F340-016D-11D2-945F-00C04FB984F9}
-		.split('/')
-		.filter(Boolean)
-		//CN={31B2F340-016D-11D2-945F-00C04FB984F9} /  CN=Policies / CN=System /
-		.reverse();
+	const splittedDn = params.rest.split('/').filter(Boolean).reverse();
 	const activeDns = splittedDn
 		.map((_, index) => splittedDn.slice(index).join(',') + `,${PUBLIC_BASE_DN}`)
 		.reverse();

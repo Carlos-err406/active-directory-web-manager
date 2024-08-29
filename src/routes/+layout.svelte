@@ -1,12 +1,21 @@
 <script>
 	import { afterNavigate } from '$app/navigation';
-	import { page } from '$app/stores';
+	import { navigating, page } from '$app/stores';
 	import Loader from '$lib/components/ui/loader.svelte';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { globalLoader } from '$lib/stores';
 	import { ModeWatcher, setMode } from 'mode-watcher';
 	import { toast } from 'svelte-sonner';
+	import NProgress from 'nprogress';
 	import '../app.pcss';
+	import '../nprogress.pcss';
+
+	NProgress.configure({
+		// Full list: https://github.com/rstacruz/nprogress#configuration
+		minimum: 0.16,
+		showSpinner: false,
+		trickleSpeed: 100
+	});
 
 	afterNavigate(() => {
 		const toastState = $page.state.toast;
@@ -14,6 +23,15 @@
 			toast[toastState.type](toastState.message, toastState.data);
 		}
 	});
+
+	$: {
+		if ($navigating) {
+			NProgress.start();
+		}
+		if (!$navigating) {
+			NProgress.done();
+		}
+	}
 	setMode('light');
 </script>
 
