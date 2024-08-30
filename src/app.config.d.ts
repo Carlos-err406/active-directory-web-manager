@@ -12,7 +12,6 @@ export interface Config {
 	app?: AppConfig;
 	directory?: DirectoryConfig;
 	system?: SystemConfig;
-	recyclebin?: RecycleBinConfig;
 	[k: string]: unknown;
 }
 /**
@@ -802,10 +801,6 @@ export interface DirectoryConfig {
 		 */
 		hide?: string[];
 		/**
-		 * Wether or not to automatically create new users under the CN=Users container. If false new users will be created un the root. @default true
-		 */
-		createUsersInUsersContainer?: boolean;
-		/**
 		 * The maximum amount of users allowed in the directory. If set to null the limit will be ignored. Default users are included in the count. @default null
 		 */
 		limit?: number | null;
@@ -881,7 +876,3 @@ export interface LoggingConfig {
 	 */
 	useLogging?: boolean;
 }
-/**
- * Recycle Bin configuration
- */
-export interface RecycleBinConfig {}

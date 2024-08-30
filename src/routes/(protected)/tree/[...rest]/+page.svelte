@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { afterNavigate } from '$app/navigation';
-	import PanelItemPlaceholder from '$lib/components/tree/panels/panel-item-placeholder.svelte';
+	import PanelPlaceholder from '$lib/components/tree/panels/panel-placeholder.svelte';
 	import Panel from '$lib/components/tree/panels/panel.svelte';
 	import { getCNFromDN } from '$lib/ldap/utils';
 	import { breadcrumbs } from '$lib/stores';
-	import _lodash from 'lodash';
 	import { tick } from 'svelte';
 	import type { PageData } from './$types';
 	export let data: PageData;
@@ -38,15 +37,11 @@
 >
 	{#each data.entries as entries}
 		{#await entries}
-			<Panel>
-				{#each Array(_lodash.random(5, 10, false)) as _}
-					<div class="flex w-full">
-						<PanelItemPlaceholder />
-					</div>
-				{/each}
-			</Panel>
-		{:then entryGroups}
-			<Panel entries={entryGroups} />
+			<PanelPlaceholder />
+		{:then { entry, treeEntries }}
+			{#await treeEntries then groupedEntries}
+				<Panel base={entry} entries={groupedEntries} />
+			{/await}
 		{/await}
 	{/each}
 	<div bind:this={anchorToLast} />

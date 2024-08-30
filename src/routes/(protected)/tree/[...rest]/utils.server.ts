@@ -1,5 +1,4 @@
 import config from '$config';
-import { getEntryByDn } from '$lib/ldap';
 import { appLog } from '$lib/server/logs';
 import type { Session } from '$lib/types/session';
 import type { TreeEntry } from '$lib/types/tree';
@@ -19,7 +18,8 @@ export const TREE_ENTRY_ATTRIBUTES = [
 	'sAMAccountName',
 	'cn',
 	'objectClass',
-	'name'
+	'name',
+	'jpegPhoto'
 ];
 
 export const getQueryFilter = (query: string) =>
@@ -31,11 +31,6 @@ export const getQueryFilter = (query: string) =>
 					any: [query]
 				})
 		)
-	});
-
-export const getBaseEntry = (ldap: Client, base: string) =>
-	getEntryByDn<{ objectClass: string[]; distinguishedName: string; dn: string }>(ldap, base, {
-		searchOpts: { attributes: ['objectClass', 'dn', 'distinguishedName'] }
 	});
 
 export const getMembersFilter = (members: string[]) =>
@@ -66,10 +61,7 @@ export const treeSearch = (
 			attributes: TREE_ENTRY_ATTRIBUTES,
 			filter
 		})
-		.then(({ searchEntries }) => {
-			console.log(searchEntries);
-			return searchEntries as TreeEntry[];
-		});
+		.then(({ searchEntries }) => searchEntries as TreeEntry[]);
 
 export const throwIfIsHiddenEntry = (dn: string, session: Session, url: URL) => {
 	const { users, ous, groups, tree } = config.directory;

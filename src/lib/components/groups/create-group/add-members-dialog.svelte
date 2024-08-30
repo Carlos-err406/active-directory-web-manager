@@ -3,18 +3,19 @@
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { toastError } from '$lib';
+	import EntryChipList from '$lib/components/entries/entry-chip-list.svelte';
+	import type { Entry } from '$lib/components/entries/entry-select.svelte';
 	import Form, { type FormOptions } from '$lib/components/form/form.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
-	import { UserChipList, UsersSelect } from '$lib/components/users';
 	import { setMembersSchema, type SetMembersSchema } from '$lib/schemas/group/set-members-schema';
-	import type { User } from '$lib/types/user';
 	import { toast } from 'svelte-sonner';
+	import MemberSelect from '../member-select.svelte';
 
 	export let open = false;
 	export let dn: string;
 	const action = `/groups/${dn}?/setMembers`;
-	let users: User[] = [];
+	let members: Entry[] = [];
 	$: form = $page.data.setMembersForm;
 	let toastId: string | number = NaN;
 
@@ -25,7 +26,7 @@
 	const onResult: FormOptions<SetMembersSchema>['onResult'] = async ({ result }) => {
 		switch (result.type) {
 			case 'success':
-				toastId = toast.success('Selected users were added to the group!', {
+				toastId = toast.success('Selected entries were added to the group!', {
 					id: toastId,
 					duration: undefined
 				});
@@ -50,13 +51,13 @@
 			<Dialog.Title class="text-xl">Add members</Dialog.Title>
 			<Dialog.Description>Select the users to be added to this group</Dialog.Description>
 		</Dialog.Header>
-		<UsersSelect
-			bind:selected={users}
+		<MemberSelect
+			bind:selected={members}
 			on:select={({ detail }) => {
-				users = [...users, detail];
+				members = [...members, detail];
 			}}
 		/>
-		<UserChipList bind:users />
+		<EntryChipList bind:entries={members} />
 		<Form
 			let:loading
 			bind:form
@@ -70,7 +71,7 @@
 			}}
 		>
 			<input hidden value={dn} name="groupDn" />
-			{#each users as user}
+			{#each members as user}
 				<input hidden value={user.dn} name="dns" />
 			{/each}
 			<Dialog.Footer>

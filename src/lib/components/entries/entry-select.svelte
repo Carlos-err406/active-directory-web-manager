@@ -2,6 +2,7 @@
 	export type Entry = {
 		dn: string;
 		distinguishedName: string;
+		objectClass: string[];
 		[index: string]: unknown;
 	};
 </script>
@@ -11,7 +12,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import { ldapFilterToUrlFilter } from '$lib/ldap/filter';
 	import type { Filter } from '$lib/ldap/filter/filter';
-	import { arrowNavigation } from '$lib/utils';
+	import { arrowNavigation, getEntryIcon } from '$lib/utils';
 	import Loading from '$lucide/loader.svelte';
 	import Search from '$lucide/search.svelte';
 	import { createEventDispatcher } from 'svelte';
@@ -67,7 +68,7 @@
 	<div class="relative">
 		<Input
 			bind:element={input}
-			placeholder="Search for users to add..."
+			placeholder="Search for entries to add..."
 			class="w-full pr-10"
 			max={100}
 			on:input={handleInput}
@@ -109,6 +110,7 @@
 					input?.focus();
 				}}
 			>
+				<svelte:component this={getEntryIcon(entry)} class="size-5" />
 				{entry.displayName || entry.givenName || entry.cn} ({entry.sAMAccountName})
 			</button>
 		{:else}

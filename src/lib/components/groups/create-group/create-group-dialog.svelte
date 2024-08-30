@@ -21,11 +21,12 @@
 	import AddMembersDialog from './add-members-dialog.svelte';
 	import AddMembersSurveyDialog from './add-members-survey-dialog.svelte';
 
-	let open: boolean;
+	export let open = false;
+	export let base = `CN=Users,${PUBLIC_BASE_DN}`;
+
 	let isManageMembersSurveyDialogOpen = false;
 	let isAddMembersDialogOpen = false;
 	let createdGroup: Group;
-	export let base = PUBLIC_BASE_DN;
 	$: form = $page.data.createGroupForm;
 
 	let toastId: number | string = NaN;
@@ -50,15 +51,19 @@
 			case 'success':
 				createdGroup = result.data!.group;
 				isManageMembersSurveyDialogOpen = true;
-				toast.success('Group created successfully', { id: toastId });
+				toast.success('Group created successfully', { id: toastId, duration: undefined });
 				invalidate('protected:groups');
+				open = false;
+				break;
+			case 'failure':
+				toast.dismiss(toastId);
 				break;
 			case 'redirect':
+				open = false;
 				toast.dismiss(toastId);
 				await applyAction(result);
 				break;
 		}
-		open = false;
 	};
 	const onError: FormOptions<CreateGroupSchema>['onError'] = ({ result }) => {
 		toastError(result.error, toastId);
@@ -66,9 +71,6 @@
 </script>
 
 <Dialog.Root bind:open>
-	<Dialog.Trigger asChild let:builder>
-		<Button builders={[builder]}>Create Group</Button>
-	</Dialog.Trigger>
 	<Dialog.Content>
 		<Dialog.Header>
 			<Dialog.Title>Create Group</Dialog.Title>

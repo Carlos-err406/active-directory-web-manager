@@ -1,3 +1,9 @@
+import Building2 from '$lucide/building-2.svelte';
+import Computer from '$lucide/computer.svelte';
+import Container from '$lucide/container.svelte';
+import FileQuestion from '$lucide/file-question.svelte';
+import User from '$lucide/user.svelte';
+import Users from '$lucide/users.svelte';
 import { type ClassValue, clsx } from 'clsx';
 import type { Action } from 'svelte/action';
 import { cubicOut } from 'svelte/easing';
@@ -78,3 +84,27 @@ export const arrowNavigation: Action = (
 };
 
 export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+type EntryWithObjectClass = {
+	[key: string]: unknown;
+	objectClass: string[];
+};
+export const isUser = <T extends EntryWithObjectClass>(entry: T) =>
+	entry.objectClass.includes('organizationalPerson');
+export const isOu = <T extends EntryWithObjectClass>(entry: T) =>
+	entry.objectClass.includes('organizationalUnit');
+export const isContainer = <T extends EntryWithObjectClass>(entry: T) =>
+	entry.objectClass.includes('container');
+export const isGroup = <T extends EntryWithObjectClass>(entry: T) =>
+	entry.objectClass.includes('group');
+export const isComputer = <T extends EntryWithObjectClass>(entry: T) =>
+	entry.objectClass.includes('computer');
+
+export const getEntryIcon = <T extends EntryWithObjectClass>(entry: T) => {
+	if (isComputer(entry)) return Computer;
+	else if (isUser(entry)) return User;
+	else if (isOu(entry)) return Building2;
+	else if (isGroup(entry)) return Users;
+	else if (isContainer(entry)) return Container;
+	else return FileQuestion;
+};

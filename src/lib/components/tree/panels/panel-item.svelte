@@ -1,38 +1,16 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import type { TreeEntry } from '$lib/types/tree';
-	import { cn } from '$lib/utils';
-	import Building2 from '$lucide/building-2.svelte';
-	import Computer from '$lucide/computer.svelte';
-	import Container from '$lucide/container.svelte';
-	import FileQuestion from '$lucide/file-question.svelte';
-	import User from '$lucide/user.svelte';
-	import Users from '$lucide/users.svelte';
-	import { onMount, setContext, tick } from 'svelte';
-	import {
-		isComputer,
-		isContainer,
-		isExpandedEntry,
-		isGroup,
-		isLastExpandedEntry,
-		isOu,
-		isUser
-	} from '../utils';
-	import PanelItemActions from './panel-item-actions.svelte';
 	import { page } from '$app/stores';
+	import type { TreeEntry } from '$lib/types/tree';
+	import { cn, getEntryIcon, isContainer, isGroup, isOu } from '$lib/utils';
+
+	import { onMount, setContext, tick } from 'svelte';
+
+	import { isExpandedEntry, isLastExpandedEntry } from '../utils';
+	import PanelItemActions from './panel-item-actions.svelte';
 
 	export let entry: TreeEntry;
-
 	setContext('tree-entry', entry);
-
-	const getIcon = () => {
-		if (isComputer(entry)) return Computer;
-		else if (isUser(entry)) return User;
-		else if (isOu(entry)) return Building2;
-		else if (isContainer(entry)) return Container;
-		else if (isGroup(entry)) return Users;
-		else return FileQuestion;
-	};
 
 	const mayHaveChildren = () => isOu(entry) || isContainer(entry) || isGroup(entry);
 	const handleItemClick = async () => {
@@ -44,10 +22,6 @@
 			await goto(`/tree/${encodeURIComponent(RDNs.join('/'))}?${$page.url.searchParams}`, {
 				invalidateAll: true
 			});
-		} else {
-			if (isUser(entry)) {
-				await goto(`/users/${encodeURIComponent(distinguishedName)}`, { invalidateAll: true });
-			}
 		}
 	};
 
@@ -55,7 +29,6 @@
 	onMount(() => {
 		if (isLastExpandedEntry(entry)) {
 			tick().then(() => panelItemElement.scrollIntoView({ behavior: 'auto', block: 'center' }));
-			// tick().then(() => panelItemElement.scrollIntoView({ behavior: 'instant', block: 'center' }));
 		}
 	});
 </script>
@@ -66,16 +39,19 @@
 	on:click|self={handleItemClick}
 	data-active={isExpandedEntry(entry)}
 	class={cn(
-		'relative flex h-fit w-full min-w-80 cursor-pointer self-start', //positioning and size
-		'rounded border-[1px] hover:shadow-md', //border
+		mayHaveChildren()
+			? 'cursor-pointer hover:shadow-md data-[active=false]:hover:bg-primary/10 data-[active=true]:hover:bg-primary/90'
+			: 'cursor-default',
+		'relative flex h-fit w-full min-w-80 self-start', //positioning and size
+		'rounded border-[1px] ', //border
 		'p-1 pl-10', //paddings
-		'transition-all duration-200',
+		'transition-all duration-200 ',
 		'data-[active=true]:text-muted', //text color
-		'data-[active=true]:bg-primary data-[active=false]:hover:bg-primary/10 data-[active=true]:hover:bg-primary/90 ' //bg
+		'data-[active=true]:bg-primary' //bg
 	)}
 >
 	<svelte:component
-		this={getIcon()}
+		this={getEntryIcon(entry)}
 		class="pointer-events-none absolute left-2 top-1/2 flex size-6 flex-none origin-center -translate-y-1/2 font-light"
 	/>
 	<div class="absolute right-1 top-1 size-fit">

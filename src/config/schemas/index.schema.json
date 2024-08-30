@@ -12,9 +12,6 @@
 		},
 		"system": {
 			"$ref": "system.schema.json"
-		},
-		"recyclebin": {
-			"$ref": "recyclebin.schema.json"
 		}
 	}
 }

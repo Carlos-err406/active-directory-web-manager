@@ -183,3 +183,8 @@ export const getHideFilters = (hide: string[] = []) =>
 				})
 			})
 	);
+
+export const getBaseEntry = (ldap: Client, base: string) =>
+	getEntryByDn<{ objectClass: string[]; distinguishedName: string; dn: string }>(ldap, base, {
+		searchOpts: { attributes: ['objectClass', 'dn', 'distinguishedName'] }
+	});

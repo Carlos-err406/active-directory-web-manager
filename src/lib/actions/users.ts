@@ -3,8 +3,10 @@ import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
 import {
 	encodePassword,
 	extractBase,
+	getBaseEntry,
 	getEntryByDn,
 	getEntryBySAMAccountName,
+	getGroupMembers,
 	inferChange,
 	replaceAttribute,
 	sudo,
@@ -63,27 +65,44 @@ export const createUser: Action = async (event) => {
 	const { sAMAccountName, base, givenName, sn, mail, password, description, jpegPhotoBase64 } =
 		form.data;
 
-	const attributes: Record<string, string[] | string> = {
-		objectClass: ['top', 'person', 'organizationalPerson', 'user'],
-		userAccountControl: [UAC['Normal Account']],
-		displayName: givenName,
-		sAMAccountName,
-		givenName,
-		mail
-	};
+	const attributes: Attribute[] = [
+		new Attribute({
+			type: 'objectClass',
+			values: ['top', 'person', 'organizationalPerson', 'user']
+		}),
+		new Attribute({ type: 'userAccountControl', values: [UAC['Normal Account']] }),
+		new Attribute({ type: 'displayName', values: [givenName] }),
+		new Attribute({ type: 'sAMAccountName', values: [sAMAccountName] }),
+		new Attribute({ type: 'givenName', values: [givenName] }),
+		new Attribute({ type: 'mail', values: [mail] }),
+		new Attribute({ type: 'unicodePwd', values: [encodePassword(password)] })
+	];
 	if (sn) {
-		attributes['sn'] = sn;
-		attributes['displayName'] = `${givenName} ${sn}`;
+		attributes.push(new Attribute({ type: 'sn', values: [sn] }));
+		const displayNameIndex = attributes.findIndex((att) => att.type === 'displayName');
+		attributes[displayNameIndex].values = [`${givenName} ${sn}`];
 	}
-	if (description) attributes['description'] = description;
+	if (description) attributes.push(new Attribute({ type: 'description', values: [description] }));
 	if (jpegPhotoBase64) {
 		const [, content] = jpegPhotoBase64.split('base64,');
-		attributes['jpegPhoto'] = Buffer.from(content, 'base64').toString('base64');
+		attributes.push(
+			new Attribute({
+				type: 'jpegPhoto',
+				values: [Buffer.from(content, 'base64').toString('base64')]
+			})
+		);
 	}
-	const dn = config.directory.users.createUsersInUsersContainer
-		? `CN=${sAMAccountName},CN=Users,${base}`
-		: `CN=${sAMAccountName},${base}`;
 
+	const baseEntry = await getBaseEntry(ldap, base);
+	let dn = `CN=${sAMAccountName}`;
+	const baseIsGroup = baseEntry.objectClass.includes('group');
+	if (baseIsGroup) {
+		dn += `,CN=Users,${PUBLIC_BASE_DN}`;
+	} else {
+		dn += `,${base}`;
+	}
+
+	//create the user
 	try {
 		await ldap.add(dn, attributes);
 	} catch (e) {
@@ -100,29 +119,24 @@ export const createUser: Action = async (event) => {
 		const errorId = errorLog(e, { message });
 		throw error(500, { message, errorId });
 	}
-
-	const encodedPassword = encodePassword(password);
-	const passwordChange: Change = new Change({
-		operation: 'replace',
-		modification: new Attribute({ type: 'unicodePwd', values: [encodedPassword] })
-	});
-
-	try {
-		await ldap.modify(dn, passwordChange);
-	} catch (e) {
-		if (e instanceof InsufficientAccessError) {
-			appLog(
-				`InsufficientAccessError User ${auth.session.sAMAccountName} tried creating a user without having enough access`,
-				'Error'
-			);
-			throw error(403, { message: "You don't have permission to perform this operation!" });
-		}
-		await sudo((sudoLdap) => sudoLdap.del(dn));
-		const message = `Something unexpected happened while setting ${sAMAccountName}'s password`;
-		const errorId = errorLog(e, { message });
-		throw error(500, { message, errorId });
-	}
 	appLog(`${auth.session.sAMAccountName} created user: ${dn}`);
+
+	//add to group
+	if (baseIsGroup) {
+		const group = await getEntryByDn(ldap, baseEntry.distinguishedName, {
+			searchOpts: { attributes: ['dn', 'distinguishedName', 'member', 'sAMAccountName'] }
+		});
+		const members = await getGroupMembers(ldap, baseEntry.distinguishedName);
+		const change = inferChange(group, 'member', [...members, dn]);
+
+		try {
+			await ldap.modify(baseEntry.distinguishedName, change!);
+		} catch (e) {
+			const message = `Something went wrong adding the user to ${group.sAMAccountName}'s members`;
+			const errorId = errorLog(e, { message });
+			throw error(500, { message, errorId });
+		}
+	}
 	return withFiles({ form });
 };
 

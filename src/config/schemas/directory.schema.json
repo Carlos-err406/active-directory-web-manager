@@ -85,11 +85,6 @@
 					},
 					"uniqueItems": true
 				},
-				"createUsersInUsersContainer": {
-					"type": "boolean",
-					"default": true,
-					"description": "Wether or not to automatically create new users under the CN=Users container. If false new users will be created un the root. @default true"
-				},
 				"limit": {
 					"minimum": 0,
 					"description": "The maximum amount of users allowed in the directory. If set to null the limit will be ignored. Default users are included in the count. @default null",

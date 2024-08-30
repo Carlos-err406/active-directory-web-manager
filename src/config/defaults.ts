@@ -247,11 +247,9 @@ const defaults: RecursiveRequired<App.Config> = {
 		},
 		users: {
 			hide: [],
-			createUsersInUsersContainer: false,
 			limit: null
 		}
 	},
-	recyclebin: {},
 	system: {
 		logging: {
 			basePath: './logs',

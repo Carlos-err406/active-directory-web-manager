@@ -1,5 +1,11 @@
 import { PUBLIC_BASE_DN } from '$env/static/public';
-import { getEntryByDn, inferChange, validateGroupAmount } from '$lib/ldap';
+import {
+	getBaseEntry,
+	getEntryByDn,
+	getGroupMembers,
+	inferChange,
+	validateGroupAmount
+} from '$lib/ldap';
 import { getCNFromDN } from '$lib/ldap/utils';
 import { deleteManySchema } from '$lib/schemas/delete-many-schema';
 import { createGroupSchema } from '$lib/schemas/group/create-group-schema';
@@ -50,7 +56,16 @@ export const createGroup: Action = async (event) => {
 
 	attributes['groupType'] = withGlobalScope.toString();
 
-	const dn = `CN=${sAMAccountName},${base}`;
+	const baseEntry = await getBaseEntry(ldap, base);
+	let dn = `CN=${sAMAccountName}`;
+	const baseIsGroup = baseEntry.objectClass.includes('group');
+
+	if (baseIsGroup) {
+		dn += `,CN=Users,${PUBLIC_BASE_DN}`;
+	} else {
+		dn += `,${base}`;
+	}
+
 	try {
 		await ldap.add(dn, attributes);
 	} catch (e) {
@@ -68,6 +83,24 @@ export const createGroup: Action = async (event) => {
 		throw error(500, { message, errorId });
 	}
 	appLog(`${auth.session.sAMAccountName} created group: ${dn}`);
+
+	//add to group
+	if (baseIsGroup) {
+		const group = await getEntryByDn(ldap, baseEntry.distinguishedName, {
+			searchOpts: { attributes: ['dn', 'distinguishedName', 'member', 'sAMAccountName'] }
+		});
+		const members = await getGroupMembers(ldap, baseEntry.distinguishedName);
+		const change = inferChange(group, 'member', [...members, dn]);
+
+		try {
+			await ldap.modify(baseEntry.distinguishedName, change!);
+		} catch (e) {
+			const message = `Something went wrong adding the group to ${group.sAMAccountName}'s members`;
+			const errorId = errorLog(e, { message });
+			throw error(500, { message, errorId });
+		}
+	}
+
 	const group = await getEntryByDn<Group>(ldap, dn);
 	return { form, group };
 };

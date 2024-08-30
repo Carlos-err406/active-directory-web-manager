@@ -20,8 +20,8 @@
 	import Mail from '$lucide/mail.svelte';
 	import { toast } from 'svelte-sonner';
 	import ImageInput from '../form/image-input.svelte';
-	let open: boolean;
-	export let base = PUBLIC_BASE_DN;
+	export let open = false;
+	export let base = `CN=Users,${PUBLIC_BASE_DN}`;
 	$: form = $page.data.createUserForm;
 
 	const onChange: FormOptions<CreateUserSchema>['onChange'] = ({ get, set, target }) => {
@@ -49,6 +49,9 @@
 				invalidate('protected:users');
 				open = false;
 				break;
+			case 'failure':
+				toast.dismiss(toastId);
+				break;
 			case 'redirect':
 				toast.dismiss(toastId);
 				open = false;
@@ -62,9 +65,6 @@
 </script>
 
 <Dialog.Root bind:open>
-	<Dialog.Trigger asChild let:builder>
-		<Button builders={[builder]}>Create User</Button>
-	</Dialog.Trigger>
 	<Dialog.Content>
 		<Dialog.Header>
 			<Dialog.Title>Create User</Dialog.Title>

@@ -7,4 +7,5 @@ export type TreeEntry = {
 	name: string;
 	sAMAccountName: string;
 	distinguishedName: string;
+	jpegPhoto?: string;
 };

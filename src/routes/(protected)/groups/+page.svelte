@@ -19,6 +19,7 @@
 	import { readable } from 'svelte/store';
 	import { slide } from 'svelte/transition';
 	import type { PageData } from './$types';
+	import { Button } from '$lib/components/ui/button';
 	export let data: PageData;
 	breadcrumbs.set([{ name: 'Groups' }]);
 	$: ({ columns: configColumns } = $page.data.config.app.views.groupsPage.table);
@@ -133,13 +134,15 @@
 		.map((id) => $rows.find((row) => row.id === id)!)
 		.map((row) => (row.cellForId.distinguishedName as unknown as DataBodyCell<string>).value)
 		.filter(Boolean) as string[];
+
+	let groupCreateDialogOpen = false;
 </script>
 
 <div class="w-full" data-test="groupsPage">
 	<div class="my-2 flex w-full justify-end gap-4">
 		<ResetFiltersDropdown />
 		<ColumnsDropdown {hidableCols} {flatColumns} />
-		<CreateGroupDialog />
+		<Button on:click={() => (groupCreateDialogOpen = true)}>Create Group</Button>
 	</div>
 	<DataTable viewModel={{ ...viewModel, flatColumns, rows, pluginStates }}>
 		<svelte:fragment slot="selected-row-actions">
@@ -149,3 +152,5 @@
 		</svelte:fragment>
 	</DataTable>
 </div>
+
+<CreateGroupDialog bind:open={groupCreateDialogOpen} />

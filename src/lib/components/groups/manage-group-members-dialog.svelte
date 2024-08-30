@@ -9,22 +9,22 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { getCNFromDN } from '$lib/ldap/utils';
 	import { setMembersSchema, type SetMembersSchema } from '$lib/schemas/group/set-members-schema';
-	import type { User } from '$lib/types/user';
 	import Loader from '$lucide/loader.svelte';
 	import { toast } from 'svelte-sonner';
 	import { slide } from 'svelte/transition';
-	import { UsersSelect } from '../users';
-	import UserChipList from '../users/chip/user-chip-list.svelte';
+	import EntryChipList from '../entries/entry-chip-list.svelte';
+	import type { Entry } from '../entries/entry-select.svelte';
+	import MemberSelect from './member-select.svelte';
 	export let open: boolean;
 	export let dn: string;
 	const action = `/groups/${dn}?/setMembers`;
 	$: form = $page.data.setMembersForm;
-	let users: User[] = [];
+	let members: Entry[] = [];
 	let initializing = false;
 	const onOpen = async () => {
 		const params = new URLSearchParams({ dn });
 		initializing = true;
-		users = await fetch(`/api/group-members?${params}`, {
+		members = await fetch(`/api/group-members?${params}`, {
 			headers: { Authorization: `Bearer ${PUBLIC_API_KEY}` }
 		}).then((r) => r.json());
 		initializing = false;
@@ -70,15 +70,15 @@
 				Add or remove members in this group ({getCNFromDN(dn)})
 			</Dialog.Description>
 		</Dialog.Header>
-		<UsersSelect selected={users} on:select={({ detail }) => (users = [...users, detail])} />
-		<UserChipList bind:users>
+		<MemberSelect selected={members} on:select={({ detail }) => (members = [...members, detail])} />
+		<EntryChipList bind:entries={members}>
 			<svelte:fragment slot="empty-list">
 				{#if !initializing}
 					--- No members ---
 				{/if}
 			</svelte:fragment>
-		</UserChipList>
-		{#if initializing && !users.length}
+		</EntryChipList>
+		{#if initializing && !members.length}
 			<div class="flex w-full justify-center" transition:slide={{ axis: 'y', duration: 200 }}>
 				<Loader class="size-5 animate-spin" />
 			</div>
@@ -96,7 +96,7 @@
 			}}
 		>
 			<input type="text" hidden value={dn} name="groupDn" />
-			{#each users as user}
+			{#each members as user}
 				<input hidden type="text" name="dns" value={user.dn} />
 			{/each}
 			<Dialog.Footer>

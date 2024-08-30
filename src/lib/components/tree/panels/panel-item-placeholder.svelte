@@ -9,7 +9,7 @@
 		'rounded border-[1px]', //border
 		'p-1', //paddings
 		'transition-all duration-200',
-		'animate-pulse bg-accent ' //bg
+		'animate-pulse bg-accent' //bg
 	)}
 >
 	<Loader class="flex size-6 animate-spin font-light" />

@@ -1,6 +1,6 @@
 import config from '$config';
 import { PUBLIC_BASE_DN } from '$env/static/public';
-import { getGroupMembers, getHideFilters } from '$lib/ldap';
+import { getBaseEntry, getGroupMembers, getHideFilters } from '$lib/ldap';
 import { deleteManySchema } from '$lib/schemas/delete-many-schema';
 import { createGroupSchema } from '$lib/schemas/group/create-group-schema';
 import { deleteGroupSchema } from '$lib/schemas/group/delete-group-schema';
@@ -17,7 +17,6 @@ import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { PageServerLoad } from './$types';
 import {
-	getBaseEntry,
 	getMembersFilter,
 	getObjectClassFilter,
 	getQueryFilter,
@@ -53,11 +52,7 @@ export const load = async ({ url, locals, params }: Parameters<PageServerLoad>[0
 	};
 };
 
-const getChildren = async (
-	ldap: Client,
-	base = PUBLIC_BASE_DN,
-	query: string | null = null
-): Promise<TreeEntry[]> => {
+const getChildren = async (ldap: Client, base = PUBLIC_BASE_DN, query: string | null = null) => {
 	let treeEntries: Promise<TreeEntry[]> = Promise.resolve([]);
 	const mainFilter: AndFilter = new AndFilter({
 		filters: [
@@ -80,5 +75,5 @@ const getChildren = async (
 		mainFilter.filters.push(getObjectClassFilter());
 		treeEntries = treeSearch(ldap, base, mainFilter, 'one');
 	}
-	return treeEntries;
+	return { entry, treeEntries };
 };
