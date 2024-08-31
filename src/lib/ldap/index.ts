@@ -19,6 +19,7 @@ import {
 import _ from 'lodash';
 import { getLDAPClient } from './client';
 import { ARRAY_ATTRIBUTES } from './utils';
+import type { OrganizationalUnit } from '$lib/types/ou';
 /**
  * Encodes password for ldap unicodePwd attribute
  * @param password
@@ -150,6 +151,21 @@ export const getAllGroups = (ldap: Client, extraFilters: Filter[] = []): Promise
 		})
 		.then(({ searchEntries }) => searchEntries as Group[]);
 
+export const getAllOrganizationalUnits = (
+	ldap: Client,
+	extraFilters: Filter[] = []
+): Promise<OrganizationalUnit[]> =>
+	ldap
+		.search(PUBLIC_BASE_DN, {
+			filter: new AndFilter({
+				filters: [
+					new EqualityFilter({ attribute: 'objectClass', value: 'organizationalUnit' }),
+					...extraFilters
+				]
+			})
+		})
+		.then(({ searchEntries }) => searchEntries as Group[]);
+
 export const validateUserAmount = async (ldap: Client) => {
 	const { limit } = config.directory.users;
 	if (!limit) return true;
@@ -169,6 +185,9 @@ export const getFilteredUsers = (ldap: Client, extraFilters: Filter[] = []) =>
 
 export const getFilteredGroups = (ldap: Client, extraFilters: Filter[] = []) =>
 	getAllGroups(ldap, [...getHideFilters(config.directory.groups.hide), ...extraFilters]);
+
+export const getFilteredOrganizationalUnits = (ldap: Client, extraFilters: Filter[] = []) =>
+	getAllOrganizationalUnits(ldap, [...getHideFilters(config.directory.ous.hide), ...extraFilters]);
 
 export const getHideFilters = (hide: string[] = []) =>
 	hide.map(

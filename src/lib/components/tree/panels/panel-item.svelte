@@ -3,23 +3,20 @@
 	import { page } from '$app/stores';
 	import type { TreeEntry } from '$lib/types/tree';
 	import { cn, getEntryIcon, isContainer, isGroup, isOu } from '$lib/utils';
-
-	import { onMount, setContext, tick } from 'svelte';
-
+	import { onMount, tick } from 'svelte';
 	import { isExpandedEntry, isLastExpandedEntry } from '../utils';
 	import PanelItemActions from './panel-item-actions.svelte';
 
 	export let entry: TreeEntry;
-	setContext('tree-entry', entry);
 
 	const mayHaveChildren = () => isOu(entry) || isContainer(entry) || isGroup(entry);
 	const handleItemClick = async () => {
+		if (isExpandedEntry(entry)) return;
 		const { distinguishedName } = entry;
-
 		if (mayHaveChildren()) {
 			const parts = distinguishedName.split(',');
 			const RDNs = parts.reverse().slice(2); //removing PUBLIC_BASE_DN
-			await goto(`/tree/${encodeURIComponent(RDNs.join('/'))}?${$page.url.searchParams}`, {
+			await goto(`/tree/${RDNs.map(encodeURIComponent).join('/')}?${$page.url.searchParams}`, {
 				invalidateAll: true
 			});
 		}
@@ -27,7 +24,7 @@
 
 	let panelItemElement: HTMLButtonElement;
 	onMount(() => {
-		if (isLastExpandedEntry(entry)) {
+		if (isLastExpandedEntry(entry) && !$page.state.preventScrollIntoView) {
 			tick().then(() => panelItemElement.scrollIntoView({ behavior: 'auto', block: 'center' }));
 		}
 	});
@@ -40,7 +37,7 @@
 	data-active={isExpandedEntry(entry)}
 	class={cn(
 		mayHaveChildren()
-			? 'cursor-pointer hover:shadow-md data-[active=false]:hover:bg-primary/10 data-[active=true]:hover:bg-primary/90'
+			? 'data-[active=false]:cursor-pointer data-[active=true]:cursor-default hover:shadow-md data-[active=false]:hover:bg-primary/10 data-[active=true]:hover:bg-primary/90'
 			: 'cursor-default',
 		'relative flex h-fit w-full min-w-80 self-start', //positioning and size
 		'rounded border-[1px] ', //border
@@ -55,7 +52,7 @@
 		class="pointer-events-none absolute left-2 top-1/2 flex size-6 flex-none origin-center -translate-y-1/2 font-light"
 	/>
 	<div class="absolute right-1 top-1 size-fit">
-		<PanelItemActions />
+		<PanelItemActions {entry} />
 	</div>
 	<div class="pointer-events-none flex !w-full flex-col p-1">
 		<p class="w-full text-start font-semibold">

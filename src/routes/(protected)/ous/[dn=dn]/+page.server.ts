@@ -19,3 +19,5 @@ export const load: PageServerLoad = async ({ locals, url, params }) => {
 		throw error(500, { message: 'Something went wrong while loading the page', errorId });
 	}
 };
+
+export * as actions from '$lib/actions/ous';

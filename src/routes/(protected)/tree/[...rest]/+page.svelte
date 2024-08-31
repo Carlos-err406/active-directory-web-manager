@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { afterNavigate } from '$app/navigation';
+	import { page } from '$app/stores';
 	import PanelPlaceholder from '$lib/components/tree/panels/panel-placeholder.svelte';
 	import Panel from '$lib/components/tree/panels/panel.svelte';
 	import { getCNFromDN } from '$lib/ldap/utils';
@@ -7,11 +8,6 @@
 	import { tick } from 'svelte';
 	import type { PageData } from './$types';
 	export let data: PageData;
-
-	$: breadcrumbs.set([
-		{ name: 'Root', link: '/tree' },
-		...data.activeDns.map((dn) => ({ name: getCNFromDN(dn), link: buildTreeUrl(dn) }))
-	]);
 
 	const buildTreeUrl = (dn: string): string => {
 		const index = data.activeDns.indexOf(dn);
@@ -23,11 +19,17 @@
 
 	let anchorToLast: HTMLDivElement;
 	afterNavigate(() => {
-		tick().then(() => {
+		breadcrumbs.set([
+			{ name: 'Root', link: '/tree' },
+			...data.activeDns.map((dn) => ({ name: getCNFromDN(dn), link: buildTreeUrl(dn) }))
+		]);
+		if (!$page.state.preventScrollIntoView) {
 			tick().then(() => {
-				anchorToLast.scrollIntoView({ behavior: 'smooth', block: 'start' });
+				tick().then(() => {
+					anchorToLast.scrollIntoView({ behavior: 'smooth', block: 'start' });
+				});
 			});
-		});
+		}
 	});
 </script>
 
@@ -38,10 +40,12 @@
 	{#each data.entries as entries}
 		{#await entries}
 			<PanelPlaceholder />
-		{:then { entry, treeEntries }}
-			{#await treeEntries then groupedEntries}
-				<Panel base={entry} entries={groupedEntries} />
-			{/await}
+		{:then entries}
+			{#if entries}
+				{#await entries.treeEntries then groupedEntries}
+					<Panel base={entries.base} entries={groupedEntries} />
+				{/await}
+			{/if}
 		{/await}
 	{/each}
 	<div bind:this={anchorToLast} />

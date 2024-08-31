@@ -98,7 +98,7 @@ export interface CaptchaConfig {
 export interface ViewsConfig {
 	groupsPage?: GroupsPageConfig;
 	logsPage?: LogsPageConfig;
-	ousPage?: OusPageConfig;
+	ousPage?: GroupsPageConfig1;
 	settingsPage?: SettingsPageConfig;
 	treePage?: TreePageConfig;
 	usersPage?: UsersPageConfig;
@@ -366,13 +366,163 @@ export interface LogsPageConfig {
 	show?: boolean;
 }
 /**
- * Configuration regarding the ous page
+ * Configuration regarding the groups page
  */
-export interface OusPageConfig {
+export interface GroupsPageConfig1 {
+	details?: OuDetailsConfig;
 	/**
-	 * Weather or not to show the /ous page in navigation. Accessing directly to this route will result on a '403 This page has been disabled by configuration' error. @defaults true
+	 * Weather or not to show the "/ous" page in navigation. Accessing directly to this route will result on a "403 This page has been disabled by configuration" error. @default true
 	 */
 	show?: boolean;
+	table?: OusTableConfig;
+}
+/**
+ * Configuration regarding the detailed view of a ou ("/ous/[dn]")
+ */
+export interface OuDetailsConfig {
+	/**
+	 * Configuration regarding the "name" attribute of the ou
+	 */
+	name?: {
+		/**
+		 * @default "name"
+		 */
+		label?: string;
+		/**
+		 * Wether or not to show the "name" attribute in the "/ous/[dn]" page. @default true
+		 */
+		show?: boolean;
+	};
+	/**
+	 * Configuration regarding the "description" attribute of the ou
+	 */
+	description?: {
+		/**
+		 * @default "description"
+		 */
+		label?: string;
+		/**
+		 * Wether or not to show the "description" attribute in the "/ous/[dn]" page. @default true
+		 */
+		show?: boolean;
+	};
+	/**
+	 * Configuration regarding the "distinguishedName" attribute of the ou
+	 */
+	distinguishedName?: {
+		/**
+		 * @default "distinguishedName"
+		 */
+		label?: string;
+		/**
+		 * Wether or not to show the "distinguishedName" attribute in the "/ous/[dn]" page. @default true
+		 */
+		show?: boolean;
+	};
+	/**
+	 * Configuration regarding the "whenChanged" attribute of the ou
+	 */
+	whenChanged?: {
+		/**
+		 * @default "whenChanged"
+		 */
+		label?: string;
+		/**
+		 * Wether or not to show the "whenChanged" attribute in the "/ous/[dn]" page. @default true
+		 */
+		show?: boolean;
+	};
+	/**
+	 * Configuration regarding the "whenCreated" attribute of the ou
+	 */
+	whenCreated?: {
+		/**
+		 * @default "whenCreated"
+		 */
+		label?: string;
+		/**
+		 * Wether or not to show the "whenCreated" attribute in the "/ous/[dn]" page. @default true
+		 */
+		show?: boolean;
+	};
+}
+/**
+ * Ous table view configuration
+ */
+export interface OusTableConfig {
+	/**
+	 * Ous table column settings
+	 */
+	columns?: {
+		/**
+		 * Configure ous table "description" column.
+		 */
+		description?: {
+			/**
+			 * Header for the "description" column of the ous table. @default "description"
+			 */
+			header?: string;
+			/**
+			 * Wether or not allow the "description" column to be hidable. @default true
+			 */
+			hidable?: boolean;
+			/**
+			 * Wether or not to show the "description" ou table column. @default true
+			 */
+			show?: boolean;
+		};
+		/**
+		 * Configure ous table "dn" column.
+		 */
+		dn?: {
+			/**
+			 * Header for the "dn" column of the ous table. @default "dn"
+			 */
+			header?: string;
+			/**
+			 * Wether or not allow the "dn" column to be hidable. @default true
+			 */
+			hidable?: boolean;
+			/**
+			 * Wether or not to show the "dn" ou table column. @default true
+			 */
+			show?: boolean;
+		};
+		/**
+		 * Configure ous table "name" column.
+		 */
+		name?: {
+			/**
+			 * Header for the "name" column of the ous table. @default "name"
+			 */
+			header?: string;
+			/**
+			 * Wether or not allow the "name" column to be hidable. @default false
+			 */
+			hidable?: boolean;
+			/**
+			 * Wether or not to show the "name" ou table column. @default true
+			 */
+			show?: boolean;
+		};
+		/**
+		 * Configure ous table "whenCreated" column.
+		 */
+		whenCreated?: {
+			/**
+			 * Header for the "whenCreated" column of the ous table. @default "whenCreated"
+			 */
+			header?: string;
+			/**
+			 * Wether or not allow the "whenCreated" column to be hidable. @default true
+			 */
+			hidable?: boolean;
+			/**
+			 * Wether or not to show the "whenCreated" ou table column. @default true
+			 */
+			show?: boolean;
+		};
+	};
 }
 /**
  * Configuration regarding the settings page
@@ -778,6 +928,10 @@ export interface DirectoryConfig {
 		 * The list of ou distinguishedNames, sAMAccountNames, or cn that should not be shown in the /ous view dropdowns and search. Accessing directly to /ous/[dn] of a ou that is listed here will result on a '403 This ou is hidden by configuration' error. @default []
 		 */
 		hide?: string[];
+		/**
+		 * [Dangerous] Allows the deletion of non-leaf Organizational Units. This will recursively delete all entries in the Organizational Unit. @default false
+		 */
+		allowNonLeafDelete?: boolean;
 		/**
 		 * The maximum amount of ous allowed in the directory. If set to null the limit will be ignored. Default ous are included in the count. @default null
 		 */

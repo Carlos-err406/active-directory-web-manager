@@ -60,27 +60,13 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 				page >= pagination.totalPages ? null : `${pathname}?${nextPageSearchParams.toString()}`,
 			previousPage: page <= 1 ? null : `${pathname}?${previousPageSearchParams.toString()}`
 		};
-		const [
-			deleteManyGroupsForm,
-			deleteGroupForm,
-			createGroupForm,
-			updateGroupForm,
-			setMembersForm
-		] = await Promise.all([
-			superValidate(zod(deleteManySchema)),
-			superValidate(zod(deleteGroupSchema)),
-			superValidate(zod(createGroupSchema)),
-			superValidate(zod(updateGroupSchema)),
-			superValidate(zod(setMembersSchema))
-		]);
-
 		return {
 			pagination: paginationWithURLs,
-			deleteManyGroupsForm,
-			deleteGroupForm,
-			createGroupForm,
-			updateGroupForm,
-			setMembersForm
+			deleteManyGroupsForm: await superValidate(zod(deleteManySchema)),
+			deleteGroupForm: await superValidate(zod(deleteGroupSchema)),
+			createGroupForm: await superValidate(zod(createGroupSchema)),
+			updateGroupForm: await superValidate(zod(updateGroupSchema)),
+			setMembersForm: await superValidate(zod(setMembersSchema))
 		};
 	} catch (e) {
 		const errorId = errorLog(e, { message: 'Error loading groups page' });

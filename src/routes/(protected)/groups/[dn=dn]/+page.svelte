@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { DeleteGroupDialog, UpdateGroupDialog } from '$lib/components/groups';
 	import ManageGroupMembersDialog from '$lib/components/groups/manage-group-members-dialog.svelte';
@@ -139,5 +140,7 @@
 	dn={group.distinguishedName}
 	bind:open={isUpdateGroupDialogOpen}
 	bind:form={updateGroupForm}
-	action="/groups/{group.distinguishedName}?/updateGroup"
+	on:name-change={async ({ detail }) => {
+		await goto(`/groups/${encodeURIComponent(detail.newDn)}`, { invalidateAll: true });
+	}}
 />

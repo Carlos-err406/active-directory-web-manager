@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { Button } from '$lib/components/ui/button';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import type { User } from '$lib/types/user';
+	import type { TreeEntry } from '$lib/types/tree';
 	import EllipsisVertical from '$lucide/ellipsis-vertical.svelte';
 	import Ellipsis from '$lucide/ellipsis.svelte';
 	import Eye from '$lucide/eye.svelte';
@@ -15,7 +14,7 @@
 	import DeleteUserDialog from './delete-user-dialog.svelte';
 	import ManageUserMembershipDialog from './manage-user-membership-dialog.svelte';
 	import UpdateUserDialog from './update-user-dialog.svelte';
-	export let id: string;
+	export let entry: TreeEntry;
 	let open = false;
 	let isChangePasswordDialogOpen = false;
 	let isDeleteUserDialogOpen = false;
@@ -23,13 +22,11 @@
 	let isManageMembershipDialogOpen = false;
 	$: ({ updateUserForm } = $page.data);
 	const onOpenEditClick = () => {
-		const paginationData: User[] = $page.data.pagination.data;
-		const user = paginationData.find(({ distinguishedName }) => distinguishedName === id);
 		updateUserForm.data = {
 			...updateUserForm.data,
-			...user,
-			dn: id,
-			jpegPhotoBase64: user?.jpegPhoto
+			...entry,
+			dn: entry.distinguishedName,
+			jpegPhotoBase64: entry?.jpegPhoto
 		};
 		isUpdateUserDialogOpen = true;
 	};
@@ -49,7 +46,10 @@
 		<DropdownMenu.Group>
 			<DropdownMenu.Label>Actions</DropdownMenu.Label>
 			<DropdownMenu.Separator />
-			<DropdownMenu.Item href="/users/{encodeURIComponent(id)}" class="flex flex-nowrap gap-2">
+			<DropdownMenu.Item
+				href="/users/{encodeURIComponent(entry.distinguishedName)}"
+				class="flex flex-nowrap gap-2"
+			>
 				<Eye class="size-5" />
 				View user details
 			</DropdownMenu.Item>
@@ -82,12 +82,12 @@
 	</DropdownMenu.Content>
 </DropdownMenu.Root>
 
-<DeleteUserDialog dn={id} bind:open={isDeleteUserDialogOpen} />
-<ChangePasswordDialog dn={id} bind:open={isChangePasswordDialogOpen} />
+<DeleteUserDialog dn={entry.distinguishedName} bind:open={isDeleteUserDialogOpen} />
+<ChangePasswordDialog dn={entry.distinguishedName} bind:open={isChangePasswordDialogOpen} />
 <UpdateUserDialog
-	dn={id}
+	dn={entry.distinguishedName}
 	bind:open={isUpdateUserDialogOpen}
 	bind:form={updateUserForm}
-	on:name-change={() => invalidate('protected:users')}
+	on:name-change
 />
-<ManageUserMembershipDialog dn={id} bind:open={isManageMembershipDialogOpen} />
+<ManageUserMembershipDialog dn={entry.distinguishedName} bind:open={isManageMembershipDialogOpen} />

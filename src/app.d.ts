@@ -28,6 +28,7 @@ declare global {
 			session?: Session;
 		}
 		interface PageState {
+			[key: string]: unknown;
 			toast?: {
 				type: 'success' | 'error' | 'info' | 'message' | 'warning';
 				message: string;

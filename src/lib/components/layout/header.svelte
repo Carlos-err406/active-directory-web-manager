@@ -21,9 +21,9 @@
 				{#each $breadcrumbs as item, index (item.name)}
 					<Breadcrumb.Item>
 						{#if item.link}
-							<Breadcrumb.Link data-test="breadCrumb-{item.name}" href={item.link}
-								>{item.name}</Breadcrumb.Link
-							>
+							<Breadcrumb.Link data-test="breadCrumb-{item.name}" href={item.link}>
+								{item.name}
+							</Breadcrumb.Link>
 						{:else}
 							<Breadcrumb.Page data-test="breadCrumb-{item.name}">{item.name}</Breadcrumb.Page>
 						{/if}

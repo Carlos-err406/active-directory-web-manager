@@ -6,11 +6,15 @@ import { createGroupSchema } from '$lib/schemas/group/create-group-schema';
 import { deleteGroupSchema } from '$lib/schemas/group/delete-group-schema';
 import { setMembersSchema } from '$lib/schemas/group/set-members-schema';
 import { updateGroupSchema } from '$lib/schemas/group/update-group-schema';
+import { createOuSchema } from '$lib/schemas/ou/create-ou-schema';
+import { deleteOuSchema } from '$lib/schemas/ou/delete-ou-schema';
+import { updateOuSchema } from '$lib/schemas/ou/update-ou-schema';
 import { changePasswordSchema } from '$lib/schemas/user/change-password-schema';
 import { createUserSchema } from '$lib/schemas/user/create-user-schema';
 import { deleteUserSchema } from '$lib/schemas/user/delete-user-schema';
 import { updateUserSchema } from '$lib/schemas/user/update-user-schema';
 import { protectedAccessControl } from '$lib/server/utils';
+import { jpegPhotoToB64 } from '$lib/transforms';
 import type { TreeEntry } from '$lib/types/tree';
 import { AndFilter, Client } from 'ldapts';
 import { superValidate } from 'sveltekit-superforms';
@@ -48,6 +52,9 @@ export const load = async ({ url, locals, params }: Parameters<PageServerLoad>[0
 		deleteGroupForm: await superValidate(zod(deleteGroupSchema)),
 		createGroupForm: await superValidate(zod(createGroupSchema)),
 		updateGroupForm: await superValidate(zod(updateGroupSchema)),
+		deleteOuForm: await superValidate(zod(deleteOuSchema)),
+		createOuForm: await superValidate(zod(createOuSchema)),
+		updateOuForm: await superValidate(zod(updateOuSchema)),
 		setMembersForm: await superValidate(zod(setMembersSchema))
 	};
 };
@@ -66,14 +73,15 @@ const getChildren = async (ldap: Client, base = PUBLIC_BASE_DN, query: string | 
 	if (query) {
 		mainFilter.filters.push(getQueryFilter(query));
 	}
-	const entry = await getBaseEntry(ldap, base);
-	if (entry?.objectClass.includes('group')) {
-		const members = await getGroupMembers(ldap, entry.distinguishedName);
+	const baseEntry = await getBaseEntry(ldap, base);
+	if (!baseEntry) return null;
+	if (baseEntry.objectClass.includes('group')) {
+		const members = await getGroupMembers(ldap, baseEntry.distinguishedName);
 		mainFilter.filters.push(getObjectClassFilter(), getMembersFilter(members));
 		treeEntries = treeSearch(ldap, PUBLIC_BASE_DN, mainFilter, 'sub');
 	} else {
 		mainFilter.filters.push(getObjectClassFilter());
-		treeEntries = treeSearch(ldap, base, mainFilter, 'one');
+		treeEntries = treeSearch(ldap, base, mainFilter, 'one').then(jpegPhotoToB64);
 	}
-	return { entry, treeEntries };
+	return { base: baseEntry, treeEntries };
 };

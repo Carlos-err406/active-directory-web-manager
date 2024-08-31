@@ -15,11 +15,17 @@
 	import { toast } from 'svelte-sonner';
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import ImageInput from '../form/image-input.svelte';
+	import type { NameChange } from '$lib/types';
+	import { createEventDispatcher } from 'svelte';
 	export let open = false;
 	export let base = PUBLIC_BASE_DN;
 	export let dn: string;
 	export let form: SuperValidated<Data>;
-	const action = `/users/${dn}?/updateUser`;
+
+	$: action = `/users/${dn}?/updateUser`;
+	const dispatch = createEventDispatcher<{
+		'name-change': NameChange;
+	}>();
 	const onChange: FormOptions<UpdateUserSchema>['onChange'] = ({ get, set, target }) => {
 		if (target?.name === 'sAMAccountName') {
 			const sAMAccountName = get('sAMAccountName');
@@ -33,15 +39,18 @@
 		toastId = toast.loading('Updating user...', { duration: 30_000 });
 	};
 
-	const onResult: FormOptions<UpdateUserSchema>['onResult'] = async ({ result }) => {
+	const onResult: FormOptions<UpdateUserSchema, { nameChange: NameChange }>['onResult'] = async ({
+		result
+	}) => {
 		switch (result.type) {
 			case 'success':
-				invalidate('protected:users');
 				toastId = toast.success('User updated successfully!', {
 					id: toastId,
 					duration: undefined
 				});
 				open = false;
+				if (result.data?.nameChange.newDn) dispatch('name-change', result.data.nameChange);
+				else invalidate('protected:users');
 				break;
 			case 'error':
 				toastError(result.error, toastId);
@@ -74,6 +83,7 @@
 			formProps={{ action, enctype: 'multipart/form-data' }}
 			formOptions={{
 				resetForm: false,
+				invalidateAll: false,
 				onChange,
 				onResult,
 				onError,

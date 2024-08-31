@@ -1,5 +1,6 @@
 import config from '$config';
 import { appLog } from '$lib/server/logs';
+import { jpegPhotoToB64 } from '$lib/transforms';
 import type { Session } from '$lib/types/session';
 import type { TreeEntry } from '$lib/types/tree';
 import { error } from '@sveltejs/kit';
@@ -19,7 +20,11 @@ export const TREE_ENTRY_ATTRIBUTES = [
 	'cn',
 	'objectClass',
 	'name',
-	'jpegPhoto'
+	'description',
+	'mail',
+	'jpegPhoto',
+	'sn',
+	'givenName'
 ];
 
 export const getQueryFilter = (query: string) =>
@@ -61,7 +66,7 @@ export const treeSearch = (
 			attributes: TREE_ENTRY_ATTRIBUTES,
 			filter
 		})
-		.then(({ searchEntries }) => searchEntries as TreeEntry[]);
+		.then(({ searchEntries }) => searchEntries.map(jpegPhotoToB64) as TreeEntry[]);
 
 export const throwIfIsHiddenEntry = (dn: string, session: Session, url: URL) => {
 	const { users, ous, groups, tree } = config.directory;

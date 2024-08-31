@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { Button } from '$lib/components/ui/button';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { getGroupTypes } from '$lib/ldap/utils';
-	import { GroupFlags, type Group } from '$lib/types/group';
+	import { GroupFlags } from '$lib/types/group';
+	import type { TreeEntry } from '$lib/types/tree';
 	import EllipsisVertical from '$lucide/ellipsis-vertical.svelte';
 	import Ellipsis from '$lucide/ellipsis.svelte';
 	import Eye from '$lucide/eye.svelte';
@@ -15,7 +15,7 @@
 	import ManageGroupMembersDialog from './manage-group-members-dialog.svelte';
 	import UpdateGroupDialog from './update-group-dialog.svelte';
 
-	export let id: string;
+	export let entry: TreeEntry;
 	let open = false;
 	let isDeleteGroupDialogOpen = false;
 	let isUpdateGroupDialogOpen = false;
@@ -23,17 +23,14 @@
 	$: ({ updateGroupForm } = $page.data);
 
 	const onOpenEditClick = () => {
-		const paginationData: Group[] = $page.data.pagination.data;
-		const group = paginationData.find(({ distinguishedName }) => distinguishedName === id);
-		if (!group) return;
-		const [match] = getGroupTypes(group.groupType).filter(
+		const [match] = getGroupTypes(entry.groupType).filter(
 			(gt) => gt !== GroupFlags['Global Scope']
 		);
 		updateGroupForm.data = {
 			...updateGroupForm.data,
-			...group,
+			...entry,
 			groupType: match,
-			dn: id
+			dn: entry.distinguishedName
 		};
 		isUpdateGroupDialogOpen = true;
 	};
@@ -53,7 +50,10 @@
 		<DropdownMenu.Group>
 			<DropdownMenu.Label>Actions</DropdownMenu.Label>
 			<DropdownMenu.Separator />
-			<DropdownMenu.Item href="/groups/{encodeURIComponent(id)}" class="flex flex-nowrap gap-2">
+			<DropdownMenu.Item
+				href="/groups/{encodeURIComponent(entry.distinguishedName)}"
+				class="flex flex-nowrap gap-2"
+			>
 				<Eye class="size-5" />
 				View group details
 			</DropdownMenu.Item>
@@ -79,11 +79,11 @@
 	</DropdownMenu.Content>
 </DropdownMenu.Root>
 
-<DeleteGroupDialog dn={id} bind:open={isDeleteGroupDialogOpen} />
-<ManageGroupMembersDialog dn={id} bind:open={isManageMembersDialogOpen} />
+<DeleteGroupDialog dn={entry.distinguishedName} bind:open={isDeleteGroupDialogOpen} />
+<ManageGroupMembersDialog dn={entry.distinguishedName} bind:open={isManageMembersDialogOpen} />
 <UpdateGroupDialog
-	dn={id}
+	dn={entry.distinguishedName}
 	bind:open={isUpdateGroupDialogOpen}
 	bind:form={updateGroupForm}
-	on:name-change={() => invalidate('protected:groups')}
+	on:name-change
 />

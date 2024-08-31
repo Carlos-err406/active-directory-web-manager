@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { CreateGroupDialog } from '$lib/components/groups';
+	import { CreateOuDialog } from '$lib/components/organizational-units';
 	import { CreateUserDialog } from '$lib/components/users';
 	import type { TreeEntry } from '$lib/types/tree';
 	import { cn } from '$lib/utils';
@@ -24,7 +25,6 @@
 	};
 	const handleCreateOu = () => {
 		createOuDialogOpen = true;
-		console.log({ createOuDialogOpen });
 	};
 </script>
 
@@ -63,3 +63,4 @@
 
 <CreateUserDialog bind:open={createUserDialogOpen} base={base.distinguishedName} />
 <CreateGroupDialog bind:open={createGroupDialogOpen} base={base.distinguishedName} />
+<CreateOuDialog bind:open={createOuDialogOpen} base={base.distinguishedName} />

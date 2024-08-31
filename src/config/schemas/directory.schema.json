@@ -47,6 +47,11 @@
 					},
 					"uniqueItems": true
 				},
+				"allowNonLeafDelete": {
+					"type": "boolean",
+					"description": "[Dangerous] Allows the deletion of non-leaf Organizational Units. This will recursively delete all entries in the Organizational Unit. @default false",
+					"default": false
+				},
 				"limit": {
 					"minimum": 0,
 					"description": "The maximum amount of ous allowed in the directory. If set to null the limit will be ignored. Default ous are included in the count. @default null",

@@ -5,13 +5,14 @@ import { updateGroupSchema } from '$lib/schemas/group/update-group-schema';
 import { errorLog } from '$lib/server/logs';
 import { specificResourceAccessControl } from '$lib/server/utils';
 import type { Group } from '$lib/types/group';
-import { error } from '@sveltejs/kit';
+import { error, isHttpError } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, url, params }) => {
-	const { dn } = params;
+	const dn = decodeURIComponent(params.dn);
+
 	const { ldap } = await specificResourceAccessControl({ locals, url, dn });
 	try {
 		const [group, setMembersForm, updateGroupForm, deleteGroupForm] = await Promise.all([
@@ -25,6 +26,7 @@ export const load: PageServerLoad = async ({ locals, url, params }) => {
 		}
 		return { group, setMembersForm, updateGroupForm, deleteGroupForm, searchForm: false };
 	} catch (e) {
+		if (isHttpError(e)) throw e;
 		const errorId = errorLog(e, { message: `Error loading group ${dn} page` });
 		throw error(500, { message: 'Something went wrong while loading the page', errorId });
 	}

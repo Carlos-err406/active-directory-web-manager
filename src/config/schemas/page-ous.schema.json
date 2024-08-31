@@ -1,13 +1,19 @@
 {
 	"$id": "page-ous.schema.json",
-	"description": "Configuration regarding the ous page",
-	"title": "OusPageConfig",
+	"description": "Configuration regarding the groups page",
+	"title": "GroupsPageConfig",
 	"type": "object",
 	"properties": {
+		"details": {
+			"$ref": "page-ous-details.schema.json"
+		},
 		"show": {
-			"description": "Weather or not to show the /ous page in navigation. Accessing directly to this route will result on a '403 This page has been disabled by configuration' error. @defaults true",
+			"description": "Weather or not to show the \"/ous\" page in navigation. Accessing directly to this route will result on a \"403 This page has been disabled by configuration\" error. @default true",
 			"type": "boolean",
 			"default": true
+		},
+		"table": {
+			"$ref": "page-ous-table.schema.json"
 		}
 	},
 	"additionalProperties": false

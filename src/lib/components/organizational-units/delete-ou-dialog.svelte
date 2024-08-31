@@ -5,26 +5,24 @@
 	import Form, { type FormOptions } from '$lib/components/form/form.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
-	import {
-		deleteGroupSchema,
-		type DeleteGroupSchema
-	} from '$lib/schemas/group/delete-group-schema';
+	import { deleteOuSchema, type DeleteOuSchema } from '$lib/schemas/ou/delete-ou-schema';
 	import { toast } from 'svelte-sonner';
 	export let open = false;
 	export let dn: string;
-	export let action = '/groups?/deleteGroup';
-	$: form = $page.data.deleteGroupForm;
+	export let action = '/ous?/deleteOu';
+	$: form = $page.data.deleteOuForm;
+	const { allowNonLeafDelete } = $page.data.config.directory.ous;
 	let toastId: string | number = NaN;
 
-	const onSubmit: FormOptions<DeleteGroupSchema>['onSubmit'] = () => {
-		toastId = toast.loading('Deleting group...', { duration: 30_000 });
+	const onSubmit: FormOptions<DeleteOuSchema>['onSubmit'] = () => {
+		toastId = toast.loading('Deleting ou...', { duration: 30_000 });
 	};
 
-	const onResult: FormOptions<DeleteGroupSchema>['onResult'] = async ({ result }) => {
+	const onResult: FormOptions<DeleteOuSchema>['onResult'] = async ({ result }) => {
 		switch (result.type) {
 			case 'success':
-				invalidate('protected:groups');
-				toastId = toast.success('Group deleted successfully!', {
+				invalidate('protected:ous');
+				toastId = toast.success('Organizational Unit deleted successfully!', {
 					id: toastId,
 					duration: undefined
 				});
@@ -37,14 +35,14 @@
 						toast: {
 							data: { id: toastId, duration: undefined },
 							type: 'success',
-							message: 'Group deleted successfully!'
+							message: 'Organizational Unit deleted successfully!'
 						}
 					}
 				});
 				break;
 		}
 	};
-	const onError: FormOptions<DeleteGroupSchema>['onError'] = ({ result }) => {
+	const onError: FormOptions<DeleteOuSchema>['onError'] = ({ result }) => {
 		toastError(result.error, toastId);
 		open = false;
 	};
@@ -53,13 +51,15 @@
 <Dialog.Root bind:open>
 	<Dialog.Content>
 		<Dialog.Header>
-			<Dialog.Title class="text-xl text-destructive">Delete Group</Dialog.Title>
-			<Dialog.Description>This is a dangerous action!</Dialog.Description>
+			<Dialog.Title class="text-xl text-destructive">Delete Organizational Unit</Dialog.Title>
+			<Dialog.Description>
+				<p>This is a dangerous action!</p>
+			</Dialog.Description>
 		</Dialog.Header>
 		<Form
 			let:loading
 			bind:form
-			schema={deleteGroupSchema}
+			schema={deleteOuSchema}
 			formProps={{ action }}
 			formOptions={{
 				resetForm: false,
@@ -70,7 +70,14 @@
 			}}
 		>
 			<input hidden name="dn" value={dn} />
-			<div class="mb-5 text-lg">Are you sure you want to delete this group?</div>
+			{#if allowNonLeafDelete}
+				<p class="text-lg">Are you sure you want to delete this Organizational Unit</p>
+				<p class="text-lg text-destructive">and all entries inside it?</p>
+			{:else}
+				<p class="text-lg">Are you sure you want to delete this Organizational Unit?</p>
+				<p class="text-muted-foreground">deletion will fail if it's not empty</p>
+			{/if}
+
 			<Dialog.Footer>
 				<Button type="button" variant="outline" on:click={() => (open = false)}>Cancel</Button>
 				<Button type="submit" variant="destructive" disabled={loading}>Accept</Button>

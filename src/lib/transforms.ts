@@ -30,8 +30,12 @@ export const b64ToObjectURL = (b64String: string, mimeType = 'image/jpeg'): stri
 
 export const jpegPhotoToB64 = <T = Entry>(entry?: T) => {
 	if (entry && typeof entry === 'object' && 'jpegPhoto' in entry) {
-		const base64String = Buffer.from(entry.jpegPhoto as string, 'base64').toString('base64');
-		entry.jpegPhoto = `data:image/jpeg;base64,${base64String}`;
+		if (Array.isArray(entry.jpegPhoto) && entry.jpegPhoto.length === 0) {
+			entry.jpegPhoto = undefined;
+		} else {
+			const base64String = Buffer.from(entry.jpegPhoto as string, 'base64').toString('base64');
+			entry.jpegPhoto = `data:image/jpeg;base64,${base64String}`;
+		}
 	}
 	return entry as T;
 };

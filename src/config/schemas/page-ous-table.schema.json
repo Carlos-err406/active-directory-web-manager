@@ -1,0 +1,100 @@
+{
+	"$id": "page-ous-table.schema.json",
+	"description": "Ous table view configuration",
+	"title": "OusTableConfig",
+	"type": "object",
+	"properties": {
+		"columns": {
+			"description": "Ous table column settings",
+			"type": "object",
+			"properties": {
+				"description": {
+					"description": "Configure ous table \"description\" column.",
+					"properties": {
+						"header": {
+							"default": "description",
+							"description": "Header for the \"description\" column of the ous table. @default \"description\"",
+							"type": "string"
+						},
+						"hidable": {
+							"description": "Wether or not allow the \"description\" column to be hidable. @default true",
+							"type": "boolean",
+							"default": true
+						},
+						"show": {
+							"description": "Wether or not to show the \"description\" ou table column. @default true",
+							"type": "boolean",
+							"default": true
+						}
+					},
+					"additionalProperties": false
+				},
+				"dn": {
+					"description": "Configure ous table \"dn\" column.",
+					"properties": {
+						"header": {
+							"default": "distinguishedName",
+							"description": "Header for the \"dn\" column of the ous table. @default \"dn\"",
+							"type": "string"
+						},
+						"hidable": {
+							"description": "Wether or not allow the \"dn\" column to be hidable. @default true",
+							"type": "boolean",
+							"default": true
+						},
+						"show": {
+							"description": "Wether or not to show the \"dn\" ou table column. @default true",
+							"type": "boolean",
+							"default": true
+						}
+					},
+					"additionalProperties": false
+				},
+				"name": {
+					"description": "Configure ous table \"name\" column.",
+					"properties": {
+						"header": {
+							"default": "name",
+							"description": "Header for the \"name\" column of the ous table. @default \"name\"",
+							"type": "string"
+						},
+						"hidable": {
+							"description": "Wether or not allow the \"name\" column to be hidable. @default false",
+							"type": "boolean",
+							"default": false
+						},
+						"show": {
+							"description": "Wether or not to show the \"name\" ou table column. @default true",
+							"type": "boolean",
+							"default": true
+						}
+					},
+					"additionalProperties": false
+				},
+				"whenCreated": {
+					"description": "Configure ous table \"whenCreated\" column.",
+					"properties": {
+						"header": {
+							"default": "whenCreated",
+							"description": "Header for the \"whenCreated\" column of the ous table. @default \"whenCreated\"",
+							"type": "string"
+						},
+						"hidable": {
+							"description": "Wether or not allow the \"whenCreated\" column to be hidable. @default true",
+							"type": "boolean",
+							"default": true
+						},
+						"show": {
+							"description": "Wether or not to show the \"whenCreated\" ou table column. @default true",
+							"type": "boolean",
+							"default": true
+						}
+					},
+					"additionalProperties": false
+				}
+			},
+			"additionalProperties": false
+		}
+	},
+	"additionalProperties": false
+}

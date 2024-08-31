@@ -1,5 +1,6 @@
 import { PUBLIC_BASE_DN } from '$env/static/public';
 import {
+	extractBase,
 	getBaseEntry,
 	getEntryByDn,
 	getGroupMembers,
@@ -198,9 +199,10 @@ export const updateGroup: Action = async (event) => {
 
 	//add global scope to group (+2)
 	const withGlobalScope = groupType + GroupFlags['Global Scope'];
+	const sAMAccountNameChange = inferChange(group, 'sAMAccountName', sAMAccountName);
 
 	const changes = [
-		inferChange(group, 'sAMAccountName', sAMAccountName),
+		sAMAccountNameChange,
 		inferChange(group, 'groupType', withGlobalScope.toString()),
 		inferChange(group, 'mail', mail),
 		inferChange(group, 'description', description)
@@ -224,7 +226,21 @@ export const updateGroup: Action = async (event) => {
 		const errorId = errorLog(e, { message });
 		throw error(500, { message, errorId });
 	}
-	return { form };
+	if (sAMAccountNameChange) {
+		const base = extractBase(group.dn);
+		const newDN = `CN=${sAMAccountName},${base}`;
+		try {
+			await ldap.modifyDN(dn, newDN);
+		} catch (e) {
+			const message = `Something unexpected happened while updating ${group.sAMAccountName}'s distinguishedName`;
+			const errorId = errorLog(e, { message });
+			throw error(500, { message, errorId });
+		}
+	}
+	return {
+		form,
+		nameChange: { oldDn: group.dn, newDn: `CN=${sAMAccountName},${extractBase(group.dn)}` }
+	};
 };
 
 export const setMembers: Action = async (event) => {

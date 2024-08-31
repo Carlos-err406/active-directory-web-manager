@@ -104,6 +104,52 @@ const defaults: RecursiveRequired<App.Config> = {
 				show: true
 			},
 			ousPage: {
+				details: {
+					name: {
+						label: 'name',
+						show: true
+					},
+					description: {
+						label: 'description',
+						show: true
+					},
+					distinguishedName: {
+						label: 'distinguishedName',
+						show: true
+					},
+					whenChanged: {
+						label: 'whenChanged',
+						show: true
+					},
+					whenCreated: {
+						label: 'whenCreated',
+						show: true
+					}
+				},
+				table: {
+					columns: {
+						description: {
+							header: 'description',
+							hidable: true,
+							show: true
+						},
+						dn: {
+							header: 'distinguishedName',
+							hidable: true,
+							show: true
+						},
+						name: {
+							header: 'name',
+							hidable: false,
+							show: true
+						},
+						whenCreated: {
+							header: 'whenCreated',
+							hidable: true,
+							show: true
+						}
+					}
+				},
 				show: true
 			},
 			settingsPage: {
@@ -243,6 +289,7 @@ const defaults: RecursiveRequired<App.Config> = {
 		},
 		ous: {
 			hide: [],
+			allowNonLeafDelete: false,
 			limit: null
 		},
 		users: {

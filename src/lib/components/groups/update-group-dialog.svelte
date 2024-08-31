@@ -11,9 +11,11 @@
 		updateGroupSchema,
 		type UpdateGroupSchema
 	} from '$lib/schemas/group/update-group-schema';
+	import type { NameChange } from '$lib/types';
 	import { GroupTypeSelect } from '$lib/types/group';
 	import Captions from '$lucide/captions.svelte';
 	import Mail from '$lucide/mail.svelte';
+	import { createEventDispatcher } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import { slide } from 'svelte/transition';
 	import type { SuperValidated } from 'sveltekit-superforms';
@@ -21,8 +23,13 @@
 	export let open = false;
 	export let base = PUBLIC_BASE_DN;
 	export let dn: string;
-	export let action = '/groups?/updateGroup';
 	export let form: SuperValidated<Data>;
+
+	$: action = `/groups/${dn}?/updateGroup`;
+	const dispatch = createEventDispatcher<{
+		'name-change': NameChange;
+	}>();
+
 	const onChange: FormOptions<UpdateGroupSchema>['onChange'] = ({ get, set, target }) => {
 		if (target?.name === 'sAMAccountName') {
 			const sAMAccountName = get('sAMAccountName');
@@ -37,8 +44,9 @@
 	const onSubmit: FormOptions<UpdateGroupSchema>['onSubmit'] = () => {
 		toastId = toast.loading('Updating group...', { duration: 30_000 });
 	};
-	const onResult: FormOptions<UpdateGroupSchema>['onResult'] = async ({ result }) => {
-		invalidate('protected:groups');
+	const onResult: FormOptions<UpdateGroupSchema, { nameChange: NameChange }>['onResult'] = async ({
+		result
+	}) => {
 		switch (result.type) {
 			case 'success':
 				open = false;
@@ -46,9 +54,12 @@
 					id: toastId,
 					duration: undefined
 				});
+				if (result.data?.nameChange.newDn) dispatch('name-change', result.data.nameChange);
+				else invalidate('protected:groups');
 				break;
 			case 'redirect':
 				open = false;
+				invalidate('protected:groups');
 				toast.dismiss(toastId);
 				applyAction(result);
 		}
@@ -72,6 +83,7 @@
 			schema={updateGroupSchema}
 			formProps={{ action }}
 			formOptions={{
+				invalidateAll: false,
 				resetForm: true,
 				onChange,
 				onSubmit,

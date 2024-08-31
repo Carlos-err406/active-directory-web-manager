@@ -11,6 +11,7 @@
 	import PencilLine from '$lucide/pencil-line.svelte';
 	import dayjs from 'dayjs';
 	import type { PageData } from './$types';
+	import { invalidateAll } from '$app/navigation';
 	export let data: PageData;
 
 	let isChangePasswordDialogOpen = false;
@@ -159,5 +160,6 @@
 	dn={user.distinguishedName}
 	bind:open={isUpdateUserDialogOpen}
 	bind:form={updateUserForm}
+	on:name-change={() => invalidateAll()}
 />
 <ChangePasswordDialog dn={user.distinguishedName} bind:open={isChangePasswordDialogOpen} />

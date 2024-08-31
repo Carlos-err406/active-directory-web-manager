@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { Avatar, AvatarFallback, AvatarWithPreview } from '$lib/components/ui/avatar';
 	import { Button } from '$lib/components/ui/button';
@@ -149,7 +150,10 @@
 <DeleteUserDialog dn={user.distinguishedName} bind:open={isDeleteUserDialogOpen} />
 <ChangePasswordDialog dn={user.distinguishedName} bind:open={isChangePasswordDialogOpen} />
 <UpdateUserDialog
-	dn={user.distinguishedName}
+	dn={$page.params.dn}
 	bind:open={isUpdateUserDialogOpen}
 	bind:form={updateUserForm}
+	on:name-change={async ({ detail }) => {
+		await goto(`/users/${encodeURIComponent(detail.newDn)}`, { invalidateAll: true });
+	}}
 />

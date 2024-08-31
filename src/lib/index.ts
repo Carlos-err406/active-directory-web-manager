@@ -7,5 +7,5 @@ export const toastError = (error: Error | App.Error, toastId?: string | number) 
 			id: toastId,
 			duration: undefined
 		});
-	else toast.error(error.message, { id: toastId });
+	else toast.error(error.message, { id: toastId, duration: undefined });
 };

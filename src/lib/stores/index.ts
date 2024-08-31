@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-
+import _ from 'lodash';
 const getBreadcrumbsStore = () => {
 	interface Breadcrumb {
 		name: string;
@@ -7,7 +7,8 @@ const getBreadcrumbsStore = () => {
 	}
 	const { subscribe, set } = writable<Breadcrumb[]>([{ name: 'Console' }]);
 	const _set = (value: Breadcrumb[]) => {
-		set([{ name: 'Console' }, ...value]);
+		const _value = _.uniqBy(value, 'name');
+		set([{ name: 'Console' }, ..._value]);
 	};
 
 	return {

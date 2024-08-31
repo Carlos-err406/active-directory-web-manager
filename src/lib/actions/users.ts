@@ -94,14 +94,14 @@ export const createUser: Action = async (event) => {
 	}
 
 	const baseEntry = await getBaseEntry(ldap, base);
-	let dn = `CN=${sAMAccountName}`;
+	let dn = `CN=${sAMAccountName},`;
 	const baseIsGroup = baseEntry.objectClass.includes('group');
 	if (baseIsGroup) {
-		dn += `,CN=Users,${PUBLIC_BASE_DN}`;
+		dn += extractBase(baseEntry.distinguishedName); //so the user is actually created at the same level as the group
 	} else {
-		dn += `,${base}`;
+		dn += base;
 	}
-
+	console.log({ dn });
 	//create the user
 	try {
 		await ldap.add(dn, attributes);
@@ -316,9 +316,9 @@ export const updateUser: Action = async (event) => {
 
 	const [, content] = jpegPhotoBase64?.split('base64,') || [];
 	const jpegPhoto = content ? Buffer.from(content, 'base64').toString('base64') : undefined;
-
+	const sAMAccountNameChange = inferChange(user, 'sAMAccountName', sAMAccountName);
 	const changes = [
-		inferChange(user, 'sAMAccountName', sAMAccountName),
+		sAMAccountNameChange,
 		inferChange(user, 'givenName', givenName),
 		inferChange(user, 'sn', sn),
 		inferChange(user, 'mail', mail),
@@ -349,7 +349,7 @@ export const updateUser: Action = async (event) => {
 		const errorId = errorLog(e, { message });
 		throw error(500, { message, errorId });
 	}
-	if (sAMAccountName && sAMAccountName !== user.sAMAccountName) {
+	if (sAMAccountNameChange) {
 		const base = extractBase(user.dn);
 		const newDN = `CN=${sAMAccountName},${base}`;
 		try {
@@ -381,7 +381,10 @@ export const updateUser: Action = async (event) => {
 	} else {
 		appLog(`User ${auth.session.sAMAccountName} updated ${updatedUser.sAMAccountName}'s profile`);
 	}
-	return withFiles({ form });
+	return withFiles({
+		form,
+		nameChange: { oldDn: user.dn, newDn: `CN=${sAMAccountName},${extractBase(user.dn)}` }
+	});
 };
 
 export const updateMembership: Action = async (event) => {
