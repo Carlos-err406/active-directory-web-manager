@@ -100,6 +100,7 @@ export const deleteOu: Action = async (event) => {
 		);
 		throw error(403, `Organizational Unit ${ou.name} can not be deleted!`);
 	}
+	const deletedEntries: string[] = [];
 	try {
 		await ldap.del(dn);
 	} catch (e) {
@@ -118,14 +119,15 @@ export const deleteOu: Action = async (event) => {
 				);
 				throw error(403, 'This Organizational Unit is not empty!');
 			} else {
-				await recursiveDelete(ldap, ou);
+				await recursiveDelete(ldap, ou, deletedEntries);
 			}
+		} else {
+			const message = `Something unexpected happened while trying to delete ${ou.name}`;
+			const errorId = errorLog(e, { message });
+			throw error(500, { message, errorId });
 		}
-		const message = `Something unexpected happened while trying to delete ${ou.name}`;
-		const errorId = errorLog(e, { message });
-		throw error(500, { message, errorId });
 	}
-	appLog(`User ${session.sAMAccountName} deleted Organizational Unit ${dn}`);
+	deletedEntries.map((dn) => appLog(`User ${session.sAMAccountName} deleted entry: ${dn}`));
 
 	if (params.dn === dn) {
 		throw redirect(302, '/groups');
@@ -214,20 +216,45 @@ export const updateOu: Action = async (event) => {
 	}
 };
 
-const recursiveDelete = async (ldap: Client, ou: OrganizationalUnit) => {
-	const allChildren = await ldap
-		.search(ou.dn, {
-			scope: 'sub',
-			attributes: ['distinguishedName', 'objectClass', 'isCriticalSystemObject']
-		})
-		.then(({ searchEntries }) => searchEntries);
+const recursiveDelete = async <
+	T extends { dn: string; isCriticalSystemObject: string; objectClass: string[] }
+>(
+	ldap: Client,
+	entry: T,
+	deletedEntries: string[]
+) => {
+	try {
+		if (entry.isCriticalSystemObject === 'TRUE') {
+			console.log(`Skipping critical system object: ${entry.dn}`);
+			return;
+		}
 
-	const lastIndentationLevel = allChildren.reduce((acc, child) => {
-		// OU=lv4,OU=lv3,OU=inside at base,OU=at base,DC=local,DC=com
-		const indentation = child.dn.replaceAll(`,${PUBLIC_BASE_DN}`, '').split(',').length;
-		if (indentation - 2 > acc) return indentation;
-		return acc;
-	}, 0);
-	console.log(lastIndentationLevel);
-	throw error(400, 'recursive delete not implemented yet!');
+		console.log(`Attempting to delete: ${entry.dn}`);
+		await ldap.del(entry.dn);
+		deletedEntries.push(entry.dn);
+		console.log(`Successfully deleted: ${entry.dn}`);
+	} catch (e) {
+		if (e instanceof NotAllowedOnNonLeafError) {
+			console.log(`Non-leaf node encountered: ${entry.dn}`);
+			const children = await ldap
+				.search(entry.dn, {
+					scope: 'one',
+					attributes: ['objectClass', 'isCriticalSystemObject', 'dn']
+				})
+				.then(({ searchEntries }) => searchEntries as T[]);
+
+			for (const child of children) {
+				await recursiveDelete(ldap, child, deletedEntries);
+			}
+
+			// Try deleting the current entry again after deleting its children
+			console.log(`Retrying deletion of: ${entry.dn}`);
+			await ldap.del(entry.dn);
+			deletedEntries.push(entry.dn);
+			console.log(`Successfully deleted: ${entry.dn}`);
+		} else {
+			console.error(`Error deleting ${entry.dn}:`, e);
+			throw e;
+		}
+	}
 };
