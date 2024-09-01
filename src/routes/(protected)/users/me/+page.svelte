@@ -1,10 +1,12 @@
 <script lang="ts">
+	import { InfoValue, MemberofInfoValue } from '$/lib/components/info-value';
+	import ParentInfoValue from '$/lib/components/info-value/parent-info-value.svelte';
 	import { invalidateAll } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { Avatar, AvatarFallback, AvatarWithPreview } from '$lib/components/ui/avatar';
 	import { Button } from '$lib/components/ui/button';
 	import { ChangePasswordDialog, UpdateUserDialog } from '$lib/components/users';
-	import { getCNFromDN, getUserAccountControls } from '$lib/ldap/utils';
+	import { getUserAccountControls } from '$lib/ldap/utils';
 	import { breadcrumbs } from '$lib/stores';
 	import { UserAccountControlTypes } from '$lib/types/user';
 	import { getTreeUrlFromDn } from '$lib/utils';
@@ -13,13 +15,16 @@
 	import LockKeyhole from '$lucide/lock-keyhole.svelte';
 	import PencilLine from '$lucide/pencil-line.svelte';
 	import dayjs from 'dayjs';
+	import { setContext } from 'svelte';
 	import type { PageData } from './$types';
 	export let data: PageData;
 
 	let isChangePasswordDialogOpen = false;
 	let isUpdateUserDialogOpen = false;
 	const { details: config } = $page.data.config.app.views.usersPage;
-	$: ({ user, updateUserForm, session } = data);
+	setContext('config', config);
+	setContext('entry', data.user);
+	$: ({ user, updateUserForm, session, memberOf, parent } = data);
 	$: ({ jpegPhoto, sAMAccountName } = user);
 
 	$: breadcrumbs.set([{ name: 'Users', link: '/users' }, { name: sAMAccountName }]);
@@ -34,7 +39,6 @@
 		isUpdateUserDialogOpen = true;
 	};
 	$: canSelfEdit = $page.data.config.app.nonAdmin.allowSelfEdit || session.isAdmin;
-	$: showGroupsAsLinks = config.memberOf.asLinks;
 </script>
 
 <div class="flex h-full w-full flex-col py-12 md:py-16" data-test="usersMePage">
@@ -56,76 +60,26 @@
 				</h1>
 			</div>
 			<div class="user-info grid grid-cols-2 gap-y-3">
-				{#if config.sAMAccountName.show}
-					<span>{config.sAMAccountName.label}:</span>
-					<span class="info-value" data-test="sAMAccountName">{user.sAMAccountName}</span>
-				{/if}
-				{#if config.displayName.show && user.displayName}
-					<span>{config.displayName.label}:</span>
-					<span class="info-value" data-test="displayName">{user.displayName}</span>
-				{/if}
-				{#if config.givenName.show && user.givenName}
-					<span>{config.givenName.label}:</span>
-					<span class="info-value" data-test="givenName">{user.givenName}</span>
-				{/if}
-				{#if config.sn.show && user.sn}
-					<span> {config.sn.label}:</span>
-					<span class="info-value" data-test="sn">{user.sn}</span>
-				{/if}
-				{#if config.mail.show && user.mail}
-					<span>{config.mail.label}:</span>
-					<span class="info-value" data-test="mail">{user.mail}</span>
-				{/if}
-				{#if config.description.show && user.description}
-					<span>{config.description.label}:</span>
-					<span class="info-value" data-test="description">{user.description}</span>
-				{/if}
-				{#if config.userAccountControl.show}
-					<span>{config.userAccountControl.label}:</span>
-					<span class="info-value" data-test="userAccountControl">
-						{getUserAccountControls(user.userAccountControl)
-							.map((uac) => UserAccountControlTypes[uac])
-							.join(', ')}
-					</span>
-				{/if}
-				{#if config.whenCreated.show}
-					<span>{config.whenCreated.label}:</span>
-					<span class="info-value" data-test="whenCreated">
-						{dayjs(user.whenCreated.replace('Z', '')).format('MMMM D, YYYY hh:mm:ss A')}
-					</span>
-				{/if}
-				{#if config.whenChanged.show}
-					<span>{config.whenChanged.label}:</span>
-					<span class="info-value" data-test="whenChanged">
-						{dayjs(user.whenChanged.replace('Z', '')).format('MMMM D, YYYY hh:mm:ss A')}
-					</span>
-				{/if}
-				{#if config.distinguishedName.show}
-					<span>{config.distinguishedName.label}:</span>
-					<span class="info-value" data-test="distinguishedName">{user.distinguishedName}</span>
-				{/if}
-				{#if config.memberOf.show}
-					<span>{config.memberOf.label}:</span>
-					<div class="info-value flex flex-wrap space-y-2" data-test="memberOf">
-						{#each (user.memberOf || []).sort( (a, b) => (a < b ? -1 : a > b ? 1 : 0) ) as groupDn, index}
-							<svelte:element
-								this={showGroupsAsLinks ? 'a' : 'p'}
-								data-sveltekit-preload-data="hover"
-								data-isLink={showGroupsAsLinks}
-								data-isShort={config.memberOf.shortMemberOf}
-								class="data-[isShort=true]:!mt-0 data-[isLink=true]:text-primary data-[isLink=true]:hover:underline"
-								href={showGroupsAsLinks ? `/groups/${groupDn}` : '#'}
-							>
-								{config.memberOf.shortMemberOf ? getCNFromDN(groupDn) : groupDn}
-							</svelte:element>
-							{#if config.memberOf.shortMemberOf && index < user.memberOf.length - 1}
-								<pre class="!m-0 font-sans">, </pre>
-							{/if}
-						{:else}
-							<span> - </span>
-						{/each}
-					</div>
-				{/if}
+				<InfoValue key="sAMAccountName" />
+				<InfoValue key="displayName" />
+				<InfoValue key="givenName" />
+				<InfoValue key="sn" />
+				<InfoValue key="mail" />
+				<InfoValue key="description" />
+				<InfoValue key="userAccountControl">
+					{getUserAccountControls(user.userAccountControl)
+						.map((uac) => UserAccountControlTypes[uac])
+						.join(', ')}
+				</InfoValue>
+				<InfoValue key="whenCreated">
+					{dayjs(user.whenCreated.replace('Z', '')).format('MMMM D, YYYY hh:mm:ss A')}
+				</InfoValue>
+				<InfoValue key="whenChanged">
+					{dayjs(user.whenChanged.replace('Z', '')).format('MMMM D, YYYY hh:mm:ss A')}
+				</InfoValue>
+				<InfoValue key="distinguishedName" />
+				<ParentInfoValue {parent} />
+				<MemberofInfoValue {memberOf} />
 			</div>
 		</div>
 	</div>

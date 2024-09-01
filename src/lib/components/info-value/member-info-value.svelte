@@ -33,7 +33,7 @@
 						class="flex items-center gap-x-2 data-[isLink=true]:text-primary data-[isLink=true]:hover:underline"
 						{href}
 					>
-						<svelte:component this={getEntryIcon(member)} class="size-6" />
+						<svelte:component this={getEntryIcon(member)} class="size-6 flex-none" />
 						{config.member.shortMember ? getCNFromDN(member.dn) : member.dn}
 					</svelte:element>
 				{:else}

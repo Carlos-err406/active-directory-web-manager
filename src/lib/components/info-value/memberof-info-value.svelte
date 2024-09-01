@@ -12,10 +12,10 @@
 {#if config.memberOf.show}
 	{#await memberOf}
 		<span>{config.memberOf.label}:</span>
-		<div class="info-value flex flex-col gap-y-2" data-test="member">
+		<div class="info-value flex flex-col gap-y-2" data-test="memberOf">
 			<div class="flex w-full items-center gap-5">
 				<Loader class="animate-spin" />
-				<p>Loading members</p>
+				<p>Loading membership</p>
 			</div>
 		</div>
 	{:then memberOf}
