@@ -1,6 +1,6 @@
 {
 	"name": "active-directory-web-manager",
-	"version": "0.10.3",
+	"version": "0.11.0",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
