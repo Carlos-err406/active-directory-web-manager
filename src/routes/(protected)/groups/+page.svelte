@@ -123,7 +123,7 @@
 					sort: { disable: true }
 				},
 				cell: ({ value }) => {
-					return createRender(GroupTableActions, { id: value });
+					return createRender(GroupTableActions, { dn: value });
 				}
 			})
 		]);

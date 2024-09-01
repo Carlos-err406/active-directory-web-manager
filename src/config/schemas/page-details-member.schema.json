@@ -1,0 +1,30 @@
+{
+	"$id": "page-details-member.schema.json",
+	"title": "MemberDetailsConfig",
+	"description": "Configuration regarding the \"member(s)\" of the entry",
+	"type": "object",
+	"properties": {
+		"label": {
+			"default": "member",
+			"description": "@default \"member\"",
+			"type": "string"
+		},
+		"asLinks": {
+			"description": "Show members as links to each member detailed page. @default false",
+			"type": "boolean",
+			"default": false
+		},
+		"shortMember": {
+			"description": "If false the each member will be shown as the full distinguishedName, else only the name will be shown. @default false",
+			"type": "boolean",
+			"default": false
+		},
+		"show": {
+			"description": "Wether or not to show the \"member(s)\" of the entry in the details view. If false \"shortMember\" will be ignored @default true",
+			"type": "boolean",
+			"default": true
+		}
+	},
+
+	"additionalProperties": false
+}

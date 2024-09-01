@@ -1,0 +1,29 @@
+{
+	"$id": "page-details-parent.schema.json",
+	"title": "ParentDetailsConfig",
+	"description": "Configuration regarding the parent entry of the group",
+	"type": "object",
+	"properties": {
+		"label": {
+			"default": "parent",
+			"description": "@default \"parent\"",
+			"type": "string"
+		},
+		"show": {
+			"description": "Wether or not to show the parent of the group in the \"/groups/[dn]\" page. @default true",
+			"type": "boolean",
+			"default": true
+		},
+		"asLink": {
+			"description": "Show parent as link to to the parent entry. @default false",
+			"type": "boolean",
+			"default": false
+		},
+		"shortParent": {
+			"description": "If false the parent of the group will be shown as the full distinguishedName, else only the CN is shown. @default false",
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"additionalProperties": false
+}

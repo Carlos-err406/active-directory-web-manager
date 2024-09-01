@@ -2,7 +2,6 @@ import config from '$config';
 import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
 import {
 	encodePassword,
-	extractBase,
 	getBaseEntry,
 	getEntryByDn,
 	getEntryBySAMAccountName,
@@ -13,7 +12,7 @@ import {
 	validateUserAmount
 } from '$lib/ldap';
 import { getLDAPClient } from '$lib/ldap/client';
-import { getCNFromDN } from '$lib/ldap/utils';
+import { extractBase, getCNFromDN } from '$lib/ldap/utils';
 import { deleteManySchema } from '$lib/schemas/delete-many-schema';
 import { changePasswordSchema } from '$lib/schemas/user/change-password-schema';
 import { createUserSchema } from '$lib/schemas/user/create-user-schema';
@@ -141,7 +140,7 @@ export const createUser: Action = async (event) => {
 };
 
 export const deleteUser: Action = async (event) => {
-	const { locals, params } = event;
+	const { locals } = event;
 	const auth = await locals.auth();
 	if (!auth) throw redirect(302, '/auth');
 	const form = await superValidate(event, zod(deleteUserSchema));
@@ -174,7 +173,6 @@ export const deleteUser: Action = async (event) => {
 		throw error(500, { message, errorId });
 	}
 	appLog(`User ${auth.session.sAMAccountName} deleted user ${dn}`);
-	if (params.dn === dn) throw redirect(302, '/users');
 	return { form };
 };
 

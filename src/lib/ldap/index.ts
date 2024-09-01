@@ -2,6 +2,7 @@ import config from '$config';
 import { ADMIN_PASSWD } from '$env/static/private';
 import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
 import type { Group } from '$lib/types/group';
+import type { OrganizationalUnit } from '$lib/types/ou';
 import type { User } from '$lib/types/user';
 import {
 	AndFilter,
@@ -19,7 +20,6 @@ import {
 import _ from 'lodash';
 import { getLDAPClient } from './client';
 import { ARRAY_ATTRIBUTES } from './utils';
-import type { OrganizationalUnit } from '$lib/types/ou';
 /**
  * Encodes password for ldap unicodePwd attribute
  * @param password
@@ -88,6 +88,26 @@ export const getGroupMembers = async (ldap: Client, groupDn: string, opts?: GetE
 	return group?.member ?? [];
 };
 
+export const getGroupMemberEntries = async <T extends Entry>(
+	ldap: Client,
+	members: string[],
+	opts?: GetEntryOpts
+) => {
+	if (!members || members?.length === 0) return [] as T[];
+	const filter = new AndFilter({
+		filters: [
+			new OrFilter({
+				filters: members.map(
+					(member) => new EqualityFilter({ attribute: 'distinguishedName', value: member })
+				)
+			}),
+			...(opts?.extraFilters ?? [])
+		]
+	});
+	const { searchEntries } = await ldap.search(PUBLIC_BASE_DN, { filter, ...opts?.searchOpts });
+	return (searchEntries ?? []) as T[];
+};
+
 export const replaceAttribute = (opts: AttributeOptions) =>
 	new Change({ modification: new Attribute(opts), operation: 'replace' });
 
@@ -108,11 +128,6 @@ export const inferChange = <T>(entry: T, attribute: keyof T, value?: string | st
 	else if (value && !_.isEqual(value, entry[attribute])) {
 		return replaceAttribute({ type: att, values });
 	}
-};
-
-export const extractBase = (dn: string) => {
-	const [, ...base] = dn.split(',');
-	return base.join(',');
 };
 
 export const isAdmin = (ldap: Client, dn: string) =>
@@ -180,6 +195,13 @@ export const validateGroupAmount = async (ldap: Client) => {
 	return groups.length < limit;
 };
 
+export const validateOuAmount = async (ldap: Client) => {
+	const { limit } = config.directory.ous;
+	if (!limit) return true;
+	const ous = await getAllOrganizationalUnits(ldap);
+	return ous.length < limit;
+};
+
 export const getFilteredUsers = (ldap: Client, extraFilters: Filter[] = []) =>
 	getAllUsers(ldap, [...getHideFilters(config.directory.users.hide), ...extraFilters]);
 
@@ -207,3 +229,9 @@ export const getBaseEntry = (ldap: Client, base: string) =>
 	getEntryByDn<{ objectClass: string[]; distinguishedName: string; dn: string }>(ldap, base, {
 		searchOpts: { attributes: ['objectClass', 'dn', 'distinguishedName'] }
 	});
+
+export const getDirectChildren = <T extends Entry>(
+	ldap: Client,
+	base: string,
+	opts?: SearchOptions
+) => ldap.search(base, { scope: 'one', ...opts }).then(({ searchEntries }) => searchEntries as T[]);

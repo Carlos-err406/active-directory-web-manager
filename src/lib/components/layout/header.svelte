@@ -29,7 +29,7 @@
 						{/if}
 					</Breadcrumb.Item>
 					{#if index < $breadcrumbs.length - 1}
-						<Breadcrumb.Separator />
+						<Breadcrumb.Separator>/</Breadcrumb.Separator>
 					{/if}
 				{/each}
 			</Breadcrumb.List>

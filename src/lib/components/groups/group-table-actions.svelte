@@ -5,9 +5,11 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { getGroupTypes } from '$lib/ldap/utils';
 	import { GroupFlags, type Group } from '$lib/types/group';
+	import { getTreeUrlFromDn } from '$lib/utils';
 	import EllipsisVertical from '$lucide/ellipsis-vertical.svelte';
 	import Ellipsis from '$lucide/ellipsis.svelte';
 	import Eye from '$lucide/eye.svelte';
+	import FolderTree from '$lucide/folder-tree.svelte';
 	import PencilLine from '$lucide/pencil-line.svelte';
 	import Trash from '$lucide/trash-2.svelte';
 	import Users from '$lucide/users.svelte';
@@ -15,7 +17,7 @@
 	import ManageGroupMembersDialog from './manage-group-members-dialog.svelte';
 	import UpdateGroupDialog from './update-group-dialog.svelte';
 
-	export let id: string;
+	export let dn: string;
 	let open = false;
 	let isDeleteGroupDialogOpen = false;
 	let isUpdateGroupDialogOpen = false;
@@ -24,7 +26,7 @@
 
 	const onOpenEditClick = () => {
 		const paginationData: Group[] = $page.data.pagination.data;
-		const group = paginationData.find(({ distinguishedName }) => distinguishedName === id);
+		const group = paginationData.find(({ distinguishedName }) => distinguishedName === dn);
 		if (!group) return;
 		const [match] = getGroupTypes(group.groupType).filter(
 			(gt) => gt !== GroupFlags['Global Scope']
@@ -33,7 +35,7 @@
 			...updateGroupForm.data,
 			...group,
 			groupType: match,
-			dn: id
+			dn: dn
 		};
 		isUpdateGroupDialogOpen = true;
 	};
@@ -53,9 +55,13 @@
 		<DropdownMenu.Group>
 			<DropdownMenu.Label>Actions</DropdownMenu.Label>
 			<DropdownMenu.Separator />
-			<DropdownMenu.Item href="/groups/{encodeURIComponent(id)}" class="flex flex-nowrap gap-2">
+			<DropdownMenu.Item href="/groups/{encodeURIComponent(dn)}" class="flex flex-nowrap gap-2">
 				<Eye class="size-5" />
 				View group details
+			</DropdownMenu.Item>
+			<DropdownMenu.Item href={getTreeUrlFromDn(dn)} class="flex flex-nowrap gap-2">
+				<FolderTree class="size-5" />
+				View in tree
 			</DropdownMenu.Item>
 			<DropdownMenu.Item class="flex flex-nowrap gap-2" on:click={onOpenEditClick}>
 				<PencilLine class="size-5" />
@@ -79,10 +85,14 @@
 	</DropdownMenu.Content>
 </DropdownMenu.Root>
 
-<DeleteGroupDialog dn={id} bind:open={isDeleteGroupDialogOpen} />
-<ManageGroupMembersDialog dn={id} bind:open={isManageMembersDialogOpen} />
+<DeleteGroupDialog
+	{dn}
+	bind:open={isDeleteGroupDialogOpen}
+	on:deleted={() => invalidate('protected:groups')}
+/>
+<ManageGroupMembersDialog {dn} bind:open={isManageMembersDialogOpen} />
 <UpdateGroupDialog
-	dn={id}
+	{dn}
 	bind:open={isUpdateGroupDialogOpen}
 	bind:form={updateGroupForm}
 	on:name-change={() => invalidate('protected:groups')}

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { invalidateAll } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { Avatar, AvatarFallback, AvatarWithPreview } from '$lib/components/ui/avatar';
 	import { Button } from '$lib/components/ui/button';
@@ -6,18 +7,19 @@
 	import { getCNFromDN, getUserAccountControls } from '$lib/ldap/utils';
 	import { breadcrumbs } from '$lib/stores';
 	import { UserAccountControlTypes } from '$lib/types/user';
+	import { getTreeUrlFromDn } from '$lib/utils';
+	import FolderTree from '$lucide/folder-tree.svelte';
 	import Info from '$lucide/info.svelte';
 	import LockKeyhole from '$lucide/lock-keyhole.svelte';
 	import PencilLine from '$lucide/pencil-line.svelte';
 	import dayjs from 'dayjs';
 	import type { PageData } from './$types';
-	import { invalidateAll } from '$app/navigation';
 	export let data: PageData;
 
 	let isChangePasswordDialogOpen = false;
 	let isUpdateUserDialogOpen = false;
 	const { details: config } = $page.data.config.app.views.usersPage;
-	$: ({ user, updateUserForm } = data);
+	$: ({ user, updateUserForm, session } = data);
 	$: ({ jpegPhoto, sAMAccountName } = user);
 
 	$: breadcrumbs.set([{ name: 'Users', link: '/users' }, { name: sAMAccountName }]);
@@ -31,8 +33,8 @@
 		};
 		isUpdateUserDialogOpen = true;
 	};
-	const canSelfEdit = $page.data.config.app.nonAdmin.allowSelfEdit || data.session.isAdmin;
-	const showGroupsAsLinks = config.memberOf.asLinks;
+	$: canSelfEdit = $page.data.config.app.nonAdmin.allowSelfEdit || session.isAdmin;
+	$: showGroupsAsLinks = config.memberOf.asLinks;
 </script>
 
 <div class="flex h-full w-full flex-col py-12 md:py-16" data-test="usersMePage">
@@ -128,6 +130,12 @@
 		</div>
 	</div>
 	<div class="mt-auto flex w-full items-center justify-center gap-3 py-3">
+		{#if $page.data.config.app.views.treePage.show && ($page.data.config.app.nonAdmin.allowAccessToTreePage || session.isAdmin)}
+			<Button href={getTreeUrlFromDn(user.dn)} class="flex items-center gap-2">
+				<FolderTree class="size-4 flex-none" />
+				View in tree
+			</Button>
+		{/if}
 		<Button
 			disabled={!canSelfEdit}
 			class="flex items-center gap-2"

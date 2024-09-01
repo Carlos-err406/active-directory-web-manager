@@ -1,3 +1,4 @@
+import Atom from '$lucide/atom.svelte';
 import Building2 from '$lucide/building-2.svelte';
 import Computer from '$lucide/computer.svelte';
 import Container from '$lucide/container.svelte';
@@ -5,10 +6,13 @@ import FileQuestion from '$lucide/file-question.svelte';
 import User from '$lucide/user.svelte';
 import Users from '$lucide/users.svelte';
 import { type ClassValue, clsx } from 'clsx';
+import type { Entry } from 'ldapts';
+import _ from 'lodash';
 import type { Action } from 'svelte/action';
 import { cubicOut } from 'svelte/easing';
 import type { TransitionConfig } from 'svelte/transition';
 import { twMerge } from 'tailwind-merge';
+import { getCNFromDN } from './ldap/utils';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -85,7 +89,7 @@ export const arrowNavigation: Action = (
 
 export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-type EntryWithObjectClass = {
+export type EntryWithObjectClass = Entry & {
 	[key: string]: unknown;
 	objectClass: string[];
 };
@@ -99,6 +103,10 @@ export const isGroup = <T extends EntryWithObjectClass>(entry: T) =>
 	entry.objectClass.includes('group');
 export const isComputer = <T extends EntryWithObjectClass>(entry: T) =>
 	entry.objectClass.includes('computer');
+export const isBuiltIn = <T extends EntryWithObjectClass>(entry: T) =>
+	entry.objectClass.includes('builtinDomain');
+export const isDomain = <T extends EntryWithObjectClass>(entry: T) =>
+	entry.objectClass.includes('domain') || entry.objectClass.includes('domainDNS');
 
 export const getEntryIcon = <T extends EntryWithObjectClass>(entry: T) => {
 	if (isComputer(entry)) return Computer;
@@ -106,5 +114,37 @@ export const getEntryIcon = <T extends EntryWithObjectClass>(entry: T) => {
 	else if (isOu(entry)) return Building2;
 	else if (isGroup(entry)) return Users;
 	else if (isContainer(entry)) return Container;
+	else if (isBuiltIn(entry)) return Atom;
 	else return FileQuestion;
 };
+
+export const mayHaveChildren = <T extends EntryWithObjectClass>(entry: T) =>
+	isOu(entry) || isContainer(entry) || isGroup(entry) || isBuiltIn(entry) || isDomain(entry);
+
+export const getEntryDetailedUrl = <T extends EntryWithObjectClass & { dn: string }>(entry: T) => {
+	let url = '';
+	if (isOu(entry)) url = '/ous/';
+	else if (isUser(entry)) url = '/users/';
+	else if (isGroup(entry)) url = '/groups/';
+	else return '/';
+	return url + encodeURIComponent(entry.dn);
+};
+
+export const buildBreadcrumbsFromDn = (dn: string, urlBaseFallback: string) => {
+	const splitted = dn.split(',');
+	const noBase = splitted.slice(0, -2);
+	const reversed = _.cloneDeep(noBase).reverse();
+	return reversed.map((part, index) => {
+		const indexOfPart = splitted.indexOf(part);
+		const base = splitted.slice(indexOfPart).join(',');
+		const name = getCNFromDN(base);
+		const isOu = base.startsWith('OU');
+		const link = `/${isOu ? 'ous' : urlBaseFallback}/${base}`;
+		const isLast = reversed.length - 1 === index;
+		if (isLast) return { name };
+		else return { link, name };
+	});
+};
+
+export const getTreeUrlFromDn = (dn: string) =>
+	`/tree/${dn.split(',').reverse().slice(2).map(encodeURIComponent).join('/')}`;

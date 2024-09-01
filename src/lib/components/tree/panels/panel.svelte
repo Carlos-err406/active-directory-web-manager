@@ -4,15 +4,11 @@
 	import { CreateOuDialog } from '$lib/components/organizational-units';
 	import { CreateUserDialog } from '$lib/components/users';
 	import type { TreeEntry } from '$lib/types/tree';
-	import { cn } from '$lib/utils';
+	import { cn, type EntryWithObjectClass } from '$lib/utils';
 	import CreateEntryDialog from './create-entry-dialog.svelte';
 	import PanelItem from './panel-item.svelte';
 	export let entries: TreeEntry[] = [];
-	export let base: {
-		objectClass: string[];
-		distinguishedName: string;
-		dn: string;
-	};
+	export let base: EntryWithObjectClass;
 	let createUserDialogOpen = false;
 	let createGroupDialogOpen = false;
 	let createOuDialogOpen = false;
@@ -39,6 +35,7 @@
 >
 	<div class="sticky top-0 z-10 flex w-full justify-end py-2">
 		<CreateEntryDialog
+			{base}
 			on:create-user={handleCreateUser}
 			on:create-group={handleCreateGroup}
 			on:create-ou={handleCreateOu}
@@ -61,6 +58,6 @@
 	</slot>
 </div>
 
-<CreateUserDialog bind:open={createUserDialogOpen} base={base.distinguishedName} />
-<CreateGroupDialog bind:open={createGroupDialogOpen} base={base.distinguishedName} />
-<CreateOuDialog bind:open={createOuDialogOpen} base={base.distinguishedName} />
+<CreateUserDialog bind:open={createUserDialogOpen} base={base.dn} />
+<CreateGroupDialog bind:open={createGroupDialogOpen} base={base.dn} />
+<CreateOuDialog bind:open={createOuDialogOpen} base={base.dn} />

@@ -1,19 +1,20 @@
 <script lang="ts">
-	import { goto, invalidate } from '$app/navigation';
+	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { toastError } from '$lib';
 	import Form, { type FormOptions } from '$lib/components/form/form.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { deleteOuSchema, type DeleteOuSchema } from '$lib/schemas/ou/delete-ou-schema';
+	import { createEventDispatcher } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	export let open = false;
 	export let dn: string;
-	export let action = '/ous?/deleteOu';
+	$: action = `/ous/${dn}?/deleteOu`;
 	$: form = $page.data.deleteOuForm;
 	const { allowNonLeafDelete } = $page.data.config.directory.ous;
 	let toastId: string | number = NaN;
-
+	const dispatch = createEventDispatcher<{ deleted: { dn: string } }>();
 	const onSubmit: FormOptions<DeleteOuSchema>['onSubmit'] = () => {
 		toastId = toast.loading('Deleting ou...', { duration: 30_000 });
 	};
@@ -21,14 +22,13 @@
 	const onResult: FormOptions<DeleteOuSchema>['onResult'] = async ({ result }) => {
 		switch (result.type) {
 			case 'success':
-				invalidate('protected:ous');
+				dispatch('deleted', { dn });
 				toastId = toast.success('Organizational Unit deleted successfully!', {
 					id: toastId,
 					duration: undefined
 				});
 				open = false;
 				break;
-
 			case 'redirect':
 				await goto(result.location, {
 					state: {
@@ -62,6 +62,7 @@
 			schema={deleteOuSchema}
 			formProps={{ action }}
 			formOptions={{
+				invalidateAll: false,
 				resetForm: false,
 				applyAction: false,
 				onError,

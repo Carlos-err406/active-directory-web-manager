@@ -1,4 +1,6 @@
-export type TreeEntry = {
+import type { Entry } from 'ldapts';
+
+export type TreeEntry = Entry & {
 	[key: string]: unknown;
 	dn: string;
 	objectClass: string[];

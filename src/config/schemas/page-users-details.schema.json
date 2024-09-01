@@ -101,6 +101,9 @@
 			},
 			"additionalProperties": false
 		},
+		"parent": {
+			"$ref": "page-details-parent.schema.json"
+		},
 		"memberOf": {
 			"description": "Configuration regarding the \"memberOf\" attribute of the user",
 			"type": "object",

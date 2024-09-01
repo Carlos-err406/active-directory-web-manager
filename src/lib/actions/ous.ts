@@ -1,13 +1,7 @@
 import config from '$config';
 import { PUBLIC_BASE_DN } from '$env/static/public';
-import {
-	extractBase,
-	getBaseEntry,
-	getEntryByDn,
-	inferChange,
-	validateGroupAmount
-} from '$lib/ldap';
-import { getCNFromDN } from '$lib/ldap/utils';
+import { getBaseEntry, getEntryByDn, inferChange, validateOuAmount } from '$lib/ldap';
+import { extractBase, getCNFromDN } from '$lib/ldap/utils';
 import { deleteManySchema } from '$lib/schemas/delete-many-schema';
 import { createOuSchema } from '$lib/schemas/ou/create-ou-schema';
 import { deleteOuSchema } from '$lib/schemas/ou/delete-ou-schema';
@@ -34,12 +28,12 @@ export const createOu: Action = async (event) => {
 
 	const form = await superValidate(event, zod(createOuSchema));
 	if (!form.valid) return fail(400, { form });
-	const { ldap } = auth;
+	const { ldap, session } = auth;
 
-	const canCreate = await validateGroupAmount(ldap);
+	const canCreate = await validateOuAmount(ldap);
 	if (!canCreate) {
 		appLog(
-			`(ReachedGroupLimit) User ${auth.session.sAMAccountName} tried creating a group but can not create more groups in this directory. Maximum amount reached.`,
+			`(ReachedGroupLimit) User ${session.sAMAccountName} tried creating a group but can not create more groups in this directory. Maximum amount reached.`,
 			'Error'
 		);
 		throw error(403, 'Can not create more groups in this directory');
@@ -68,7 +62,7 @@ export const createOu: Action = async (event) => {
 			return setError(form, 'name', 'name already in use!');
 		} else if (e instanceof InsufficientAccessError) {
 			appLog(
-				`(InsufficientAccessError) User ${auth.session.sAMAccountName} tried creating an Organizational Unit without having enough access`,
+				`(InsufficientAccessError) User ${session.sAMAccountName} tried creating an Organizational Unit without having enough access`,
 				'Error'
 			);
 			throw error(403, "You don't have permission to create Organizational Units");
@@ -83,7 +77,7 @@ export const createOu: Action = async (event) => {
 };
 
 export const deleteOu: Action = async (event) => {
-	const { locals, params } = event;
+	const { locals } = event;
 	const auth = await locals.auth();
 	if (!auth) throw redirect(302, '/auth');
 	const form = await superValidate(event, zod(deleteOuSchema));
@@ -129,9 +123,6 @@ export const deleteOu: Action = async (event) => {
 	}
 	deletedEntries.map((dn) => appLog(`User ${session.sAMAccountName} deleted entry: ${dn}`));
 
-	if (params.dn === dn) {
-		throw redirect(302, '/groups');
-	}
 	return { form };
 };
 

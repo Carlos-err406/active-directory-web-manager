@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
-	import { cn } from '$lib/utils';
+	import { cn, isGroup, type EntryWithObjectClass } from '$lib/utils';
 	import Building2 from '$lucide/building-2.svelte';
 	import Plus from '$lucide/plus.svelte';
 	import User from '$lucide/user.svelte';
 	import Users from '$lucide/users.svelte';
 	import { createEventDispatcher } from 'svelte';
 	export let open = false;
+	export let base: EntryWithObjectClass;
 	const dispatch = createEventDispatcher();
 </script>
 
@@ -59,6 +60,7 @@
 				<span class="text-xl">Group</span>
 			</Button>
 			<Button
+				disabled={isGroup(base)}
 				variant="ghost"
 				on:click={() => {
 					open = false;

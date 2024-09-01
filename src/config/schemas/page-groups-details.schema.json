@@ -89,32 +89,11 @@
 			},
 			"additionalProperties": false
 		},
+		"parent": {
+			"$ref": "page-details-parent.schema.json"
+		},
 		"member": {
-			"description": "Configuration regarding the \"member\" attribute of the group",
-			"type": "object",
-			"properties": {
-				"label": {
-					"default": "member",
-					"description": "@default \"member\"",
-					"type": "string"
-				},
-				"asLinks": {
-					"description": "Show group members as links to each member description",
-					"type": "boolean",
-					"default": false
-				},
-				"shortMember": {
-					"description": "If false the attribute \"member\" of the group will be shown as the full distinguishedName, else only the CN is shown. @default false",
-					"type": "boolean",
-					"default": false
-				},
-				"show": {
-					"description": "Wether or not to show the \"member\" attribute in the \"/groups/[dn]\" page. If false \"shortMember\" will be ignored @default true",
-					"type": "boolean",
-					"default": true
-				}
-			},
-			"additionalProperties": false
+			"$ref": "page-details-member.schema.json"
 		},
 		"sAMAccountName": {
 			"description": "Configuration regarding the \"sAMAccountName\" attribute of the group",

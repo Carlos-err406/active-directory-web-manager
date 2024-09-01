@@ -50,6 +50,7 @@ export const getObjectClassFilter = () =>
 			new EqualityFilter({ attribute: 'objectClass', value: 'organizationalPerson' }),
 			new EqualityFilter({ attribute: 'objectClass', value: 'container' }),
 			new EqualityFilter({ attribute: 'objectClass', value: 'computer' }),
+			new EqualityFilter({ attribute: 'objectClass', value: 'builtinDomain' }),
 			new EqualityFilter({ attribute: 'objectClass', value: 'group' })
 		]
 	});

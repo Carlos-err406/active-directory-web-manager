@@ -14,7 +14,8 @@ const config = {
 		adapter: adapter(),
 		alias: {
 			$lucide: './node_modules/lucide-svelte/dist/icons',
-			$config: './src/config'
+			$config: './src/config',
+			$: './src'
 		}
 	}
 };

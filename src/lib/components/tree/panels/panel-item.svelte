@@ -2,41 +2,44 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import type { TreeEntry } from '$lib/types/tree';
-	import { cn, getEntryIcon, isContainer, isGroup, isOu } from '$lib/utils';
+	import { cn, getEntryIcon, getTreeUrlFromDn, mayHaveChildren } from '$lib/utils';
 	import { onMount, tick } from 'svelte';
 	import { isExpandedEntry, isLastExpandedEntry } from '../utils';
 	import PanelItemActions from './panel-item-actions.svelte';
 
 	export let entry: TreeEntry;
 
-	const mayHaveChildren = () => isOu(entry) || isContainer(entry) || isGroup(entry);
 	const handleItemClick = async () => {
-		if (isExpandedEntry(entry)) return;
-		const { distinguishedName } = entry;
-		if (mayHaveChildren()) {
-			const parts = distinguishedName.split(',');
-			const RDNs = parts.reverse().slice(2); //removing PUBLIC_BASE_DN
-			await goto(`/tree/${RDNs.map(encodeURIComponent).join('/')}?${$page.url.searchParams}`, {
-				invalidateAll: true
-			});
+		if (isLastExpanded) return;
+		const { dn } = entry;
+		if (isExpandable) {
+			const url = getTreeUrlFromDn(dn);
+			await goto(`${url}?${$page.url.searchParams}`, { invalidateAll: true });
 		}
 	};
 
 	let panelItemElement: HTMLButtonElement;
 	onMount(() => {
-		if (isLastExpandedEntry(entry) && !$page.state.preventScrollIntoView) {
+		if (isLastExpanded && !$page.state.preventScrollIntoView) {
 			tick().then(() => panelItemElement.scrollIntoView({ behavior: 'auto', block: 'center' }));
 		}
 	});
+
+	$: isExpanded = isExpandedEntry(entry);
+	$: isExpandable = mayHaveChildren(entry);
+	$: isLastExpanded = isLastExpandedEntry(entry);
+	$: highlight = isExpanded && !isExpandable;
+	$: active = isExpanded && isExpandable;
 </script>
 
 <button
 	bind:this={panelItemElement}
 	type="button"
 	on:click|self={handleItemClick}
-	data-active={isExpandedEntry(entry)}
+	data-active={active}
+	data-highlight={highlight}
 	class={cn(
-		mayHaveChildren()
+		isExpandable
 			? 'data-[active=false]:cursor-pointer data-[active=true]:cursor-default hover:shadow-md data-[active=false]:hover:bg-primary/10 data-[active=true]:hover:bg-primary/90'
 			: 'cursor-default',
 		'relative flex h-fit w-full min-w-80 self-start', //positioning and size
@@ -44,7 +47,8 @@
 		'p-1 pl-10', //paddings
 		'transition-all duration-200 ',
 		'data-[active=true]:text-muted', //text color
-		'data-[active=true]:bg-primary' //bg
+		'data-[active=true]:bg-primary', //bg
+		'data-[highlight=true]:border-2 data-[highlight=true]:border-primary' //highlight
 	)}
 >
 	<svelte:component
@@ -59,7 +63,7 @@
 			{entry.name}
 		</p>
 		<p
-			data-active={isExpandedEntry(entry)}
+			data-active={active}
 			class="truncate text-start font-light text-muted-foreground data-[active=true]:text-muted/90"
 		>
 			{entry.dn}

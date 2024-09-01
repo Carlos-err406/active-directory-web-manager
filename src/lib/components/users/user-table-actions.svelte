@@ -4,9 +4,11 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import type { User } from '$lib/types/user';
+	import { getTreeUrlFromDn } from '$lib/utils';
 	import EllipsisVertical from '$lucide/ellipsis-vertical.svelte';
 	import Ellipsis from '$lucide/ellipsis.svelte';
 	import Eye from '$lucide/eye.svelte';
+	import FolderTree from '$lucide/folder-tree.svelte';
 	import LockKeyholeOpen from '$lucide/lock-keyhole-open.svelte';
 	import PencilLine from '$lucide/pencil-line.svelte';
 	import Trash from '$lucide/trash-2.svelte';
@@ -15,7 +17,7 @@
 	import DeleteUserDialog from './delete-user-dialog.svelte';
 	import ManageUserMembershipDialog from './manage-user-membership-dialog.svelte';
 	import UpdateUserDialog from './update-user-dialog.svelte';
-	export let id: string;
+	export let dn: string;
 	let open = false;
 	let isChangePasswordDialogOpen = false;
 	let isDeleteUserDialogOpen = false;
@@ -24,11 +26,11 @@
 	$: ({ updateUserForm } = $page.data);
 	const onOpenEditClick = () => {
 		const paginationData: User[] = $page.data.pagination.data;
-		const user = paginationData.find(({ distinguishedName }) => distinguishedName === id);
+		const user = paginationData.find(({ distinguishedName }) => distinguishedName === dn);
 		updateUserForm.data = {
 			...updateUserForm.data,
 			...user,
-			dn: id,
+			dn: dn,
 			jpegPhotoBase64: user?.jpegPhoto
 		};
 		isUpdateUserDialogOpen = true;
@@ -49,9 +51,13 @@
 		<DropdownMenu.Group>
 			<DropdownMenu.Label>Actions</DropdownMenu.Label>
 			<DropdownMenu.Separator />
-			<DropdownMenu.Item href="/users/{encodeURIComponent(id)}" class="flex flex-nowrap gap-2">
+			<DropdownMenu.Item href="/users/{encodeURIComponent(dn)}" class="flex flex-nowrap gap-2">
 				<Eye class="size-5" />
 				View user details
+			</DropdownMenu.Item>
+			<DropdownMenu.Item href={getTreeUrlFromDn(dn)} class="flex flex-nowrap gap-2">
+				<FolderTree class="size-5" />
+				View in tree
 			</DropdownMenu.Item>
 			<DropdownMenu.Item
 				class="flex flex-nowrap gap-2"
@@ -82,12 +88,16 @@
 	</DropdownMenu.Content>
 </DropdownMenu.Root>
 
-<DeleteUserDialog dn={id} bind:open={isDeleteUserDialogOpen} />
-<ChangePasswordDialog dn={id} bind:open={isChangePasswordDialogOpen} />
+<DeleteUserDialog
+	{dn}
+	bind:open={isDeleteUserDialogOpen}
+	on:deleted={() => invalidate('protected:users')}
+/>
+<ChangePasswordDialog {dn} bind:open={isChangePasswordDialogOpen} />
 <UpdateUserDialog
-	dn={id}
+	{dn}
 	bind:open={isUpdateUserDialogOpen}
 	bind:form={updateUserForm}
 	on:name-change={() => invalidate('protected:users')}
 />
-<ManageUserMembershipDialog dn={id} bind:open={isManageMembershipDialogOpen} />
+<ManageUserMembershipDialog {dn} bind:open={isManageMembershipDialogOpen} />

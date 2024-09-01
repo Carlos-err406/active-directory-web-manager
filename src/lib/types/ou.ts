@@ -6,7 +6,6 @@ export type OrganizationalUnit = {
 	whenCreated: string;
 	whenChanged: string;
 	name: string;
-	sAMAccountName: string;
 	isCriticalSystemObject: string;
 	distinguishedName: string;
 };

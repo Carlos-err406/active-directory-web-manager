@@ -98,7 +98,7 @@ export interface CaptchaConfig {
 export interface ViewsConfig {
 	groupsPage?: GroupsPageConfig;
 	logsPage?: LogsPageConfig;
-	ousPage?: GroupsPageConfig1;
+	ousPage?: OrganizationalUnitsPageConfig;
 	settingsPage?: SettingsPageConfig;
 	treePage?: TreePageConfig;
 	usersPage?: UsersPageConfig;
@@ -183,27 +183,8 @@ export interface GroupDetailsConfig {
 		 */
 		show?: boolean;
 	};
-	/**
-	 * Configuration regarding the "member" attribute of the group
-	 */
-	member?: {
-		/**
-		 * @default "member"
-		 */
-		label?: string;
-		/**
-		 * Show group members as links to each member description
-		 */
-		asLinks?: boolean;
-		/**
-		 * If false the attribute "member" of the group will be shown as the full distinguishedName, else only the CN is shown. @default false
-		 */
-		shortMember?: boolean;
-		/**
-		 * Wether or not to show the "member" attribute in the "/groups/[dn]" page. If false "shortMember" will be ignored @default true
-		 */
-		show?: boolean;
-	};
+	parent?: ParentDetailsConfig;
+	member?: MemberDetailsConfig;
 	/**
 	 * Configuration regarding the "sAMAccountName" attribute of the group
 	 */
@@ -243,6 +224,48 @@ export interface GroupDetailsConfig {
 		 */
 		show?: boolean;
 	};
+}
+/**
+ * Configuration regarding the parent entry of the group
+ */
+export interface ParentDetailsConfig {
+	/**
+	 * @default "parent"
+	 */
+	label?: string;
+	/**
+	 * Wether or not to show the parent of the group in the "/groups/[dn]" page. @default true
+	 */
+	show?: boolean;
+	/**
+	 * Show parent as link to to the parent entry. @default false
+	 */
+	asLink?: boolean;
+	/**
+	 * If false the parent of the group will be shown as the full distinguishedName, else only the CN is shown. @default false
+	 */
+	shortParent?: boolean;
+}
+/**
+ * Configuration regarding the "member(s)" of the entry
+ */
+export interface MemberDetailsConfig {
+	/**
+	 * @default "member"
+	 */
+	label?: string;
+	/**
+	 * Show members as links to each member detailed page. @default false
+	 */
+	asLinks?: boolean;
+	/**
+	 * If false the each member will be shown as the full distinguishedName, else only the name will be shown. @default false
+	 */
+	shortMember?: boolean;
+	/**
+	 * Wether or not to show the "member(s)" of the entry in the details view. If false "shortMember" will be ignored @default true
+	 */
+	show?: boolean;
 }
 /**
  * Groups table view configuration
@@ -366,9 +389,9 @@ export interface LogsPageConfig {
 	show?: boolean;
 }
 /**
- * Configuration regarding the groups page
+ * Configuration regarding the organizational units page
  */
-export interface GroupsPageConfig1 {
+export interface OrganizationalUnitsPageConfig {
 	details?: OuDetailsConfig;
 	/**
 	 * Weather or not to show the "/ous" page in navigation. Accessing directly to this route will result on a "403 This page has been disabled by configuration" error. @default true
@@ -377,11 +400,11 @@ export interface GroupsPageConfig1 {
 	table?: OusTableConfig;
 }
 /**
- * Configuration regarding the detailed view of a ou ("/ous/[dn]")
+ * Configuration regarding the detailed view of a OU ("/ous/[dn]")
  */
 export interface OuDetailsConfig {
 	/**
-	 * Configuration regarding the "name" attribute of the ou
+	 * Configuration regarding the "name" attribute of the OU
 	 */
 	name?: {
 		/**
@@ -394,7 +417,7 @@ export interface OuDetailsConfig {
 		show?: boolean;
 	};
 	/**
-	 * Configuration regarding the "description" attribute of the ou
+	 * Configuration regarding the "description" attribute of the OU
 	 */
 	description?: {
 		/**
@@ -406,6 +429,8 @@ export interface OuDetailsConfig {
 		 */
 		show?: boolean;
 	};
+	parent?: ParentDetailsConfig;
+	member?: MemberDetailsConfig;
 	/**
 	 * Configuration regarding the "distinguishedName" attribute of the ou
 	 */
@@ -631,6 +656,7 @@ export interface UserDetailsConfig {
 		 */
 		show?: boolean;
 	};
+	parent?: ParentDetailsConfig;
 	/**
 	 * Configuration regarding the "memberOf" attribute of the user
 	 */

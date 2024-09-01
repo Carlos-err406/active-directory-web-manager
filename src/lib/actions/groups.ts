@@ -1,13 +1,12 @@
 import { PUBLIC_BASE_DN } from '$env/static/public';
 import {
-	extractBase,
 	getBaseEntry,
 	getEntryByDn,
 	getGroupMembers,
 	inferChange,
 	validateGroupAmount
 } from '$lib/ldap';
-import { getCNFromDN } from '$lib/ldap/utils';
+import { extractBase, getCNFromDN } from '$lib/ldap/utils';
 import { deleteManySchema } from '$lib/schemas/delete-many-schema';
 import { createGroupSchema } from '$lib/schemas/group/create-group-schema';
 import { deleteGroupSchema } from '$lib/schemas/group/delete-group-schema';
@@ -107,29 +106,29 @@ export const createGroup: Action = async (event) => {
 };
 
 export const deleteGroup: Action = async (event) => {
-	const { locals, params } = event;
+	const { locals } = event;
 	const auth = await locals.auth();
 	if (!auth) throw redirect(302, '/auth');
 	const form = await superValidate(event, zod(deleteGroupSchema));
 	if (!form.valid) return fail(400, { form });
-	const { ldap } = auth;
+	const { ldap, session } = auth;
 	const { dn } = form.data;
 
 	const group = await getEntryByDn<Group>(ldap, dn);
 	if (!group) throw error(404, 'Group not found!');
 	else if (group.isCriticalSystemObject === 'TRUE') {
 		appLog(
-			`(CriticalSystemObject) User ${auth.session.sAMAccountName} tried deleting ${dn} but is a critical system object and can not be deleted!`,
+			`(CriticalSystemObject) User ${session.sAMAccountName} tried deleting group ${dn} but is a critical system object and can not be deleted!`,
 			'Error'
 		);
-		throw error(403, `User ${group.sAMAccountName} can not be deleted!`);
+		throw error(403, `Group ${group.sAMAccountName} can not be deleted!`);
 	}
 	try {
 		await ldap.del(dn);
 	} catch (e) {
 		if (e instanceof InsufficientAccessError) {
 			appLog(
-				`(InsufficientAccessError) User ${auth.session.sAMAccountName} tried deleting a group (${dn}) but does not have enough access`,
+				`(InsufficientAccessError) User ${session.sAMAccountName} tried deleting a group (${dn}) but does not have enough access`,
 				'Error'
 			);
 			throw error(403, "You don't have permission to delete groups!");
@@ -138,11 +137,8 @@ export const deleteGroup: Action = async (event) => {
 		const errorId = errorLog(e, { message });
 		throw error(500, { message, errorId });
 	}
-	appLog(`User ${auth.session.sAMAccountName} deleted group ${dn}`);
+	appLog(`User ${session.sAMAccountName} deleted group ${dn}`);
 
-	if (params.dn === dn) {
-		throw redirect(302, '/groups');
-	}
 	return { form };
 };
 
@@ -152,7 +148,7 @@ export const deleteManyGroups: Action = async (event) => {
 	if (!auth) throw redirect(302, '/auth');
 	const form = await superValidate(event, zod(deleteManySchema));
 	if (!form.valid) return fail(400, { form });
-	const { ldap } = auth;
+	const { ldap, session } = auth;
 	const { dns } = form.data;
 	const filter = new OrFilter({
 		filters: dns.map((dn) => new EqualityFilter({ attribute: 'distinguishedName', value: dn }))
@@ -162,7 +158,7 @@ export const deleteManyGroups: Action = async (event) => {
 	const promises = searchEntries.map(async (entry) => {
 		if (entry['isCriticalSystemObject'] === 'TRUE') {
 			appLog(
-				`(CriticalSystemObject) User ${auth.session.sAMAccountName} tried deleting ${entry.dn} but is a critical system object and can not be deleted!`,
+				`(CriticalSystemObject) User ${session.sAMAccountName} tried deleting ${entry.dn} but is a critical system object and can not be deleted!`,
 				'Error'
 			);
 			throw error(403, `Entry ${entry.sAMAccountName} can not be deleted!`);
@@ -175,10 +171,10 @@ export const deleteManyGroups: Action = async (event) => {
 	});
 
 	await Promise.all(promises);
-	if (dns.length === 1) appLog(`User ${auth.session.sAMAccountName} deleted group ${dns[0]}`);
+	if (dns.length === 1) appLog(`User ${session.sAMAccountName} deleted group ${dns[0]}`);
 	else
 		appLog(
-			`User ${auth.session.sAMAccountName} deleted several groups: ${dns.map(getCNFromDN).join(', ')}`
+			`User ${session.sAMAccountName} deleted several groups: ${dns.map(getCNFromDN).join(', ')}`
 		);
 	return { form };
 };
@@ -190,7 +186,7 @@ export const updateGroup: Action = async (event) => {
 	const form = await superValidate(event, zod(updateGroupSchema));
 
 	if (!form.valid) return fail(400, { form });
-	const { ldap } = auth;
+	const { ldap, session } = auth;
 
 	const { groupType, mail, sAMAccountName, description, dn } = form.data;
 
@@ -217,7 +213,7 @@ export const updateGroup: Action = async (event) => {
 			return setError(form, 'sAMAccountName', 'sAMAccountName already in use!');
 		} else if (e instanceof InsufficientAccessError) {
 			appLog(
-				`(InsufficientAccessError) User ${auth.session.sAMAccountName} tried updating group ${dn} but does not have enough access`,
+				`(InsufficientAccessError) User ${session.sAMAccountName} tried updating group ${dn} but does not have enough access`,
 				'Error'
 			);
 			throw error(403, { message: "You don't have permission to edit groups!" });
@@ -228,14 +224,17 @@ export const updateGroup: Action = async (event) => {
 	}
 	if (sAMAccountNameChange) {
 		const base = extractBase(group.dn);
-		const newDN = `CN=${sAMAccountName},${base}`;
+		const newDn = `CN=${sAMAccountName},${base}`;
+		appLog(`User ${session.sAMAccountName} updated group ${dn} -> ${newDn}`);
 		try {
-			await ldap.modifyDN(dn, newDN);
+			await ldap.modifyDN(dn, newDn);
 		} catch (e) {
 			const message = `Something unexpected happened while updating ${group.sAMAccountName}'s distinguishedName`;
 			const errorId = errorLog(e, { message });
 			throw error(500, { message, errorId });
 		}
+	} else {
+		appLog(`User ${session.sAMAccountName} updated group ${dn}`);
 	}
 	return {
 		form,
@@ -249,7 +248,7 @@ export const setMembers: Action = async (event) => {
 	if (!auth) throw redirect(302, '/auth'); //type narrowing
 	const form = await superValidate(event, zod(setMembersSchema));
 	if (!form.valid) return fail(400, { form });
-	const { ldap } = auth;
+	const { ldap, session } = auth;
 	const { dns, groupDn } = form.data;
 
 	const group = await getEntryByDn<Group>(ldap, groupDn);
@@ -261,7 +260,7 @@ export const setMembers: Action = async (event) => {
 	} catch (e) {
 		if (e instanceof InsufficientAccessError) {
 			appLog(
-				`(InsufficientAccessError) User ${auth.session.sAMAccountName} tried setting the members of ${groupDn} but does not have enough access`,
+				`(InsufficientAccessError) User ${session.sAMAccountName} tried setting the members of ${groupDn} but does not have enough access`,
 				'Error'
 			);
 			throw error(403, { message: "You don't have permission to edit groups!" });
@@ -270,6 +269,6 @@ export const setMembers: Action = async (event) => {
 		const errorId = errorLog(e, { message });
 		throw error(500, { message, errorId });
 	}
-
+	appLog(`User ${session.sAMAccountName} set the members of ${groupDn}`);
 	return { form };
 };

@@ -3,26 +3,35 @@
 	import { page } from '$app/stores';
 	import PanelPlaceholder from '$lib/components/tree/panels/panel-placeholder.svelte';
 	import Panel from '$lib/components/tree/panels/panel.svelte';
-	import { getCNFromDN } from '$lib/ldap/utils';
+	import { getCNFromDN, getRDNFromDN } from '$lib/ldap/utils';
 	import { breadcrumbs } from '$lib/stores';
 	import { tick } from 'svelte';
 	import type { PageData } from './$types';
+	import { mayHaveChildren } from '$lib/utils';
 	export let data: PageData;
+	$: breadcrumbs.set([
+		{ name: 'Root', link: '/tree' },
+		...data.activeDns.map(buildTreeBreadcrumbs)
+	]);
 
-	const buildTreeUrl = (dn: string): string => {
+	const buildTreeBreadcrumbs = (dn: string) => {
 		const index = data.activeDns.indexOf(dn);
 		if (index === -1) {
 			throw new Error(`DNS '${dn}' not found in activeDns`);
 		}
-		return '/tree/' + data.activeDns.slice(0, index + 1).join('/');
+		return {
+			name: getCNFromDN(data.activeDns[index]),
+			link:
+				'/tree/' +
+				data.activeDns
+					.map(getRDNFromDN)
+					.slice(0, index + 1)
+					.join('/')
+		};
 	};
 
 	let anchorToLast: HTMLDivElement;
 	afterNavigate(() => {
-		breadcrumbs.set([
-			{ name: 'Root', link: '/tree' },
-			...data.activeDns.map((dn) => ({ name: getCNFromDN(dn), link: buildTreeUrl(dn) }))
-		]);
 		if (!$page.state.preventScrollIntoView) {
 			tick().then(() => {
 				tick().then(() => {
@@ -42,9 +51,11 @@
 			<PanelPlaceholder />
 		{:then entries}
 			{#if entries}
-				{#await entries.treeEntries then groupedEntries}
-					<Panel base={entries.base} entries={groupedEntries} />
-				{/await}
+				{#if mayHaveChildren(entries.base)}
+					{#await entries.treeEntries then groupedEntries}
+						<Panel base={entries.base} entries={groupedEntries} />
+					{/await}
+				{/if}
 			{/if}
 		{/await}
 	{/each}

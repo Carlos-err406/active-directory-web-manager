@@ -1,11 +1,12 @@
 <script lang="ts">
-	import { goto, invalidate, invalidateAll } from '$app/navigation';
+	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { toastError } from '$lib';
 	import Form, { type FormOptions } from '$lib/components/form/form.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { deleteUserSchema, type DeleteUserSchema } from '$lib/schemas/user/delete-user-schema';
+	import { createEventDispatcher } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	export let open = false;
 	export let dn: string;
@@ -13,6 +14,7 @@
 	$: form = $page.data.deleteUserForm;
 
 	let toastId: string | number = NaN;
+	const dispatch = createEventDispatcher<{ deleted: { dn: string } }>();
 
 	const onSubmit: FormOptions<DeleteUserSchema>['onSubmit'] = () => {
 		toastId = toast.loading('Deleting user...', { duration: 30_000 });
@@ -21,28 +23,23 @@
 	const onResult: FormOptions<DeleteUserSchema>['onResult'] = async ({ result }) => {
 		switch (result.type) {
 			case 'success':
-				invalidate('protected:users');
 				toastId = toast.success('User deleted successfully!', {
 					id: toastId,
 					duration: undefined
 				});
+				dispatch('deleted', { dn });
 				open = false;
 				break;
 			case 'redirect':
-				if ($page.url.pathname.startsWith('/tree')) {
-					toast.success('User deleted successfully!', { id: toastId, duration: undefined });
-					await invalidateAll();
-				} else {
-					await goto(result.location, {
-						state: {
-							toast: {
-								data: { id: toastId },
-								type: 'success',
-								message: 'User deleted successfully!'
-							}
+				await goto(result.location, {
+					state: {
+						toast: {
+							data: { id: toastId },
+							type: 'success',
+							message: 'User deleted successfully!'
 						}
-					});
-				}
+					}
+				});
 				break;
 		}
 	};
@@ -66,6 +63,7 @@
 			formOptions={{
 				resetForm: false,
 				applyAction: false,
+				invalidateAll: false,
 				onResult,
 				onError,
 				onSubmit

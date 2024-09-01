@@ -1,4 +1,6 @@
 <script lang="ts">
+	import InfoValue from '$/lib/components/info-value.svelte';
+	import ParentInfoValue from '$/lib/components/parent-info-value.svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { Avatar, AvatarFallback, AvatarWithPreview } from '$lib/components/ui/avatar';
@@ -7,10 +9,13 @@
 	import { getCNFromDN, getUserAccountControls } from '$lib/ldap/utils';
 	import { breadcrumbs } from '$lib/stores';
 	import { UserAccountControlTypes } from '$lib/types/user';
+	import { buildBreadcrumbsFromDn, getTreeUrlFromDn } from '$lib/utils';
+	import FolderTree from '$lucide/folder-tree.svelte';
 	import LockKeyhole from '$lucide/lock-keyhole.svelte';
 	import PencilLine from '$lucide/pencil-line.svelte';
 	import Trash2 from '$lucide/trash-2.svelte';
 	import dayjs from 'dayjs';
+	import { setContext } from 'svelte';
 	import type { PageData } from './$types';
 	export let data: PageData;
 
@@ -18,9 +23,14 @@
 	let isUpdateUserDialogOpen = false;
 	let isDeleteUserDialogOpen = false;
 	const { details: config } = $page.data.config.app.views.usersPage;
-	$: ({ user, updateUserForm } = data);
-	$: ({ jpegPhoto, sAMAccountName } = user);
-	$: breadcrumbs.set([{ name: 'Users', link: '/users' }, { name: sAMAccountName }]);
+	setContext('config', config);
+	setContext('entry', data.user);
+
+	$: ({ user, updateUserForm, session, parent } = data);
+	$: breadcrumbs.set([
+		{ name: 'Users', link: '/users' },
+		...buildBreadcrumbsFromDn(user.dn, 'users')
+	]);
 
 	const onOpenEditClick = () => {
 		const { jpegPhoto, ...restAttributes } = user;
@@ -41,7 +51,7 @@
 			<div class="flex w-full items-center justify-center gap-10">
 				{#if config.jpegPhoto.show}
 					<Avatar class="size-40 overflow-clip">
-						<AvatarWithPreview alt="jpegPhoto" bind:src={jpegPhoto} />
+						<AvatarWithPreview alt="jpegPhoto" bind:src={user.jpegPhoto} />
 						<AvatarFallback
 							class="flex h-full w-full items-center justify-center rounded-full bg-gray-800 text-6xl font-bold uppercase text-gray-100 dark:bg-gray-100 dark:text-gray-800"
 						>
@@ -54,66 +64,38 @@
 				</h1>
 			</div>
 			<div class="user-info grid grid-cols-2 gap-y-3">
-				{#if config.sAMAccountName.show}
-					<span>{config.sAMAccountName.label}:</span>
-					<span class="info-value">{user.sAMAccountName}</span>
-				{/if}
-				{#if config.displayName.show && user.displayName}
-					<span>{config.displayName.label}:</span>
-					<span class="info-value">{user.displayName}</span>
-				{/if}
-				{#if config.givenName.show && user.givenName}
-					<span>{config.givenName.label}:</span>
-					<span class="info-value">{user.givenName}</span>
-				{/if}
-				{#if config.sn.show && user.sn}
-					<span> {config.sn.label}:</span>
-					<span class="info-value">{user.sn}</span>
-				{/if}
-				{#if config.mail.show && user.mail}
-					<span>{config.mail.label}:</span>
-					<span class="info-value">{user.mail}</span>
-				{/if}
-				{#if config.description.show && user.description}
-					<span>{config.description.label}:</span>
-					<span class="info-value">{user.description}</span>
-				{/if}
-				{#if config.userAccountControl.show}
-					<span>{config.userAccountControl.label}:</span>
-					<span class="info-value">
-						{getUserAccountControls(user.userAccountControl)
-							.map((uac) => UserAccountControlTypes[uac])
-							.join(', ')}
-					</span>
-				{/if}
-				{#if config.whenCreated.show}
-					<span>{config.whenCreated.label}:</span>
-					<span class="info-value">
-						{dayjs(user.whenCreated.replace('Z', '')).format('MMMM D, YYYY hh:mm:ss A')}
-					</span>
-				{/if}
-				{#if config.whenChanged.show}
-					<span>{config.whenChanged.label}:</span>
-					<span class="info-value">
-						{dayjs(user.whenChanged.replace('Z', '')).format('MMMM D, YYYY hh:mm:ss A')}
-					</span>
-				{/if}
-				{#if config.distinguishedName.show}
-					<span>{config.distinguishedName.label}:</span>
-					<span class="info-value">{user.distinguishedName}</span>
-				{/if}
+				<InfoValue key="sAMAccountName" />
+				<InfoValue key="displayName" />
+				<InfoValue key="givenName" />
+				<InfoValue key="sn" />
+				<InfoValue key="mail" />
+				<InfoValue key="description" />
+				<InfoValue key="userAccountControl">
+					{getUserAccountControls(user.userAccountControl)
+						.map((uac) => UserAccountControlTypes[uac])
+						.join(', ')}
+				</InfoValue>
+				<InfoValue key="whenCreated">
+					{dayjs(user.whenCreated.replace('Z', '')).format('MMMM D, YYYY hh:mm:ss A')}
+				</InfoValue>
+				<InfoValue key="whenChanged">
+					{dayjs(user.whenChanged.replace('Z', '')).format('MMMM D, YYYY hh:mm:ss A')}
+				</InfoValue>
+				<InfoValue key="distinguishedName" />
+				<ParentInfoValue {parent} />
+
 				{#if config.memberOf.show}
 					<span>{config.memberOf.label}:</span>
 					<div class="info-value flex flex-wrap space-y-2">
-						{#each (user.memberOf || []).sort( (a, b) => (a < b ? -1 : a > b ? 1 : 0) ) as groupDn, index}
+						{#each (user.memberOf || []).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)) as dn, index}
 							<svelte:element
 								this={showGroupsAsLinks ? 'a' : 'span'}
 								data-sveltekit-preload-data="hover"
 								data-isLink={showGroupsAsLinks}
 								class="data-[isLink=true]:text-primary data-[isLink=true]:hover:underline"
-								href={showGroupsAsLinks ? `/groups/${groupDn}` : '#'}
+								href={showGroupsAsLinks ? `/groups/${encodeURIComponent(dn)}` : '#'}
 							>
-								{config.memberOf.shortMemberOf ? getCNFromDN(groupDn) : groupDn}
+								{config.memberOf.shortMemberOf ? getCNFromDN(dn) : dn}
 							</svelte:element>
 							{#if config.memberOf.shortMemberOf && index < user.memberOf.length - 1}
 								<pre class="!mx-0 font-sans">, </pre>
@@ -126,8 +108,14 @@
 			</div>
 		</div>
 	</div>
-	{#if data.session.isAdmin}
-		<div class="flex h-full w-full items-center justify-center gap-3 py-3">
+	<div class="flex h-full w-full items-center justify-center gap-3 py-3">
+		{#if $page.data.config.app.views.treePage.show && (session.isAdmin || $page.data.config.app.nonAdmin.allowAccessToTreePage)}
+			<Button href={getTreeUrlFromDn(user.dn)} class="flex items-center gap-2">
+				<FolderTree class="size-4 flex-none" />
+				View in tree
+			</Button>
+		{/if}
+		{#if data.session.isAdmin}
 			<Button class="flex items-center gap-2" on:click={onOpenEditClick}>
 				<PencilLine class="size-4 flex-none" />
 				Edit
@@ -144,13 +132,17 @@
 				<Trash2 class="size-4 flex-none" />
 				Delete user
 			</Button>
-		</div>
-	{/if}
+		{/if}
+	</div>
 </div>
-<DeleteUserDialog dn={user.distinguishedName} bind:open={isDeleteUserDialogOpen} />
+<DeleteUserDialog
+	dn={user.distinguishedName}
+	bind:open={isDeleteUserDialogOpen}
+	on:deleted={() => goto('/users', { invalidateAll: true })}
+/>
 <ChangePasswordDialog dn={user.distinguishedName} bind:open={isChangePasswordDialogOpen} />
 <UpdateUserDialog
-	dn={$page.params.dn}
+	dn={user.dn}
 	bind:open={isUpdateUserDialogOpen}
 	bind:form={updateUserForm}
 	on:name-change={async ({ detail }) => {

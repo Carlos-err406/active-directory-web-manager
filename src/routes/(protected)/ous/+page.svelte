@@ -99,7 +99,7 @@
 					sort: { disable: true }
 				},
 				cell: ({ value }) => {
-					return createRender(OuTableActions, { id: value });
+					return createRender(OuTableActions, { dn: value });
 				}
 			})
 		]);

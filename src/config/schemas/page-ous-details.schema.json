@@ -1,11 +1,11 @@
 {
 	"$id": "page-ous-details.schema.json",
-	"description": "Configuration regarding the detailed view of a ou (\"/ous/[dn]\")",
+	"description": "Configuration regarding the detailed view of a OU (\"/ous/[dn]\")",
 	"title": "OuDetailsConfig",
 	"type": "object",
 	"properties": {
 		"name": {
-			"description": "Configuration regarding the \"name\" attribute of the ou",
+			"description": "Configuration regarding the \"name\" attribute of the OU",
 			"type": "object",
 			"properties": {
 				"label": {
@@ -22,7 +22,7 @@
 			"additionalProperties": false
 		},
 		"description": {
-			"description": "Configuration regarding the \"description\" attribute of the ou",
+			"description": "Configuration regarding the \"description\" attribute of the OU",
 			"type": "object",
 			"properties": {
 				"label": {
@@ -37,6 +37,12 @@
 				}
 			},
 			"additionalProperties": false
+		},
+		"parent": {
+			"$ref": "page-details-parent.schema.json"
+		},
+		"member": {
+			"$ref": "page-details-member.schema.json"
 		},
 		"distinguishedName": {
 			"description": "Configuration regarding the \"distinguishedName\" attribute of the ou",

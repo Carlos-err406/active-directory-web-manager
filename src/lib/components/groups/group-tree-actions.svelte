@@ -79,7 +79,7 @@
 	</DropdownMenu.Content>
 </DropdownMenu.Root>
 
-<DeleteGroupDialog dn={entry.distinguishedName} bind:open={isDeleteGroupDialogOpen} />
+<DeleteGroupDialog dn={entry.distinguishedName} bind:open={isDeleteGroupDialogOpen} on:deleted />
 <ManageGroupMembersDialog dn={entry.distinguishedName} bind:open={isManageMembersDialogOpen} />
 <UpdateGroupDialog
 	dn={entry.distinguishedName}

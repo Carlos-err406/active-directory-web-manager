@@ -4,30 +4,39 @@
 	import GroupTreeActions from '$lib/components/groups/group-tree-actions.svelte';
 	import OuTreeActions from '$lib/components/organizational-units/ou-tree-actions.svelte';
 	import UserTreeActions from '$lib/components/users/user-tree-actions.svelte';
+	import { extractBase } from '$lib/ldap/utils';
 	import type { NameChange } from '$lib/types';
 	import type { TreeEntry } from '$lib/types/tree';
-	import { isGroup, isOu, isUser } from '$lib/utils';
-	import { getDnFromUrl } from '../utils';
+	import { getTreeUrlFromDn, isGroup, isOu, isUser } from '$lib/utils';
+	import { getDnFromUrl, isExpandedEntry } from '../utils';
 
 	export let entry: TreeEntry;
 
 	const handleNameChange = async ({ detail }: CustomEvent<NameChange>) => {
 		const urlDn = getDnFromUrl($page.url.pathname);
-		console.log({ urlDn, ...detail });
 		const newUrlDn = urlDn.replace(detail.oldDn, detail.newDn);
-		const newUrl = newUrlDn.split(',').reverse().slice(2).map(encodeURIComponent).join('/');
-		console.log({ newUrlDn, newUrl });
-		await goto(`/tree/${newUrl}?${$page.url.searchParams}`, {
+		const newUrl = getTreeUrlFromDn(newUrlDn);
+		await goto(`${newUrl}?${$page.url.searchParams}`, {
 			invalidateAll: true,
 			state: { preventScrollIntoView: true }
 		});
 	};
+
+	const handleDeleted = async ({ detail }: CustomEvent<{ dn: string }>) => {
+		if (isExpandedEntry(entry)) {
+			const base = extractBase(detail.dn);
+			const newUrl = getTreeUrlFromDn(base);
+			await goto(newUrl, { invalidateAll: true, state: { preventScrollIntoView: true } });
+		} else {
+			await invalidateAll();
+		}
+	};
 </script>
 
 {#if isUser(entry)}
-	<UserTreeActions {entry} on:name-change={() => invalidateAll()} />
+	<UserTreeActions {entry} on:name-change={() => invalidateAll()} on:deleted={handleDeleted} />
 {:else if isGroup(entry)}
-	<GroupTreeActions {entry} on:name-change={handleNameChange} />
+	<GroupTreeActions {entry} on:name-change={handleNameChange} on:deleted={handleDeleted} />
 {:else if isOu(entry)}
-	<OuTreeActions {entry} on:name-change={handleNameChange} />
+	<OuTreeActions {entry} on:name-change={handleNameChange} on:deleted={handleDeleted} />
 {/if}

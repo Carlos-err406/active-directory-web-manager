@@ -1,7 +1,7 @@
 {
 	"$id": "page-ous.schema.json",
-	"description": "Configuration regarding the groups page",
-	"title": "GroupsPageConfig",
+	"description": "Configuration regarding the organizational units page",
+	"title": "OrganizationalUnitsPageConfig",
 	"type": "object",
 	"properties": {
 		"details": {

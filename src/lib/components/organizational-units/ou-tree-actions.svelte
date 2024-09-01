@@ -64,7 +64,7 @@
 	</DropdownMenu.Content>
 </DropdownMenu.Root>
 
-<DeleteOuDialog dn={entry.distinguishedName} bind:open={isDeleteOuDialogOpen} />
+<DeleteOuDialog dn={entry.distinguishedName} bind:open={isDeleteOuDialogOpen} on:deleted />
 <UpdateOuDialog
 	on:name-change
 	dn={entry.distinguishedName}

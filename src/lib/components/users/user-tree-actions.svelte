@@ -82,7 +82,7 @@
 	</DropdownMenu.Content>
 </DropdownMenu.Root>
 
-<DeleteUserDialog dn={entry.distinguishedName} bind:open={isDeleteUserDialogOpen} />
+<DeleteUserDialog dn={entry.distinguishedName} bind:open={isDeleteUserDialogOpen} on:deleted />
 <ChangePasswordDialog dn={entry.distinguishedName} bind:open={isChangePasswordDialogOpen} />
 <UpdateUserDialog
 	dn={entry.distinguishedName}

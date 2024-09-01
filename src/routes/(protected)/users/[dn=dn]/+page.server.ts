@@ -1,16 +1,18 @@
+import config from '$config';
 import { getEntryByDn } from '$lib/ldap';
+import { extractBase } from '$lib/ldap/utils';
 import { changePasswordSchema } from '$lib/schemas/user/change-password-schema';
 import { deleteUserSchema } from '$lib/schemas/user/delete-user-schema';
 import { updateUserSchema } from '$lib/schemas/user/update-user-schema';
+import { errorLog } from '$lib/server/logs';
 import { specificResourceAccessControl } from '$lib/server/utils';
 import { jpegPhotoToB64 } from '$lib/transforms';
 import type { User } from '$lib/types/user';
-import { error, redirect } from '@sveltejs/kit';
+import type { EntryWithObjectClass } from '$lib/utils';
+import { error, isHttpError, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { PageServerLoad } from './$types';
-import { isHttpError } from '@sveltejs/kit';
-import { errorLog } from '$lib/server/logs';
 
 export const load: PageServerLoad = async ({ params, url, locals, depends }) => {
 	depends('protected:users:dn');
@@ -24,19 +26,22 @@ export const load: PageServerLoad = async ({ params, url, locals, depends }) => 
 	const { ldap, session } = auth;
 	if (session.dn === paramDN) throw redirect(303, '/users/me');
 	try {
-		const [user, changePasswordForm, updateUserForm, deleteUserForm] = await Promise.all([
-			getEntryByDn<User>(ldap, paramDN).then(jpegPhotoToB64),
-			superValidate(zod(changePasswordSchema)),
-			superValidate(zod(updateUserSchema)),
-			superValidate(zod(deleteUserSchema))
-		]);
+		const user = await getEntryByDn<User>(ldap, paramDN).then(jpegPhotoToB64);
 		if (!user) throw error(404, 'User not found');
+		const baseParent = extractBase(user.dn);
+		let parent: null | Promise<EntryWithObjectClass> = null;
+		if (config.app.views.usersPage.details.parent.show) {
+			parent = getEntryByDn<EntryWithObjectClass>(ldap, baseParent, {
+				searchOpts: { attributes: ['dn', 'distinguishedName', 'objectClass'] }
+			});
+		}
 		return {
 			user,
+			parent,
 			searchForm: null,
-			changePasswordForm,
-			updateUserForm,
-			deleteUserForm
+			changePasswordForm: await superValidate(zod(changePasswordSchema)),
+			updateUserForm: await superValidate(zod(updateUserSchema)),
+			deleteUserForm: await superValidate(zod(deleteUserSchema))
 		};
 	} catch (e) {
 		if (isHttpError(e)) throw e;

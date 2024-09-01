@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto, invalidate } from '$app/navigation';
+	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { toastError } from '$lib';
 	import Form, { type FormOptions } from '$lib/components/form/form.svelte';
@@ -9,10 +9,11 @@
 		deleteGroupSchema,
 		type DeleteGroupSchema
 	} from '$lib/schemas/group/delete-group-schema';
+	import { createEventDispatcher } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	export let open = false;
 	export let dn: string;
-	export let action = '/groups?/deleteGroup';
+	$: action = `/groups/${dn}?/deleteGroup`;
 	$: form = $page.data.deleteGroupForm;
 	let toastId: string | number = NaN;
 
@@ -20,15 +21,16 @@
 		toastId = toast.loading('Deleting group...', { duration: 30_000 });
 	};
 
+	const dispatch = createEventDispatcher<{ deleted: { dn: string } }>();
 	const onResult: FormOptions<DeleteGroupSchema>['onResult'] = async ({ result }) => {
 		switch (result.type) {
 			case 'success':
-				invalidate('protected:groups');
 				toastId = toast.success('Group deleted successfully!', {
 					id: toastId,
 					duration: undefined
 				});
 				open = false;
+				dispatch('deleted', { dn });
 				break;
 
 			case 'redirect':
@@ -64,6 +66,7 @@
 			formOptions={{
 				resetForm: false,
 				applyAction: false,
+				invalidateAll: false,
 				onError,
 				onSubmit,
 				onResult

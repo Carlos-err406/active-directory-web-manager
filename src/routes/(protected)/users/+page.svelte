@@ -160,7 +160,7 @@
 					sort: { disable: true }
 				},
 				cell: ({ value }) => {
-					return createRender(UserTableActions, { id: value });
+					return createRender(UserTableActions, { dn: value });
 				}
 			})
 		]);

@@ -45,6 +45,12 @@ const defaults: RecursiveRequired<App.Config> = {
 						label: 'mail',
 						show: true
 					},
+					parent: {
+						asLink: false,
+						label: 'parent',
+						shortParent: false,
+						show: true
+					},
 					member: {
 						label: 'member',
 						shortMember: false,
@@ -124,6 +130,18 @@ const defaults: RecursiveRequired<App.Config> = {
 					whenCreated: {
 						label: 'whenCreated',
 						show: true
+					},
+					parent: {
+						asLink: false,
+						label: 'parent',
+						shortParent: false,
+						show: true
+					},
+					member: {
+						label: 'member',
+						show: true,
+						shortMember: false,
+						asLinks: false
 					}
 				},
 				table: {
@@ -182,6 +200,12 @@ const defaults: RecursiveRequired<App.Config> = {
 					},
 					mail: {
 						label: 'mail',
+						show: true
+					},
+					parent: {
+						asLink: false,
+						label: 'parent',
+						shortParent: false,
 						show: true
 					},
 					memberOf: {
