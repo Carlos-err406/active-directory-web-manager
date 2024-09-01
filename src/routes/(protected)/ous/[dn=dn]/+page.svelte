@@ -1,7 +1,5 @@
 <script lang="ts">
-	import InfoValue from '$/lib/components/info-value.svelte';
-	import MemberInfoValue from '$/lib/components/member-info-value.svelte';
-	import ParentInfoValue from '$/lib/components/parent-info-value.svelte';
+	import { InfoValue, MemberInfoValue, ParentInfoValue } from '$/lib/components/info-value';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { DeleteOuDialog, UpdateOuDialog } from '$lib/components/organizational-units';

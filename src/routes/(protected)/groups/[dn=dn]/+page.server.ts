@@ -1,4 +1,6 @@
-import { getEntryByDn, getGroupMemberEntries } from '$lib/ldap';
+import config from '$config';
+import { getEntryByDn, getMemberEntries } from '$lib/ldap';
+import { extractBase } from '$lib/ldap/utils';
 import { deleteGroupSchema } from '$lib/schemas/group/delete-group-schema';
 import { setMembersSchema } from '$lib/schemas/group/set-members-schema';
 import { updateGroupSchema } from '$lib/schemas/group/update-group-schema';
@@ -10,8 +12,6 @@ import { error, isHttpError } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { PageServerLoad } from './$types';
-import { extractBase } from '$lib/ldap/utils';
-import config from '$config';
 
 export const load: PageServerLoad = async ({ locals, url, params }) => {
 	const dn = decodeURIComponent(params.dn);
@@ -24,17 +24,24 @@ export const load: PageServerLoad = async ({ locals, url, params }) => {
 		}
 		const baseParent = extractBase(group.dn);
 		let parent: null | Promise<EntryWithObjectClass> = null;
-		if (config.app.views.usersPage.details.parent.show) {
+		let members: null | Promise<EntryWithObjectClass[]> = null;
+		if (config.app.views.groupsPage.details.parent.show) {
 			parent = getEntryByDn<EntryWithObjectClass>(ldap, baseParent, {
 				searchOpts: { attributes: ['dn', 'distinguishedName', 'objectClass'] }
+			});
+		}
+
+		if (config.app.views.groupsPage.details.member.show) {
+			members = getMemberEntries<EntryWithObjectClass>(ldap, group.member, {
+				searchOpts: {
+					attributes: ['dn', 'distinguishedName', 'name', 'objectClass']
+				}
 			});
 		}
 		return {
 			group,
 			parent,
-			members: getGroupMemberEntries<EntryWithObjectClass>(ldap, group.member, {
-				searchOpts: { attributes: ['dn', 'distinguishedName', 'objectClass'] }
-			}),
+			members,
 			setMembersForm: await superValidate(zod(setMembersSchema)),
 			updateGroupForm: await superValidate(zod(updateGroupSchema)),
 			deleteGroupForm: await superValidate(zod(deleteGroupSchema)),

@@ -657,27 +657,7 @@ export interface UserDetailsConfig {
 		show?: boolean;
 	};
 	parent?: ParentDetailsConfig;
-	/**
-	 * Configuration regarding the "memberOf" attribute of the user
-	 */
-	memberOf?: {
-		/**
-		 * @default "memberOf"
-		 */
-		label?: string;
-		/**
-		 * If false the attribute "memberOf" of the user will be shown as the full distinguishedName, else only the CN is shown. @default false
-		 */
-		shortMemberOf?: boolean;
-		/**
-		 * Show groups as links to each group description
-		 */
-		asLinks?: boolean;
-		/**
-		 * Wether or not to show the "memberOf" attribute in the detail pages ("/users/[dn]" or "/users/me"). If false "shortMemberOf" will be ignored @default true
-		 */
-		show?: boolean;
-	};
+	memberOf?: MemberDetailsConfig;
 	/**
 	 * Configuration regarding the "sAMAccountName" attribute of the user
 	 */

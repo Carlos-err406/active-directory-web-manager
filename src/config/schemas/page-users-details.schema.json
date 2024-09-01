@@ -105,31 +105,7 @@
 			"$ref": "page-details-parent.schema.json"
 		},
 		"memberOf": {
-			"description": "Configuration regarding the \"memberOf\" attribute of the user",
-			"type": "object",
-			"properties": {
-				"label": {
-					"default": "memberOf",
-					"description": "@default \"memberOf\"",
-					"type": "string"
-				},
-				"shortMemberOf": {
-					"description": "If false the attribute \"memberOf\" of the user will be shown as the full distinguishedName, else only the CN is shown. @default false",
-					"type": "boolean",
-					"default": false
-				},
-				"asLinks": {
-					"description": "Show groups as links to each group description",
-					"type": "boolean",
-					"default": false
-				},
-				"show": {
-					"description": "Wether or not to show the \"memberOf\" attribute in the detail pages (\"/users/[dn]\" or \"/users/me\"). If false \"shortMemberOf\" will be ignored @default true",
-					"type": "boolean",
-					"default": true
-				}
-			},
-			"additionalProperties": false
+			"$ref": "page-details-member.schema.json"
 		},
 		"sAMAccountName": {
 			"description": "Configuration regarding the \"sAMAccountName\" attribute of the user",

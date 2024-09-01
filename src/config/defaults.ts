@@ -210,7 +210,7 @@ const defaults: RecursiveRequired<App.Config> = {
 					},
 					memberOf: {
 						label: 'memberOf',
-						shortMemberOf: false,
+						shortMember: false,
 						show: true,
 						asLinks: false
 					},

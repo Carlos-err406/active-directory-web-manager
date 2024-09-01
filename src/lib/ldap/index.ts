@@ -88,7 +88,7 @@ export const getGroupMembers = async (ldap: Client, groupDn: string, opts?: GetE
 	return group?.member ?? [];
 };
 
-export const getGroupMemberEntries = async <T extends Entry>(
+export const getMemberEntries = async <T extends Entry>(
 	ldap: Client,
 	members: string[],
 	opts?: GetEntryOpts

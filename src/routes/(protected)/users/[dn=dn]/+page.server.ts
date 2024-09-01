@@ -1,5 +1,5 @@
 import config from '$config';
-import { getEntryByDn } from '$lib/ldap';
+import { getEntryByDn, getMemberEntries } from '$lib/ldap';
 import { extractBase } from '$lib/ldap/utils';
 import { changePasswordSchema } from '$lib/schemas/user/change-password-schema';
 import { deleteUserSchema } from '$lib/schemas/user/delete-user-schema';
@@ -30,14 +30,23 @@ export const load: PageServerLoad = async ({ params, url, locals, depends }) => 
 		if (!user) throw error(404, 'User not found');
 		const baseParent = extractBase(user.dn);
 		let parent: null | Promise<EntryWithObjectClass> = null;
+		let memberOf: null | Promise<EntryWithObjectClass[]> = null;
 		if (config.app.views.usersPage.details.parent.show) {
 			parent = getEntryByDn<EntryWithObjectClass>(ldap, baseParent, {
 				searchOpts: { attributes: ['dn', 'distinguishedName', 'objectClass'] }
 			});
 		}
+
+		if (config.app.views.usersPage.details.memberOf.show) {
+			memberOf = getMemberEntries<EntryWithObjectClass>(ldap, user.memberOf, {
+				searchOpts: { attributes: ['dn', 'distinguishedName', 'objectClass'] }
+			});
+		}
+
 		return {
 			user,
 			parent,
+			memberOf,
 			searchForm: null,
 			changePasswordForm: await superValidate(zod(changePasswordSchema)),
 			updateUserForm: await superValidate(zod(updateUserSchema)),

@@ -1,12 +1,11 @@
 <script lang="ts">
-	import InfoValue from '$/lib/components/info-value.svelte';
-	import ParentInfoValue from '$/lib/components/parent-info-value.svelte';
+	import { InfoValue, MemberofInfoValue, ParentInfoValue } from '$/lib/components/info-value';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { Avatar, AvatarFallback, AvatarWithPreview } from '$lib/components/ui/avatar';
 	import { Button } from '$lib/components/ui/button';
 	import { ChangePasswordDialog, DeleteUserDialog, UpdateUserDialog } from '$lib/components/users';
-	import { getCNFromDN, getUserAccountControls } from '$lib/ldap/utils';
+	import { getUserAccountControls } from '$lib/ldap/utils';
 	import { breadcrumbs } from '$lib/stores';
 	import { UserAccountControlTypes } from '$lib/types/user';
 	import { buildBreadcrumbsFromDn, getTreeUrlFromDn } from '$lib/utils';
@@ -26,7 +25,7 @@
 	setContext('config', config);
 	setContext('entry', data.user);
 
-	$: ({ user, updateUserForm, session, parent } = data);
+	$: ({ user, updateUserForm, session, parent, memberOf } = data);
 	$: breadcrumbs.set([
 		{ name: 'Users', link: '/users' },
 		...buildBreadcrumbsFromDn(user.dn, 'users')
@@ -41,8 +40,6 @@
 		};
 		isUpdateUserDialogOpen = true;
 	};
-	const showGroupsAsLinks =
-		data.session.isAdmin || $page.data.config.app.nonAdmin.allowAccessToGroupsPage;
 </script>
 
 <div class="flex h-full w-full flex-col py-12 md:py-16" data-test="usersDnPage">
@@ -83,28 +80,7 @@
 				</InfoValue>
 				<InfoValue key="distinguishedName" />
 				<ParentInfoValue {parent} />
-
-				{#if config.memberOf.show}
-					<span>{config.memberOf.label}:</span>
-					<div class="info-value flex flex-wrap space-y-2">
-						{#each (user.memberOf || []).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)) as dn, index}
-							<svelte:element
-								this={showGroupsAsLinks ? 'a' : 'span'}
-								data-sveltekit-preload-data="hover"
-								data-isLink={showGroupsAsLinks}
-								class="data-[isLink=true]:text-primary data-[isLink=true]:hover:underline"
-								href={showGroupsAsLinks ? `/groups/${encodeURIComponent(dn)}` : '#'}
-							>
-								{config.memberOf.shortMemberOf ? getCNFromDN(dn) : dn}
-							</svelte:element>
-							{#if config.memberOf.shortMemberOf && index < user.memberOf.length - 1}
-								<pre class="!mx-0 font-sans">, </pre>
-							{/if}
-						{:else}
-							<span> - </span>
-						{/each}
-					</div>
-				{/if}
+				<MemberofInfoValue {memberOf} />
 			</div>
 		</div>
 	</div>

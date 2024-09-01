@@ -22,15 +22,18 @@ export const load: PageServerLoad = async ({ locals, url, params }) => {
 		if (!ou) {
 			throw error(404, { message: 'Organizational Unit not found' });
 		}
-		const members = getDirectChildren<EntryWithObjectClass>(ldap, ou.distinguishedName, {
-			attributes: ['dn', 'distinguishedName', 'name', 'objectClass']
-		});
 
 		const baseParent = extractBase(ou.dn);
 		let parent: null | Promise<EntryWithObjectClass> = null;
-		if (config.app.views.usersPage.details.parent.show) {
+		let members: null | Promise<EntryWithObjectClass[]> = null;
+		if (config.app.views.ousPage.details.parent.show) {
 			parent = getEntryByDn<EntryWithObjectClass>(ldap, baseParent, {
 				searchOpts: { attributes: ['dn', 'distinguishedName', 'objectClass'] }
+			});
+		}
+		if (config.app.views.ousPage.details.member.show) {
+			members = getDirectChildren<EntryWithObjectClass>(ldap, ou.distinguishedName, {
+				attributes: ['dn', 'distinguishedName', 'name', 'objectClass']
 			});
 		}
 		return {

@@ -1,11 +1,9 @@
 <script lang="ts">
-	import MemberInfoValue from '$/lib/components/member-info-value.svelte';
-	import ParentInfoValue from '$/lib/components/parent-info-value.svelte';
+	import { InfoValue, MemberInfoValue, ParentInfoValue } from '$/lib/components/info-value';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { DeleteGroupDialog, UpdateGroupDialog } from '$lib/components/groups';
 	import ManageGroupMembersDialog from '$lib/components/groups/manage-group-members-dialog.svelte';
-	import InfoValue from '$lib/components/info-value.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { getGroupTypes } from '$lib/ldap/utils';
 	import { breadcrumbs } from '$lib/stores';

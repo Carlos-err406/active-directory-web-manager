@@ -427,7 +427,7 @@ export const updateMembership: Action = async (event) => {
 		throw error(500, { message, errorId });
 	}
 	appLog(
-		`User ${auth.session.sAMAccountName} updated ${user.sAMAccountName}'s group membership: ${dns.map(getCNFromDN).join(', ')}`
+		`User ${auth.session.sAMAccountName} set ${user.sAMAccountName}'s group membership to: ${dns.map(getCNFromDN).join(', ')}`
 	);
 	return { form };
 };
