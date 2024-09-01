@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { applyAction } from '$app/forms';
-	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
 	import { toastError } from '$lib';
@@ -16,6 +15,7 @@
 	import { GroupTypeSelect, type Group } from '$lib/types/group';
 	import Captions from '$lucide/captions.svelte';
 	import Mail from '$lucide/mail.svelte';
+	import { createEventDispatcher } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import { slide } from 'svelte/transition';
 	import AddMembersDialog from './add-members-dialog.svelte';
@@ -27,8 +27,8 @@
 	let isManageMembersSurveyDialogOpen = false;
 	let isAddMembersDialogOpen = false;
 	let createdGroup: Group;
+	const dispatch = createEventDispatcher<{ created: Group }>();
 	$: form = $page.data.createGroupForm;
-
 	let toastId: number | string = NaN;
 
 	const onSubmit: FormOptions['onSubmit'] = () => {
@@ -52,7 +52,7 @@
 				createdGroup = result.data!.group;
 				isManageMembersSurveyDialogOpen = true;
 				toast.success('Group created successfully', { id: toastId, duration: undefined });
-				invalidate('protected:groups');
+				dispatch('created', createdGroup);
 				open = false;
 				break;
 			case 'failure':
@@ -85,6 +85,7 @@
 			formProps={{ action: '/groups?/createGroup' }}
 			formOptions={{
 				resetForm: true,
+				invalidateAll: false,
 				onChange,
 				onError,
 				onSubmit,

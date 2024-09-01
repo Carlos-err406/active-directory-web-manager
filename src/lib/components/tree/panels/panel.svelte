@@ -59,5 +59,5 @@
 </div>
 
 <CreateUserDialog bind:open={createUserDialogOpen} base={base.dn} />
-<CreateGroupDialog bind:open={createGroupDialogOpen} base={base.dn} />
+<CreateGroupDialog bind:open={createGroupDialogOpen} base={base.dn} on:created={() => {}} />
 <CreateOuDialog bind:open={createOuDialogOpen} base={base.dn} />

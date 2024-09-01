@@ -16,6 +16,10 @@
 	export let dn: string;
 	const action = `/groups/${dn}?/setMembers`;
 	let members: Entry[] = [];
+	$: {
+		open;
+		members = [];
+	}
 	$: form = $page.data.setMembersForm;
 	let toastId: string | number = NaN;
 

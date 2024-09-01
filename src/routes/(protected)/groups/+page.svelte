@@ -20,6 +20,7 @@
 	import { slide } from 'svelte/transition';
 	import type { PageData } from './$types';
 	import { Button } from '$lib/components/ui/button';
+	import { invalidate } from '$app/navigation';
 	export let data: PageData;
 	breadcrumbs.set([{ name: 'Groups' }]);
 	$: ({ columns: configColumns } = $page.data.config.app.views.groupsPage.table);
@@ -153,4 +154,7 @@
 	</DataTable>
 </div>
 
-<CreateGroupDialog bind:open={groupCreateDialogOpen} />
+<CreateGroupDialog
+	bind:open={groupCreateDialogOpen}
+	on:created={() => invalidate('protected:groups')}
+/>
