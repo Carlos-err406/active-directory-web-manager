@@ -11,7 +11,7 @@
 
 {#if config.member.show}
 	{#await members}
-		<span>{config.member.label}:</span>
+		<span class="justify-self-end">{config.member.label}:</span>
 		<div class="info-value flex flex-col gap-y-2" data-test="member">
 			<div class="flex w-full items-center gap-5">
 				<Loader class="animate-spin" />
@@ -21,7 +21,7 @@
 	{:then members}
 		{#if members}
 			{@const sorted = members.sort((a, b) => (a.dn < b.dn ? -1 : a.dn > b.dn ? 1 : 0))}
-			<span>{config.member.label}:</span>
+			<span class="justify-self-end">{config.member.label}:</span>
 			<div class="info-value flex flex-col gap-y-2" data-test="member">
 				{#each sorted as member}
 					{@const href = getEntryDetailedUrl(member)}

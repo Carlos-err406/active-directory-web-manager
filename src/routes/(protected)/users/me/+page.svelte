@@ -59,7 +59,7 @@
 					{user.displayName || user.sAMAccountName}
 				</h1>
 			</div>
-			<div class="user-info grid grid-cols-2 gap-y-3">
+			<div class="grid grid-cols-2 gap-4">
 				<InfoValue key="sAMAccountName" />
 				<InfoValue key="displayName" />
 				<InfoValue key="givenName" />

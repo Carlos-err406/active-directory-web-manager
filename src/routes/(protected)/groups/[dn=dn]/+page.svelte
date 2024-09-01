@@ -49,7 +49,7 @@
 					{group.sAMAccountName}
 				</h1>
 			</div>
-			<div class="group-info grid grid-cols-2 gap-y-3">
+			<div class="group-info grid grid-cols-2 gap-4">
 				<InfoValue key="sAMAccountName" />
 				<InfoValue key="cn" />
 				<InfoValue key="description" />

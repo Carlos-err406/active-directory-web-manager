@@ -4,7 +4,12 @@
 	import { page } from '$app/stores';
 	import { Avatar, AvatarFallback, AvatarWithPreview } from '$lib/components/ui/avatar';
 	import { Button } from '$lib/components/ui/button';
-	import { ChangePasswordDialog, DeleteUserDialog, UpdateUserDialog } from '$lib/components/users';
+	import {
+		ChangePasswordDialog,
+		DeleteUserDialog,
+		ManageUserMembershipDialog,
+		UpdateUserDialog
+	} from '$lib/components/users';
 	import { getUserAccountControls } from '$lib/ldap/utils';
 	import { breadcrumbs } from '$lib/stores';
 	import { UserAccountControlTypes } from '$lib/types/user';
@@ -13,6 +18,7 @@
 	import LockKeyhole from '$lucide/lock-keyhole.svelte';
 	import PencilLine from '$lucide/pencil-line.svelte';
 	import Trash2 from '$lucide/trash-2.svelte';
+	import Users from '$lucide/users.svelte';
 	import dayjs from 'dayjs';
 	import { setContext } from 'svelte';
 	import type { PageData } from './$types';
@@ -21,6 +27,8 @@
 	let isChangePasswordDialogOpen = false;
 	let isUpdateUserDialogOpen = false;
 	let isDeleteUserDialogOpen = false;
+	let isManageMembershipDialogOpen = false;
+
 	const { details: config } = $page.data.config.app.views.usersPage;
 	setContext('config', config);
 	setContext('entry', data.user);
@@ -60,7 +68,7 @@
 					{user.displayName || user.sAMAccountName}
 				</h1>
 			</div>
-			<div class="user-info grid grid-cols-2 gap-y-3">
+			<div class="grid grid-cols-2 gap-4">
 				<InfoValue key="sAMAccountName" />
 				<InfoValue key="displayName" />
 				<InfoValue key="givenName" />
@@ -96,6 +104,10 @@
 				<PencilLine class="size-4 flex-none" />
 				Edit
 			</Button>
+			<Button class="flex flex-nowrap gap-2" on:click={() => (isManageMembershipDialogOpen = true)}>
+				<Users class="size-5" />
+				Manage groups
+			</Button>
 			<Button class="flex items-center gap-2" on:click={() => (isChangePasswordDialogOpen = true)}>
 				<LockKeyhole class="size-4 flex-none" />
 				Change password
@@ -125,3 +137,4 @@
 		await goto(`/users/${encodeURIComponent(detail.newDn)}`, { invalidateAll: true });
 	}}
 />
+<ManageUserMembershipDialog dn={user.distinguishedName} bind:open={isManageMembershipDialogOpen} />

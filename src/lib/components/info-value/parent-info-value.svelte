@@ -11,7 +11,7 @@
 
 {#if config.parent.show}
 	{#await parent}
-		<span>{config.parent.label}:</span>
+		<span class="justify-self-end">{config.parent.label}:</span>
 		<span class="info-value">
 			<div class="flex w-full items-center gap-5">
 				<Loader class="animate-spin" />
@@ -20,7 +20,7 @@
 		</span>
 	{:then parent}
 		{#if parent}
-			<span>{config.parent.label}:</span>
+			<span class="justify-self-end">{config.parent.label}:</span>
 			<span class="info-value">
 				{#if parent.dn === PUBLIC_BASE_DN}
 					Root

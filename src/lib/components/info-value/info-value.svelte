@@ -7,7 +7,7 @@
 </script>
 
 {#if config?.[key].show && entry[key]}
-	<span>{config[key].label}:</span>
+	<span class="justify-self-end">{config[key].label}:</span>
 	<span class="info-value">
 		<slot>
 			{entry[key]}

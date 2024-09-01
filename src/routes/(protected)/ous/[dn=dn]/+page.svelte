@@ -43,7 +43,7 @@
 					{ou.name}
 				</h1>
 			</div>
-			<div class="group-info grid grid-cols-2 gap-y-3">
+			<div class="group-info grid grid-cols-2 gap-4">
 				<InfoValue key="name" />
 				<InfoValue key="description" />
 				<InfoValue key="distinguishedName" />
