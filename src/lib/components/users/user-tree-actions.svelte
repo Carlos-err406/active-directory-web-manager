@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { getUserAccountControlMatches } from '$/lib/ldap/utils';
 	import { page } from '$app/stores';
 	import { Button } from '$lib/components/ui/button';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
@@ -22,11 +23,16 @@
 	let isManageMembershipDialogOpen = false;
 	$: ({ updateUserForm } = $page.data);
 	const onOpenEditClick = () => {
+		const uacMatches = entry.userAccountControl
+			? getUserAccountControlMatches(entry.userAccountControl)
+			: [];
+
 		updateUserForm.data = {
 			...updateUserForm.data,
 			...entry,
 			dn: entry.distinguishedName,
-			jpegPhotoBase64: entry?.jpegPhoto
+			jpegPhotoBase64: entry?.jpegPhoto,
+			...uacMatches.reduce((acc, match) => ({ ...acc, [`uac.${match}`]: true }), {})
 		};
 		isUpdateUserDialogOpen = true;
 	};

@@ -74,7 +74,7 @@
 	"dependencies": {
 		"@apidevtools/json-schema-ref-parser": "^11.6.4",
 		"@internationalized/date": "^3.5.4",
-		"bits-ui": "^0.21.10",
+		"bits-ui": "^0.21.13",
 		"chokidar-cli": "^3.0.0",
 		"clsx": "^2.1.0",
 		"cmdk-sv": "^0.0.17",

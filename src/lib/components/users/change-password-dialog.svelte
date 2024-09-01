@@ -15,7 +15,7 @@
 	import { toast } from 'svelte-sonner';
 	export let open = false;
 	export let dn: string;
-	export let action = '/users?/changePassword';
+	$: action = `/users/${dn}?/changeUserPassword`;
 	$: session = $page.data.session as Session;
 	$: form = $page.data.changePasswordForm;
 	$: isSelf = session.dn === dn;

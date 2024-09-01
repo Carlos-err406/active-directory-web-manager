@@ -23,7 +23,6 @@
 	let isUpdateUserDialogOpen = false;
 	const { details: config } = $page.data.config.app.views.usersPage;
 	setContext('config', config);
-	setContext('entry', data.user);
 	$: ({ user, updateUserForm, session, memberOf, parent } = data);
 	$: ({ jpegPhoto, sAMAccountName } = user);
 
@@ -60,24 +59,24 @@
 				</h1>
 			</div>
 			<div class="grid grid-cols-2 gap-4">
-				<InfoValue key="sAMAccountName" />
-				<InfoValue key="displayName" />
-				<InfoValue key="givenName" />
-				<InfoValue key="sn" />
-				<InfoValue key="mail" />
-				<InfoValue key="description" />
-				<InfoValue key="userAccountControl">
+				<InfoValue entry={user} key="sAMAccountName" />
+				<InfoValue entry={user} key="displayName" />
+				<InfoValue entry={user} key="givenName" />
+				<InfoValue entry={user} key="sn" />
+				<InfoValue entry={user} key="mail" />
+				<InfoValue entry={user} key="description" />
+				<InfoValue entry={user} key="userAccountControl">
 					{getUserAccountControls(user.userAccountControl)
 						.map((uac) => UserAccountControlTypes[uac])
 						.join(', ')}
 				</InfoValue>
-				<InfoValue key="whenCreated">
+				<InfoValue entry={user} key="whenCreated">
 					{dayjs(user.whenCreated.replace('Z', '')).format('MMMM D, YYYY hh:mm:ss A')}
 				</InfoValue>
-				<InfoValue key="whenChanged">
+				<InfoValue entry={user} key="whenChanged">
 					{dayjs(user.whenChanged.replace('Z', '')).format('MMMM D, YYYY hh:mm:ss A')}
 				</InfoValue>
-				<InfoValue key="distinguishedName" />
+				<InfoValue entry={user} key="distinguishedName" />
 				<ParentInfoValue {parent} />
 				<MemberofInfoValue {memberOf} />
 			</div>

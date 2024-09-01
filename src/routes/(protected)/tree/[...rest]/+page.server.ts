@@ -27,6 +27,7 @@ import {
 	throwIfIsHiddenEntry,
 	treeSearch
 } from './utils.server';
+import { UAC } from '$/lib/types/user';
 
 export const load = async ({ url, locals, params }: Parameters<PageServerLoad>[0]) => {
 	const auth = await protectedAccessControl({ locals, url });
@@ -45,7 +46,17 @@ export const load = async ({ url, locals, params }: Parameters<PageServerLoad>[0
 		activeDns,
 		deleteManyUsersForm: await superValidate(zod(deleteManySchema)),
 		deleteUserForm: await superValidate(zod(deleteUserSchema)),
-		createUserForm: await superValidate(zod(createUserSchema)),
+		createUserForm: await superValidate(zod(createUserSchema), {
+			defaults: {
+				[`uac.${UAC['Normal Account']}`]: true,
+				base: `CN=Users,${PUBLIC_BASE_DN}`,
+				sAMAccountName: '',
+				givenName: '',
+				passwordConfirmation: '',
+				mail: '',
+				password: ''
+			}
+		}),
 		updateUserForm: await superValidate(zod(updateUserSchema)),
 		changePasswordForm: await superValidate(zod(changePasswordSchema)),
 		deleteManyGroupsForm: await superValidate(zod(deleteManySchema)),

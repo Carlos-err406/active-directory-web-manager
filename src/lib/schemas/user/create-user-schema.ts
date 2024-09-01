@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { base } from '../dn-schema';
+import { userAccountControlSchema } from './uac-schema';
 
 export const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 export const MAX_FILE_SIZE_MB = 6;
@@ -43,6 +44,7 @@ export const createUserSchema = z
 			),
 		passwordConfirmation: z.string().min(1, 'Password confirmation is required')
 	})
+	.merge(userAccountControlSchema)
 	.refine(({ password, passwordConfirmation }) => password === passwordConfirmation, {
 		message: 'Passwords do not match',
 		path: ['passwordConfirmation']

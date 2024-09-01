@@ -46,3 +46,9 @@ export const extractBase = (dn: string) => {
 
 /** If an entry has any of these attributes it should be an array. LDAP sets them as a string if attribute.length === 1 */
 export const ARRAY_ATTRIBUTES = ['objectClass', 'member', 'memberOf'];
+
+export const getUserAccountControlMatches = (userAccountControl: number | string) => {
+	const flags = Object.keys(UserAccountControlTypes).map(Number);
+	const match = flags.filter((uac) => uac & Number(userAccountControl)) as UserAccountControl[];
+	return match;
+};

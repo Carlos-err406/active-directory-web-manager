@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { base } from '../dn-schema';
 import { ALLOWED_FILE_TYPES, MAX_FILE_SIZE_MB } from './create-user-schema';
+import { userAccountControlSchema } from './uac-schema';
 
 export const updateUserSchema = z
 	.object({
@@ -30,6 +31,7 @@ export const updateUserSchema = z
 		mail: z.string().email().trim().min(1, 'mail is required'),
 		description: z.string().max(100, 'description cannot be longer than 100 characters').optional()
 	})
+	.merge(userAccountControlSchema)
 	.refine(
 		({ jpegPhoto, jpegPhotoBase64 }) =>
 			(!jpegPhoto && !jpegPhotoBase64) || (jpegPhoto && jpegPhotoBase64),

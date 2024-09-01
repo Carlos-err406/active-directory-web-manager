@@ -23,7 +23,6 @@
 		...buildBreadcrumbsFromDn(group.dn, 'groups')
 	]);
 	const { details: config } = $page.data.config.app.views.groupsPage;
-	setContext('entry', data.group);
 	setContext('config', config);
 	let isUpdateGroupDialogOpen = false;
 	let isManageMembersDialogOpen = false;
@@ -50,20 +49,20 @@
 				</h1>
 			</div>
 			<div class="group-info grid grid-cols-2 gap-4">
-				<InfoValue key="sAMAccountName" />
-				<InfoValue key="cn" />
-				<InfoValue key="description" />
-				<InfoValue key="mail" />
-				<InfoValue key="distinguishedName" />
-				<InfoValue key="groupType">
+				<InfoValue entry={group} key="sAMAccountName" />
+				<InfoValue entry={group} key="cn" />
+				<InfoValue entry={group} key="description" />
+				<InfoValue entry={group} key="mail" />
+				<InfoValue entry={group} key="distinguishedName" />
+				<InfoValue entry={group} key="groupType">
 					{getGroupTypes(group.groupType)
 						.map((gt) => GroupTypes[gt])
 						.join(', ')}
 				</InfoValue>
-				<InfoValue key="whenCreated">
+				<InfoValue entry={group} key="whenCreated">
 					{dayjs(group.whenCreated.replace('Z', '')).format('MMMM D, YYYY. hh:mm:ss A')}
 				</InfoValue>
-				<InfoValue key="whenChanged">
+				<InfoValue entry={group} key="whenChanged">
 					{dayjs(group.whenChanged.replace('Z', '')).format('MMMM D, YYYY. hh:mm:ss A')}
 				</InfoValue>
 				<ParentInfoValue {parent} />

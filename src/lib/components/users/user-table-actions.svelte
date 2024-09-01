@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { getUserAccountControlMatches } from '$/lib/ldap/utils';
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { Button } from '$lib/components/ui/button';
@@ -27,11 +28,14 @@
 	const onOpenEditClick = () => {
 		const paginationData: User[] = $page.data.pagination.data;
 		const user = paginationData.find(({ distinguishedName }) => distinguishedName === dn);
+		if (!user) return;
+		const uacMatches = getUserAccountControlMatches(user.userAccountControl);
 		updateUserForm.data = {
 			...updateUserForm.data,
 			...user,
-			dn: dn,
-			jpegPhotoBase64: user?.jpegPhoto
+			dn,
+			jpegPhotoBase64: user?.jpegPhoto,
+			...uacMatches.reduce((acc, match) => ({ ...acc, [`uac.${match}`]: true }), {})
 		};
 		isUpdateUserDialogOpen = true;
 	};

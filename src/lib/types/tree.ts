@@ -10,6 +10,7 @@ export type TreeEntry = Entry & {
 	groupType: string;
 	mail: string;
 	sAMAccountName: string;
+	userAccountControl?: string;
 	distinguishedName: string;
 	jpegPhoto?: string;
 };

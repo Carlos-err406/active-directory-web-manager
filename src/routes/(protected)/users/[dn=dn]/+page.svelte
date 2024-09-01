@@ -10,7 +10,7 @@
 		ManageUserMembershipDialog,
 		UpdateUserDialog
 	} from '$lib/components/users';
-	import { getUserAccountControls } from '$lib/ldap/utils';
+	import { getUserAccountControlMatches, getUserAccountControls } from '$lib/ldap/utils';
 	import { breadcrumbs } from '$lib/stores';
 	import { UserAccountControlTypes } from '$lib/types/user';
 	import { buildBreadcrumbsFromDn, getTreeUrlFromDn } from '$lib/utils';
@@ -31,7 +31,6 @@
 
 	const { details: config } = $page.data.config.app.views.usersPage;
 	setContext('config', config);
-	setContext('entry', data.user);
 
 	$: ({ user, updateUserForm, session, parent, memberOf } = data);
 	$: breadcrumbs.set([
@@ -41,9 +40,12 @@
 
 	const onOpenEditClick = () => {
 		const { jpegPhoto, ...restAttributes } = user;
+		const uacMatches = getUserAccountControlMatches(user.userAccountControl);
+
 		updateUserForm.data = {
 			...updateUserForm.data,
 			...restAttributes,
+			...uacMatches.reduce((acc, match) => ({ ...acc, [`uac.${match}`]: true }), {}),
 			jpegPhotoBase64: jpegPhoto
 		};
 		isUpdateUserDialogOpen = true;
@@ -69,24 +71,24 @@
 				</h1>
 			</div>
 			<div class="grid grid-cols-2 gap-4">
-				<InfoValue key="sAMAccountName" />
-				<InfoValue key="displayName" />
-				<InfoValue key="givenName" />
-				<InfoValue key="sn" />
-				<InfoValue key="mail" />
-				<InfoValue key="description" />
-				<InfoValue key="userAccountControl">
+				<InfoValue entry={user} key="sAMAccountName" />
+				<InfoValue entry={user} key="displayName" />
+				<InfoValue entry={user} key="givenName" />
+				<InfoValue entry={user} key="sn" />
+				<InfoValue entry={user} key="mail" />
+				<InfoValue entry={user} key="description" />
+				<InfoValue entry={user} key="userAccountControl">
 					{getUserAccountControls(user.userAccountControl)
 						.map((uac) => UserAccountControlTypes[uac])
 						.join(', ')}
 				</InfoValue>
-				<InfoValue key="whenCreated">
+				<InfoValue entry={user} key="whenCreated">
 					{dayjs(user.whenCreated.replace('Z', '')).format('MMMM D, YYYY hh:mm:ss A')}
 				</InfoValue>
-				<InfoValue key="whenChanged">
+				<InfoValue entry={user} key="whenChanged">
 					{dayjs(user.whenChanged.replace('Z', '')).format('MMMM D, YYYY hh:mm:ss A')}
 				</InfoValue>
-				<InfoValue key="distinguishedName" />
+				<InfoValue entry={user} key="distinguishedName" />
 				<ParentInfoValue {parent} />
 				<MemberofInfoValue {memberOf} />
 			</div>

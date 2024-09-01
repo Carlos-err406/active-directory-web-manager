@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { UserAccountControlTypes } from '$/lib/types/user';
 	import { applyAction } from '$app/forms';
 	import { invalidate } from '$app/navigation';
 	import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
@@ -6,17 +7,21 @@
 	import Form, { type Data, type FormOptions } from '$lib/components/form/form.svelte';
 	import Input from '$lib/components/form/input.svelte';
 	import { Button } from '$lib/components/ui/button';
+	import * as Collapsible from '$lib/components/ui/collapsible';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { ALLOWED_FILE_TYPES, MAX_FILE_SIZE_MB } from '$lib/schemas/user/create-user-schema';
 	import { updateUserSchema, type UpdateUserSchema } from '$lib/schemas/user/update-user-schema';
+	import type { NameChange } from '$lib/types';
 	import { cn } from '$lib/utils';
 	import Captions from '$lucide/captions.svelte';
+	import ChevronsDownUp from '$lucide/chevrons-down-up.svelte';
+	import ChevronsUpDown from '$lucide/chevrons-up-down.svelte';
 	import Mail from '$lucide/mail.svelte';
+	import { createEventDispatcher } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import type { SuperValidated } from 'sveltekit-superforms';
+	import Checkbox from '../form/checkbox.svelte';
 	import ImageInput from '../form/image-input.svelte';
-	import type { NameChange } from '$lib/types';
-	import { createEventDispatcher } from 'svelte';
 	export let open = false;
 	export let base = PUBLIC_BASE_DN;
 	export let dn: string;
@@ -66,11 +71,17 @@
 	const onError: FormOptions<UpdateUserSchema>['onError'] = ({ result }) => {
 		toastError(result.error, toastId);
 	};
-	// TODO: UAC flags!
+
+	let expandedUacFlags = false;
+	$: {
+		open;
+		expandedUacFlags = false;
+	}
+	let anchorBottom: HTMLSpanElement;
 </script>
 
 <Dialog.Root bind:open>
-	<Dialog.Content>
+	<Dialog.Content class="max-h-[calc(100svh-4rem)] !w-fit max-w-[calc(100vw-4rem)] overflow-y-auto">
 		<Dialog.Header>
 			<Dialog.Title>Update User</Dialog.Title>
 			<Dialog.Description>Update the values in the following form</Dialog.Description>
@@ -131,10 +142,46 @@
 					</Input>
 				</div>
 			</div>
+			<Collapsible.Root
+				bind:open={expandedUacFlags}
+				onOpenChange={async () => {
+					setTimeout(() => {
+						anchorBottom.scrollIntoView({ behavior: 'smooth', block: 'start' });
+					}, 250);
+				}}
+			>
+				<div class="flex items-center justify-start space-x-4">
+					<Collapsible.Trigger asChild let:builder>
+						<Button builders={[builder]} variant="ghost" size="sm" class="mb-2 gap-2">
+							<h4 class="text-sm font-semibold">
+								{#if expandedUacFlags}
+									Hide user account control flags
+								{:else}
+									Show user account control flags
+								{/if}
+							</h4>
+							<svelte:component
+								this={expandedUacFlags ? ChevronsDownUp : ChevronsUpDown}
+								class="size-4"
+							/>
+						</Button>
+					</Collapsible.Trigger>
+				</div>
+				<Collapsible.Content>
+					<div class="grid grid-cols-2 gap-2">
+						{#each Object.entries(UserAccountControlTypes) as [uac, label]}
+							<Checkbox name="uac.{uac}" {methods} inputProps={{ value: uac }}>
+								<svelte:fragment slot="label">{label}</svelte:fragment>
+							</Checkbox>
+						{/each}
+					</div>
+				</Collapsible.Content>
+			</Collapsible.Root>
 			<Dialog.Footer>
 				<Button type="button" variant="outline" on:click={() => (open = false)}>Cancel</Button>
 				<Button type="submit" disabled={loading}>Save</Button>
 			</Dialog.Footer>
 		</Form>
+		<span bind:this={anchorBottom} />
 	</Dialog.Content>
 </Dialog.Root>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { UserAccountControlTypes } from '$/lib/types/user';
 	import { applyAction } from '$app/forms';
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
@@ -8,6 +9,7 @@
 	import Input from '$lib/components/form/input.svelte';
 	import PasswordInput from '$lib/components/form/password-input.svelte';
 	import { Button } from '$lib/components/ui/button';
+	import * as Collapsible from '$lib/components/ui/collapsible';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import {
 		ALLOWED_FILE_TYPES,
@@ -17,9 +19,13 @@
 	} from '$lib/schemas/user/create-user-schema';
 	import { cn } from '$lib/utils';
 	import Captions from '$lucide/captions.svelte';
+	import ChevronsDownUp from '$lucide/chevrons-down-up.svelte';
+	import ChevronsUpDown from '$lucide/chevrons-up-down.svelte';
 	import Mail from '$lucide/mail.svelte';
 	import { toast } from 'svelte-sonner';
+	import Checkbox from '../form/checkbox.svelte';
 	import ImageInput from '../form/image-input.svelte';
+
 	export let open = false;
 	export let base = `CN=Users,${PUBLIC_BASE_DN}`;
 	$: form = $page.data.createUserForm;
@@ -62,10 +68,17 @@
 	const onError: FormOptions<CreateUserSchema>['onError'] = ({ result }) => {
 		toastError(result.error, toastId);
 	};
+
+	let expandedUacFlags = false;
+	$: {
+		open;
+		expandedUacFlags = false;
+	}
+	let anchorBottom: HTMLSpanElement;
 </script>
 
 <Dialog.Root bind:open>
-	<Dialog.Content>
+	<Dialog.Content class="max-h-[calc(100svh-4rem)] !w-fit max-w-[calc(100vw-4rem)] overflow-y-auto">
 		<Dialog.Header>
 			<Dialog.Title>Create User</Dialog.Title>
 			<Dialog.Description>Fill in the following data to create a new user</Dialog.Description>
@@ -85,8 +98,8 @@
 			}}
 		>
 			<input hidden name="base" value={base} />
-			<div class="grid grid-cols-2 gap-4">
-				<div class="col-span-2">
+			<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+				<div class="md:col-span-2">
 					<ImageInput
 						name="jpegPhoto"
 						b64Name="jpegPhotoBase64"
@@ -116,7 +129,7 @@
 						<Mail />
 					</svelte:fragment>
 				</Input>
-				<div class="col-span-2">
+				<div class="md:col-span-2">
 					<Input name="description" {methods}>
 						<svelte:fragment slot="label">description</svelte:fragment>
 						<svelte:fragment slot="adornment-left">
@@ -131,10 +144,47 @@
 					<svelte:fragment slot="label">Password Confirmation</svelte:fragment>
 				</PasswordInput>
 			</div>
+			<Collapsible.Root
+				bind:open={expandedUacFlags}
+				onOpenChange={async () => {
+					setTimeout(() => {
+						anchorBottom.scrollIntoView({ behavior: 'smooth', block: 'start' });
+					}, 250);
+				}}
+			>
+				<div class="flex items-center justify-start space-x-4">
+					<Collapsible.Trigger asChild let:builder>
+						<Button builders={[builder]} variant="ghost" size="sm" class="mb-2 gap-2">
+							<h4 class="text-sm font-semibold">
+								{#if expandedUacFlags}
+									Hide user account control flags
+								{:else}
+									Show user account control flags
+								{/if}
+							</h4>
+							<svelte:component
+								this={expandedUacFlags ? ChevronsDownUp : ChevronsUpDown}
+								class="size-4"
+							/>
+						</Button>
+					</Collapsible.Trigger>
+				</div>
+				<Collapsible.Content>
+					<div class="grid grid-cols-2 gap-2">
+						{#each Object.entries(UserAccountControlTypes) as [uac, label]}
+							<Checkbox name="uac.{uac}" {methods} inputProps={{ value: uac }}>
+								<svelte:fragment slot="label">{label}</svelte:fragment>
+							</Checkbox>
+						{/each}
+					</div>
+				</Collapsible.Content>
+			</Collapsible.Root>
+
 			<Dialog.Footer>
 				<Button type="button" variant="outline" on:click={() => (open = false)}>Cancel</Button>
 				<Button type="submit" disabled={loading}>Create User</Button>
 			</Dialog.Footer>
 		</Form>
+		<span bind:this={anchorBottom} />
 	</Dialog.Content>
 </Dialog.Root>

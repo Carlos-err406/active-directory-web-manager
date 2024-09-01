@@ -1,3 +1,4 @@
+import { PUBLIC_BASE_DN } from '$env/static/public';
 import { getFilteredUsers } from '$lib/ldap';
 import { extractPagination, type PaginationWithUrls } from '$lib/pagination';
 import { deleteManySchema } from '$lib/schemas/delete-many-schema';
@@ -8,7 +9,7 @@ import { updateUserSchema } from '$lib/schemas/user/update-user-schema';
 import { errorLog } from '$lib/server/logs';
 import { protectedAccessControl } from '$lib/server/utils';
 import { jpegPhotoToB64 } from '$lib/transforms';
-import type { User } from '$lib/types/user';
+import { UAC, type User } from '$lib/types/user';
 import { error } from '@sveltejs/kit';
 import { SubstringFilter, type Filter } from 'ldapts';
 import { superValidate } from 'sveltekit-superforms';
@@ -65,27 +66,23 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 			previousPage: page <= 1 ? null : `${pathname}?${previousPageSearchParams.toString()}`
 		};
 
-		const [
-			deleteManyUsersForm,
-			deleteUserForm,
-			createUserForm,
-			updateUserForm,
-			changePasswordForm
-		] = await Promise.all([
-			superValidate(zod(deleteManySchema)),
-			superValidate(zod(deleteUserSchema)),
-			superValidate(zod(createUserSchema)),
-			superValidate(zod(updateUserSchema)),
-			superValidate(zod(changePasswordSchema))
-		]);
-
 		return {
 			pagination: paginationWithURLs,
-			deleteManyUsersForm,
-			deleteUserForm,
-			createUserForm,
-			updateUserForm,
-			changePasswordForm
+			deleteManyUsersForm: await superValidate(zod(deleteManySchema)),
+			deleteUserForm: await superValidate(zod(deleteUserSchema)),
+			createUserForm: await superValidate(zod(createUserSchema), {
+				defaults: {
+					[`uac.${UAC['Normal Account']}`]: true,
+					base: `CN=Users,${PUBLIC_BASE_DN}`,
+					sAMAccountName: '',
+					givenName: '',
+					passwordConfirmation: '',
+					mail: '',
+					password: ''
+				}
+			}),
+			updateUserForm: await superValidate(zod(updateUserSchema)),
+			changePasswordForm: await superValidate(zod(changePasswordSchema))
 		};
 	} catch (e) {
 		const errorId = errorLog(e, { message: 'Error loading users page' });

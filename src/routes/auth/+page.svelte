@@ -43,6 +43,9 @@
 		switch (result.type) {
 			case 'success':
 				break;
+			case 'failure':
+				toast.dismiss(toastId);
+				break;
 			case 'redirect':
 				toastId = toast.success('Signed in successfully!', { id: toastId, duration: undefined });
 				await applyAction(result);

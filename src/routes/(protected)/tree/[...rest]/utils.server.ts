@@ -24,7 +24,8 @@ export const TREE_ENTRY_ATTRIBUTES = [
 	'mail',
 	'jpegPhoto',
 	'sn',
-	'givenName'
+	'givenName',
+	'userAccountControl'
 ];
 
 export const getQueryFilter = (query: string) =>

@@ -37,9 +37,20 @@ export const signIn: Action = async (event) => {
 		await ldap.bind(`${sAMAccountName}@${PUBLIC_LDAP_DOMAIN}`, password);
 	} catch (e) {
 		const errorId = errorLog(e, { message: 'Sign in attempt failed for user ' + email });
-		if (e instanceof InvalidCredentialsError)
-			throw error(401, { message: 'Invalid Credentials', errorId });
-		else if (e instanceof AggregateError) {
+		if (e instanceof InvalidCredentialsError) {
+			const dataCode = e.message.split('data ')[1].split(',')[0];
+			if (dataCode === '52e') throw error(401, { message: 'Invalid Credentials', errorId });
+			else if (dataCode === '530')
+				throw error(401, { message: 'Not permitted to logon at this time', errorId });
+			else if (dataCode === '532') throw error(401, { message: 'Password has expired!', errorId });
+			else if (dataCode === '533') throw error(401, { message: 'Account is disabled!', errorId });
+			else if (dataCode === '701') throw error(401, { message: 'Account has expired!', errorId });
+			else
+				throw error(401, {
+					message: 'Something unexpected happened. Consider consulting your administrator',
+					errorId
+				});
+		} else if (e instanceof AggregateError) {
 			console.log({ e, errorId });
 			throw error(500, { message: 'Error trying to connect to directory', errorId });
 		} else {

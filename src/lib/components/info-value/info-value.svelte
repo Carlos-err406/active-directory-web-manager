@@ -2,7 +2,7 @@
 	import { getContext } from 'svelte';
 
 	export let key: keyof typeof config;
-	const entry = getContext<Record<string, string>>('entry');
+	export let entry: Record<string, unknown>;
 	const config = getContext<Record<string, { show: boolean; label: string }>>('config');
 </script>
 

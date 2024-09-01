@@ -16,7 +16,6 @@
 
 	const { details: config } = $page.data.config.app.views.ousPage;
 	setContext('config', config);
-	setContext('entry', data.ou);
 	$: ({ ou, members, updateOuForm, session, parent } = data);
 
 	$: breadcrumbs.set([
@@ -44,12 +43,13 @@
 				</h1>
 			</div>
 			<div class="group-info grid grid-cols-2 gap-4">
-				<InfoValue key="name" />
-				<InfoValue key="description" />
-				<InfoValue key="distinguishedName" />
-				<InfoValue key="whenCreated">
+				<InfoValue entry={ou} key="name" />
+				<InfoValue entry={ou} key="description" />
+				<InfoValue entry={ou} key="distinguishedName" />
+				<InfoValue entry={ou} key="whenCreated">
 					{dayjs(ou.whenCreated.replace('Z', '')).format('MMMM D, YYYY. hh:mm:ss A')}
-				</InfoValue><InfoValue key="whenChanged">
+				</InfoValue>
+				<InfoValue entry={ou} key="whenChanged">
 					{dayjs(ou.whenChanged.replace('Z', '')).format('MMMM D, YYYY. hh:mm:ss A')}
 				</InfoValue>
 				<ParentInfoValue {parent} />
