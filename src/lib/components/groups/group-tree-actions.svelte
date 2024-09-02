@@ -6,11 +6,14 @@
 	import { GroupFlags } from '$lib/types/group';
 	import type { TreeEntry } from '$lib/types/tree';
 	import EllipsisVertical from '$lucide/ellipsis-vertical.svelte';
-	import Ellipsis from '$lucide/ellipsis.svelte';
 	import Eye from '$lucide/eye.svelte';
 	import PencilLine from '$lucide/pencil-line.svelte';
+	import SquareCheck from '$lucide/square-check.svelte';
+	import Square from '$lucide/square.svelte';
 	import Trash from '$lucide/trash-2.svelte';
 	import Users from '$lucide/users.svelte';
+	import { getContext } from 'svelte';
+	import type { Writable } from 'svelte/store';
 	import DeleteGroupDialog from './delete-group-dialog.svelte';
 	import ManageGroupMembersDialog from './manage-group-members-dialog.svelte';
 	import UpdateGroupDialog from './update-group-dialog.svelte';
@@ -34,22 +37,36 @@
 		};
 		isUpdateGroupDialogOpen = true;
 	};
+	const selectedEntries = getContext<Writable<TreeEntry[]>>('selected-entries');
+	$: isSelected = $selectedEntries.includes(entry);
 </script>
 
 <DropdownMenu.Root bind:open>
 	<DropdownMenu.Trigger asChild let:builder>
 		<Button variant="ghost" builders={[builder]} size="icon" class="relative size-8 p-0">
 			<span class="sr-only">Open menu</span>
-			<svelte:component
-				this={$page.url.pathname.startsWith('/tree') ? EllipsisVertical : Ellipsis}
-				class="size-4"
-			/>
+			<EllipsisVertical class="size-4" />
 		</Button>
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content>
 		<DropdownMenu.Group>
 			<DropdownMenu.Label>Actions</DropdownMenu.Label>
 			<DropdownMenu.Separator />
+			<DropdownMenu.Item
+				class="flex flex-nowrap gap-2"
+				on:click={() =>
+					selectedEntries.update((entries) =>
+						isSelected ? entries.filter(({ dn }) => dn !== entry.dn) : [...entries, entry]
+					)}
+			>
+				{#if isSelected}
+					<Square class="size-5" />
+					Deselect
+				{:else}
+					<SquareCheck class="size-5" />
+					Select
+				{/if}
+			</DropdownMenu.Item>
 			<DropdownMenu.Item
 				href="/groups/{encodeURIComponent(entry.distinguishedName)}"
 				class="flex flex-nowrap gap-2"

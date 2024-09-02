@@ -9,6 +9,7 @@
 	import type { TreeEntry } from '$lib/types/tree';
 	import { getTreeUrlFromDn, isGroup, isOu, isUser } from '$lib/utils';
 	import { getDnFromUrl, isExpandedEntry } from '../utils';
+	import FallbackTreeActions from './fallback-tree-actions.svelte';
 
 	export let entry: TreeEntry;
 
@@ -39,4 +40,6 @@
 	<GroupTreeActions {entry} on:name-change={handleNameChange} on:deleted={handleDeleted} />
 {:else if isOu(entry)}
 	<OuTreeActions {entry} on:name-change={handleNameChange} on:deleted={handleDeleted} />
+{:else}
+	<FallbackTreeActions {entry} />
 {/if}

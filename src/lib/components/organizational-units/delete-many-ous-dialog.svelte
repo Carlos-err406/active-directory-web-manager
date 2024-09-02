@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { getCorrectPluralization } from '$/lib/utils';
 	import { applyAction } from '$app/forms';
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
@@ -55,7 +56,7 @@
 				>This is a dangerous action!
 				{#if dns.length > 1}
 					<br /> You are deleting <strong>{dns.length}</strong>
-					{dns.length > 1 ? 'Organizational Units' : 'Organizational Unit'}!
+					{getCorrectPluralization(dns, 'Organizational Units', 'Organizational Unit')}!
 				{/if}
 			</Dialog.Description>
 		</Dialog.Header>

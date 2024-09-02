@@ -148,3 +148,6 @@ export const buildBreadcrumbsFromDn = (dn: string, urlBaseFallback: string) => {
 
 export const getTreeUrlFromDn = (dn: string) =>
 	`/tree/${dn.split(',').reverse().slice(2).map(encodeURIComponent).join('/')}`;
+
+export const getCorrectPluralization = (entries: unknown[], plural: string, singular: string) =>
+	entries.length === 1 ? singular : plural;

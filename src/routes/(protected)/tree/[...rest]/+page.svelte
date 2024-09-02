@@ -7,7 +7,7 @@
 	import Panel from '$lib/components/tree/panels/panel.svelte';
 	import { extractBase, getCNFromDN, getRDNFromDN } from '$lib/ldap/utils';
 	import { breadcrumbs } from '$lib/stores';
-	import { getTreeUrlFromDn, mayHaveChildren } from '$lib/utils';
+	import { getCorrectPluralization, getTreeUrlFromDn, mayHaveChildren } from '$lib/utils';
 	import Move from '$lucide/move.svelte';
 
 	import DeleteManyEntriesDialog from '$/lib/components/tree/delete-many-entries-dialog.svelte';
@@ -50,22 +50,29 @@
 		}
 	});
 
+	let deleteSelectedDialogOpen = false;
 	const selectedEntries = writable<TreeEntry[]>([]);
 	const copiedEntries = writable<TreeEntry[]>([]);
 	setContext('selected-entries', selectedEntries);
+	setContext('copied-entries', copiedEntries);
 
-	$: console.log($selectedEntries.map((entry) => entry.dn));
 	const handleKeyDown = (e: KeyboardEvent) => {
-		if (($selectedEntries.length || $copiedEntries.length) && e.key === 'Escape') {
+		if (e.key === 'Escape') {
 			e.preventDefault();
-			selectedEntries.set([]);
-			copiedEntries.set([]);
+			if ($copiedEntries.length) {
+				copiedEntries.set([]);
+			} else {
+				selectedEntries.set([]);
+			}
+		}
+		if (e.key === 'Delete' && $selectedEntries.length && !$copiedEntries.length) {
+			e.preventDefault();
+			deleteSelectedDialogOpen = true;
 		}
 	};
 
 	const handleInitMove = () => {
 		copiedEntries.set(_.cloneDeep($selectedEntries));
-		selectedEntries.set([]);
 	};
 
 	const handleDeletedMany = async ({ detail }: CustomEvent<TreeEntry[]>) => {
@@ -91,10 +98,44 @@
 	const handleMoveCancel = () => {
 		copiedEntries.set([]);
 	};
+	$: {
+		$selectedEntries;
+		if ($copiedEntries.length) copiedEntries.set(_.cloneDeep($selectedEntries));
+	}
 </script>
 
 <svelte:window on:keydown={handleKeyDown} />
 <div class="flex size-full flex-col gap-2">
+	{#if ($selectedEntries.length && !$copiedEntries.length) || $copiedEntries.length}
+		<div transition:slide={{ duration: 200 }} class="flex items-center gap-6">
+			{#if $selectedEntries.length && !$copiedEntries.length}
+				<div class="flex items-center gap-4">
+					<span class="text-nowrap text-muted-foreground">
+						Selected {$selectedEntries.length}
+						{getCorrectPluralization($selectedEntries, 'entries', 'entry')}
+					</span>
+					<Button class="flex items-center gap-2" on:click={handleInitMove}>
+						<Move class="size-4 flex-none" />
+						Move selected entries
+					</Button>
+					<DeleteManyEntriesDialog
+						bind:open={deleteSelectedDialogOpen}
+						entries={$selectedEntries}
+						on:deleted={handleDeletedMany}
+					/>
+				</div>
+			{/if}
+			{#if $copiedEntries.length}
+				<div class="flex items-center gap-4">
+					<span class="text-nowrap text-muted-foreground">
+						Moving {$copiedEntries.length}
+						{getCorrectPluralization($copiedEntries, 'entries', 'entry')}
+					</span>
+					<Button class="flex items-center gap-2" on:click={handleMoveCancel}>Cancel</Button>
+				</div>
+			{/if}
+		</div>
+	{/if}
 	<div
 		data-test="treePage"
 		class="flex size-full overflow-x-auto overflow-y-hidden rounded border-2 border-muted-foreground last:border-r-0"
@@ -114,33 +155,5 @@
 		{/each}
 
 		<div bind:this={anchorToLast} />
-	</div>
-	<div class="flex">
-		{#if $copiedEntries.length}
-			<div
-				class="flex items-center gap-4"
-				in:slide={{ axis: 'x', duration: 200, delay: 200 }}
-				out:slide={{ axis: 'y', duration: 200 }}
-			>
-				<span class="text-nowrap text-muted-foreground">
-					Moving {$selectedEntries.length}
-					{$selectedEntries.length > 1 ? 'entries' : 'entry'}
-				</span>
-				<Button class="flex items-center gap-2" on:click={handleMoveCancel}>Cancel</Button>
-			</div>
-		{/if}
-		{#if $selectedEntries.length}
-			<div class="flex items-center gap-4" transition:slide={{ axis: 'y', duration: 200 }}>
-				<span class="text-nowrap text-muted-foreground">
-					Selected {$selectedEntries.length}
-					{$selectedEntries.length > 1 ? 'entries' : 'entry'}
-				</span>
-				<Button class="flex items-center gap-2" on:click={handleInitMove}>
-					<Move class="size-4 flex-none" />
-					Move selected entries
-				</Button>
-				<DeleteManyEntriesDialog entries={$selectedEntries} on:deleted={handleDeletedMany} />
-			</div>
-		{/if}
 	</div>
 </div>

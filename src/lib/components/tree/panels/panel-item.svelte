@@ -10,13 +10,13 @@
 
 	export let entry: TreeEntry;
 	const selectedEntries = getContext<Writable<TreeEntry[]>>('selected-entries');
+
 	$: selected = !!$selectedEntries.find((e) => e.dn === entry.dn);
 
 	const handleItemClick = async (e: MouseEvent) => {
 		if (e.ctrlKey) {
 			if (selected) selectedEntries.update((entries) => entries.filter((e) => e.dn !== entry.dn));
 			else selectedEntries.update((entries) => [...entries, entry]);
-
 			return;
 		}
 		if (isLastExpanded) return;

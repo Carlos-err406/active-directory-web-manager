@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { getCorrectPluralization } from '$/lib/utils';
 	import { applyAction } from '$app/forms';
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
@@ -52,7 +53,7 @@
 			<Dialog.Description>
 				This is a dangerous action!
 				<br /> You are deleting <strong>{dns.length}</strong>
-				{dns.length > 1 ? 'groups' : 'group'}!
+				{getCorrectPluralization(dns, 'groups', 'group')}!
 			</Dialog.Description>
 		</Dialog.Header>
 		<Form

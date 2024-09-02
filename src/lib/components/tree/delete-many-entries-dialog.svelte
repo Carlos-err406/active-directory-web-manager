@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { TreeEntry } from '$/lib/types/tree';
+	import { getCorrectPluralization } from '$/lib/utils';
 	import { applyAction } from '$app/forms';
 	import { page } from '$app/stores';
 	import { toastError } from '$lib';
@@ -9,7 +10,7 @@
 	import { deleteManySchema, type DeleteManySchema } from '$lib/schemas/delete-many-schema';
 	import { createEventDispatcher } from 'svelte';
 	import { toast } from 'svelte-sonner';
-	let open: boolean;
+	export let open = false;
 	export let entries: TreeEntry[] = [];
 	$: form = $page.data.deleteManyEntriesForm;
 
@@ -53,7 +54,7 @@
 			<Dialog.Description>
 				This is a very dangerous action!
 				<br /> You are deleting <strong>{entries.length}</strong>
-				{entries.length > 1 ? 'entries' : 'entry'}
+				{getCorrectPluralization(entries, 'entries', 'entry')}
 				{#if $page.data.config.directory.ous.allowNonLeafDelete}
 					<strong>And all its possible children!</strong>
 				{/if}
