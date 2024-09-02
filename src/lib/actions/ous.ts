@@ -1,6 +1,12 @@
 import config from '$config';
 import { PUBLIC_BASE_DN } from '$env/static/public';
-import { getBaseEntry, getEntryByDn, inferChange, validateOuAmount } from '$lib/ldap';
+import {
+	getBaseEntry,
+	getEntryByDn,
+	inferChange,
+	recursiveDelete,
+	validateOuAmount
+} from '$lib/ldap';
 import { extractBase, getCNFromDN } from '$lib/ldap/utils';
 import { deleteManySchema } from '$lib/schemas/delete-many-schema';
 import { createOuSchema } from '$lib/schemas/ou/create-ou-schema';
@@ -12,7 +18,6 @@ import { error, fail, redirect, type Action } from '@sveltejs/kit';
 import {
 	AlreadyExistsError,
 	Attribute,
-	Client,
 	EqualityFilter,
 	InsufficientAccessError,
 	NotAllowedOnNonLeafError,
@@ -204,48 +209,5 @@ export const updateOu: Action = async (event) => {
 		const message = `Something unexpected happened while updating ${ou.name}`;
 		const errorId = errorLog(e, { message });
 		throw error(500, { message, errorId });
-	}
-};
-
-const recursiveDelete = async <
-	T extends { dn: string; isCriticalSystemObject: string; objectClass: string[] }
->(
-	ldap: Client,
-	entry: T,
-	deletedEntries: string[]
-) => {
-	try {
-		if (entry.isCriticalSystemObject === 'TRUE') {
-			console.log(`Skipping critical system object: ${entry.dn}`);
-			return;
-		}
-
-		console.log(`Attempting to delete: ${entry.dn}`);
-		await ldap.del(entry.dn);
-		deletedEntries.push(entry.dn);
-		console.log(`Successfully deleted: ${entry.dn}`);
-	} catch (e) {
-		if (e instanceof NotAllowedOnNonLeafError) {
-			console.log(`Non-leaf node encountered: ${entry.dn}`);
-			const children = await ldap
-				.search(entry.dn, {
-					scope: 'one',
-					attributes: ['objectClass', 'isCriticalSystemObject', 'dn']
-				})
-				.then(({ searchEntries }) => searchEntries as T[]);
-
-			for (const child of children) {
-				await recursiveDelete(ldap, child, deletedEntries);
-			}
-
-			// Try deleting the current entry again after deleting its children
-			console.log(`Retrying deletion of: ${entry.dn}`);
-			await ldap.del(entry.dn);
-			deletedEntries.push(entry.dn);
-			console.log(`Successfully deleted: ${entry.dn}`);
-		} else {
-			console.error(`Error deleting ${entry.dn}:`, e);
-			throw e;
-		}
 	}
 };

@@ -1,3 +1,4 @@
+import { UAC } from '$/lib/types/user';
 import config from '$config';
 import { PUBLIC_BASE_DN } from '$env/static/public';
 import { getBaseEntry, getGroupMembers, getHideFilters } from '$lib/ldap';
@@ -27,7 +28,6 @@ import {
 	throwIfIsHiddenEntry,
 	treeSearch
 } from './utils.server';
-import { UAC } from '$/lib/types/user';
 
 export const load = async ({ url, locals, params }: Parameters<PageServerLoad>[0]) => {
 	const auth = await protectedAccessControl({ locals, url });
@@ -45,6 +45,7 @@ export const load = async ({ url, locals, params }: Parameters<PageServerLoad>[0
 		entries: dns.map((dn) => getChildren(ldap, dn, q)),
 		activeDns,
 		deleteManyUsersForm: await superValidate(zod(deleteManySchema)),
+		deleteManyEntriesForm: await superValidate(zod(deleteManySchema)),
 		deleteUserForm: await superValidate(zod(deleteUserSchema)),
 		createUserForm: await superValidate(zod(createUserSchema), {
 			defaults: {
@@ -96,3 +97,5 @@ const getChildren = async (ldap: Client, base = PUBLIC_BASE_DN, query: string | 
 	}
 	return { base: baseEntry, treeEntries };
 };
+
+export * as actions from '$lib/actions/tree';

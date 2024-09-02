@@ -3,13 +3,22 @@
 	import { page } from '$app/stores';
 	import type { TreeEntry } from '$lib/types/tree';
 	import { cn, getEntryIcon, getTreeUrlFromDn, mayHaveChildren } from '$lib/utils';
-	import { onMount, tick } from 'svelte';
+	import { getContext, onMount, tick } from 'svelte';
+	import type { Writable } from 'svelte/store';
 	import { isExpandedEntry, isLastExpandedEntry } from '../utils';
 	import PanelItemActions from './panel-item-actions.svelte';
 
 	export let entry: TreeEntry;
+	const selectedEntries = getContext<Writable<TreeEntry[]>>('selected-entries');
+	$: selected = !!$selectedEntries.find((e) => e.dn === entry.dn);
 
-	const handleItemClick = async () => {
+	const handleItemClick = async (e: MouseEvent) => {
+		if (e.ctrlKey) {
+			if (selected) selectedEntries.update((entries) => entries.filter((e) => e.dn !== entry.dn));
+			else selectedEntries.update((entries) => [...entries, entry]);
+
+			return;
+		}
 		if (isLastExpanded) return;
 		const { dn } = entry;
 		if (isExpandable) {
@@ -37,7 +46,7 @@
 	type="button"
 	on:click|self={handleItemClick}
 	data-active={active}
-	data-highlight={highlight}
+	data-highlight={selected || highlight}
 	class={cn(
 		isExpandable
 			? 'data-[active=false]:cursor-pointer data-[active=true]:cursor-default hover:shadow-md data-[active=false]:hover:bg-primary/10 data-[active=true]:hover:bg-primary/90'
@@ -48,7 +57,7 @@
 		'transition-all duration-200 ',
 		'data-[active=true]:text-muted', //text color
 		'data-[active=true]:bg-primary', //bg
-		'data-[highlight=true]:border-2 data-[highlight=true]:border-primary' //highlight
+		'data-[highlight=true]:ring-2 data-[highlight=true]:ring-primary/90' //highlight
 	)}
 >
 	<svelte:component

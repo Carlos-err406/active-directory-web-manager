@@ -10,6 +10,7 @@ import {
 	Change,
 	Client,
 	EqualityFilter,
+	NotAllowedOnNonLeafError,
 	NotFilter,
 	OrFilter,
 	type AttributeOptions,
@@ -235,3 +236,49 @@ export const getDirectChildren = <T extends Entry>(
 	base: string,
 	opts?: SearchOptions
 ) => ldap.search(base, { scope: 'one', ...opts }).then(({ searchEntries }) => searchEntries as T[]);
+
+export type RecursiveDeleteEntry = {
+	dn: string;
+	isCriticalSystemObject: string;
+	objectClass: string[];
+};
+export const recursiveDelete = async <T extends RecursiveDeleteEntry>(
+	ldap: Client,
+	entry: T,
+	deletedEntries: string[]
+) => {
+	try {
+		if (entry.isCriticalSystemObject === 'TRUE') {
+			console.log(`Skipping critical system object: ${entry.dn}`);
+			return;
+		}
+
+		console.log(`Attempting to delete: ${entry.dn}`);
+		await ldap.del(entry.dn);
+		deletedEntries.push(entry.dn);
+		console.log(`Successfully deleted: ${entry.dn}`);
+	} catch (e) {
+		if (e instanceof NotAllowedOnNonLeafError) {
+			console.log(`Non-leaf node encountered: ${entry.dn}`);
+			const children = await ldap
+				.search(entry.dn, {
+					scope: 'one',
+					attributes: ['objectClass', 'isCriticalSystemObject', 'dn']
+				})
+				.then(({ searchEntries }) => searchEntries as T[]);
+
+			for (const child of children) {
+				await recursiveDelete(ldap, child, deletedEntries);
+			}
+
+			// Try deleting the current entry again after deleting its children
+			console.log(`Retrying deletion of: ${entry.dn}`);
+			await ldap.del(entry.dn);
+			deletedEntries.push(entry.dn);
+			console.log(`Successfully deleted: ${entry.dn}`);
+		} else {
+			console.error(`Error deleting ${entry.dn}:`, e);
+			throw e;
+		}
+	}
+};

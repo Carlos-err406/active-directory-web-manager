@@ -27,7 +27,7 @@
 				});
 				break;
 			case 'redirect':
-				toast.success('Group deleted successfully!', {
+				toast.success('Groups deleted successfully!', {
 					id: toastId,
 					duration: undefined
 				});
@@ -49,12 +49,10 @@
 	<Dialog.Content class="">
 		<Dialog.Header>
 			<Dialog.Title class="text-xl text-destructive">Delete selected groups</Dialog.Title>
-			<Dialog.Description
-				>This is a dangerous action!
-				{#if dns.length > 1}
-					<br /> You are deleting <strong>{dns.length}</strong>
-					{dns.length > 1 ? 'groups' : 'group'}!
-				{/if}
+			<Dialog.Description>
+				This is a dangerous action!
+				<br /> You are deleting <strong>{dns.length}</strong>
+				{dns.length > 1 ? 'groups' : 'group'}!
 			</Dialog.Description>
 		</Dialog.Header>
 		<Form
