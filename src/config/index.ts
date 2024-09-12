@@ -26,11 +26,15 @@ const rawConfig = fs.readFileSync(configPath, { encoding: 'utf-8' });
 const configPathExtension = path.extname(configPath);
 
 const isYAML = ['.yml', '.yaml'].includes(configPathExtension);
+const isJSON = ['.json'].includes(configPathExtension);
+
 let Config = {};
-if (isYAML) {
+if (isJSON) {
+	Config = JSON.parse(rawConfig);
+} else if (isYAML) {
 	Config = YAML.parse(rawConfig);
 } else {
-	Config = JSON.parse(rawConfig);
+	throw Error(`Config file must be either YAML or JSON. received: ${configPathExtension}`);
 }
 
 /**Resolves the json schema file, dereferencing all $refs to correctly use it for validation  */
