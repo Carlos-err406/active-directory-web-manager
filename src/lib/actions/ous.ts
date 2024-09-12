@@ -38,10 +38,10 @@ export const createOu: Action = async (event) => {
 	const canCreate = await validateOuAmount(ldap);
 	if (!canCreate) {
 		appLog(
-			`(ReachedGroupLimit) User ${session.sAMAccountName} tried creating a group but can not create more groups in this directory. Maximum amount reached.`,
+			`(ReachedOULimit) User ${session.sAMAccountName} tried creating an Organizational Unit but can not create more Organizational Units in this directory. Maximum amount reached.`,
 			'Error'
 		);
-		throw error(403, 'Can not create more groups in this directory');
+		throw error(403, 'Can not create more Organizational Units in this directory');
 	}
 	const { base, name, description } = form.data;
 
