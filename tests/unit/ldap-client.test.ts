@@ -77,7 +77,7 @@ describe('ldap-ts operations on a user', () => {
 		it('throws if deleting a critical system object', async () => {
 			await expect(
 				sudo(async (ldap) => await ldap.del(`CN=administrator,CN=Users,${PUBLIC_BASE_DN}`))
-			).rejects.toThrow();
+			).rejects.toThrow(Error);
 		});
 	});
 	describe('user updates', () => {

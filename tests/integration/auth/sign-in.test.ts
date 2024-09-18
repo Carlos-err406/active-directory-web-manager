@@ -1,6 +1,6 @@
-import { sleep } from '$lib/utils';
 import { expect, test } from '@playwright/test';
 import config from '../../config';
+import { sleep } from '../fixtures';
 import { NO_AUTH } from '../storage-states';
 
 test.use({ storageState: NO_AUTH });

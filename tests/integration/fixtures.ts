@@ -51,3 +51,5 @@ export const addTestUser = (ldap: Client) =>
 		);
 
 export const delTestUser = (ldap: Client) => ldap.del(dn);
+
+export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
