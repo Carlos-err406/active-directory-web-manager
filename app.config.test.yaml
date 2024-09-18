@@ -14,7 +14,7 @@ app:
       details:
         memberOf:
           label: memberOf
-          shortMemberOf: false
+          shortMember: false
           show: false
 system:
   logging:

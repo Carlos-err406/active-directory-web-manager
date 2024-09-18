@@ -9,7 +9,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { createOuSchema, type CreateOuSchema } from '$lib/schemas/ou/create-ou-schema';
-	import Captions from '$lucide/captions.svelte';
+	import Captions from 'lucide-svelte/icons/captions';
 	import { toast } from 'svelte-sonner';
 
 	export let open = false;

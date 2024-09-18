@@ -1,11 +1,11 @@
-import Building2 from '$lucide/building-2.svelte';
-import FileTextIcon from '$lucide/file-text.svelte';
-import FolderTree from '$lucide/folder-tree.svelte';
-import User from '$lucide/user.svelte';
-import Users from '$lucide/users.svelte';
 import type { RecursiveRequired } from '@sveltejs/kit';
 import dayjs from 'dayjs';
 import type { Icon } from 'lucide-svelte';
+import Building2 from 'lucide-svelte/icons/building-2';
+import FileTextIcon from 'lucide-svelte/icons/file-text';
+import FolderTree from 'lucide-svelte/icons/folder-tree';
+import User from 'lucide-svelte/icons/user';
+import Users from 'lucide-svelte/icons/users';
 import type { ComponentType } from 'svelte';
 export interface NavigationItemType {
 	name: string;

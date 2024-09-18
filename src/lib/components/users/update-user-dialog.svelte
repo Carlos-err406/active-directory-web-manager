@@ -13,10 +13,10 @@
 	import { updateUserSchema, type UpdateUserSchema } from '$lib/schemas/user/update-user-schema';
 	import type { NameChange } from '$lib/types';
 	import { cn } from '$lib/utils';
-	import Captions from '$lucide/captions.svelte';
-	import ChevronsDownUp from '$lucide/chevrons-down-up.svelte';
-	import ChevronsUpDown from '$lucide/chevrons-up-down.svelte';
-	import Mail from '$lucide/mail.svelte';
+	import Captions from 'lucide-svelte/icons/captions';
+	import ChevronsDownUp from 'lucide-svelte/icons/chevrons-down-up';
+	import ChevronsUpDown from 'lucide-svelte/icons/chevrons-up-down';
+	import Mail from 'lucide-svelte/icons/mail';
 	import { createEventDispatcher } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import type { SuperValidated } from 'sveltekit-superforms';

@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import { Button } from '$lib/components/ui/button';
 	import { breadcrumbs } from '$lib/stores';
-	import TriangleAlert from '$lucide/triangle-alert.svelte';
+	import TriangleAlert from 'lucide-svelte/icons/triangle-alert';
 	breadcrumbs.set([{ name: `Error (${$page.status})` }]);
 </script>
 

@@ -2,7 +2,7 @@
 	import type { MemberDetailsConfig } from '$/app.config';
 	import { getCNFromDN } from '$lib/ldap/utils';
 	import { getEntryDetailedUrl, getEntryIcon, type EntryWithObjectClass } from '$lib/utils';
-	import Loader from '$lucide/loader.svelte';
+	import Loader from 'lucide-svelte/icons/loader';
 	import { getContext } from 'svelte';
 
 	const config = getContext<Record<'memberOf', MemberDetailsConfig>>('config');

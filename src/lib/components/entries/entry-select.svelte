@@ -1,20 +1,11 @@
-<script lang="ts" context="module">
-	export type Entry = {
-		dn: string;
-		distinguishedName: string;
-		objectClass: string[];
-		[index: string]: unknown;
-	};
-</script>
-
 <script lang="ts">
 	import { PUBLIC_API_KEY } from '$env/static/public';
 	import { Input } from '$lib/components/ui/input';
 	import { ldapFilterToUrlFilter } from '$lib/ldap/filter';
 	import type { Filter } from '$lib/ldap/filter/filter';
-	import { arrowNavigation, getEntryIcon } from '$lib/utils';
-	import Loading from '$lucide/loader.svelte';
-	import Search from '$lucide/search.svelte';
+	import { arrowNavigation, getEntryIcon, type EntryWithObjectClass } from '$lib/utils';
+	import Loading from 'lucide-svelte/icons/loader';
+	import Search from 'lucide-svelte/icons/search';
 	import { createEventDispatcher } from 'svelte';
 	import { flip } from 'svelte/animate';
 	import { slide } from 'svelte/transition';
@@ -22,11 +13,11 @@
 	let loading = Promise.resolve(false);
 	let q = '';
 	let abortController: AbortController | null = null;
-	let entries: Entry[] = [];
+	let entries: EntryWithObjectClass[] = [];
 	let input: HTMLInputElement;
 	let usersContainer: HTMLDivElement;
 
-	export let selected: Entry[] = [];
+	export let selected: EntryWithObjectClass[] = [];
 	export let getFilter: (q: string) => Filter;
 	const _getFilter = () => {
 		const filter = getFilter(q);
@@ -61,7 +52,7 @@
 		abortController?.abort('Outdated');
 	};
 
-	const dispatch = createEventDispatcher<{ select: Entry }>();
+	const dispatch = createEventDispatcher<{ select: EntryWithObjectClass }>();
 </script>
 
 <div class="relative flex w-full flex-col gap-2">

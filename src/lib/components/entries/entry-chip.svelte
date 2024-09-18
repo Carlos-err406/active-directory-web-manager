@@ -1,12 +1,11 @@
 <script lang="ts">
-	import X from '$lucide/x.svelte';
+	import { getEntryIcon, type EntryWithObjectClass } from '$lib/utils';
+	import X from 'lucide-svelte/icons/x';
 	import { createEventDispatcher } from 'svelte';
 	import { slide } from 'svelte/transition';
-	import type { Entry } from './entry-select.svelte';
-	import { getEntryIcon } from '$lib/utils';
 
-	export let entry: Entry;
-	const dispatch = createEventDispatcher<{ x: Entry }>();
+	export let entry: EntryWithObjectClass;
+	const dispatch = createEventDispatcher<{ x: EntryWithObjectClass }>();
 </script>
 
 <div

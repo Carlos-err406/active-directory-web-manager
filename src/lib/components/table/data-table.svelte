@@ -8,9 +8,9 @@
 	import { page } from '$app/stores';
 	import { Button } from '$lib/components/ui/button';
 	import * as Table from '$lib/components/ui/table';
-	import ChevronDown from '$lucide/chevron-down.svelte';
-	import ChevronUp from '$lucide/chevron-up.svelte';
-	import Chevrons from '$lucide/chevrons-up-down.svelte';
+	import ChevronDown from 'lucide-svelte/icons/chevron-down';
+	import ChevronUp from 'lucide-svelte/icons/chevron-up';
+	import Chevrons from 'lucide-svelte/icons/chevrons-up-down';
 	import { Render, Subscribe } from 'svelte-headless-table';
 	import { get } from 'svelte/store';
 

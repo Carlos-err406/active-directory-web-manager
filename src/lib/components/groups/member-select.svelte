@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { EntryWithObjectClass } from '$/lib/utils';
 	import {
 		AndFilter,
 		EqualityFilter,
@@ -6,11 +7,10 @@
 		OrFilter,
 		SubstringFilter
 	} from '$lib/ldap/filter';
-	import type { User } from '$lib/types/user';
 	import { createEventDispatcher } from 'svelte';
-	import EntrySelect, { type Entry } from '../entries/entry-select.svelte';
-	export let selected: Entry[] = [];
-	const dispatch = createEventDispatcher<{ select: User }>();
+	import EntrySelect from '../entries/entry-select.svelte';
+	export let selected: EntryWithObjectClass[] = [];
+	const dispatch = createEventDispatcher<{ select: EntryWithObjectClass }>();
 	const onSelect = ({ detail }: CustomEvent) => dispatch('select', detail);
 </script>
 

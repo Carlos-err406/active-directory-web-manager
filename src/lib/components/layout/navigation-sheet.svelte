@@ -3,10 +3,10 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Sheet from '$lib/components/ui/sheet';
 	import type { Session } from '$lib/types/session';
-	import Code from '$lucide/code.svelte';
-	import PanelLeft from '$lucide/panel-left.svelte';
-	import PanelRight from '$lucide/panel-right.svelte';
-	import Settings from '$lucide/settings.svelte';
+	import Code from 'lucide-svelte/icons/code';
+	import PanelLeft from 'lucide-svelte/icons/panel-left';
+	import PanelRight from 'lucide-svelte/icons/panel-right';
+	import Settings from 'lucide-svelte/icons/settings';
 	import { getNavigationItems } from '.';
 	import SheetNavigationItem from './sheet-navigation-item.svelte';
 	$: session = $page.data.session as Session;

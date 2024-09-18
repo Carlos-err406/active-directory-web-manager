@@ -9,7 +9,7 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { updateOuSchema, type UpdateOuSchema } from '$lib/schemas/ou/update-ou-schema';
 	import type { NameChange } from '$lib/types';
-	import Captions from '$lucide/captions.svelte';
+	import Captions from 'lucide-svelte/icons/captions';
 	import { createEventDispatcher } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import type { SuperValidated } from 'sveltekit-superforms';

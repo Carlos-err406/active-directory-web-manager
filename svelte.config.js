@@ -13,7 +13,6 @@ const config = {
 		// See https://kit.svelte.dev/docs/adapters for more information about adapters.
 		adapter: adapter(),
 		alias: {
-			$lucide: './node_modules/lucide-svelte/dist/icons',
 			$config: './src/config',
 			$: './src'
 		}

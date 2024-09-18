@@ -2,9 +2,9 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import type { TreeEntry } from '$lib/types/tree';
-	import EllipsisVertical from '$lucide/ellipsis-vertical.svelte';
-	import SquareCheck from '$lucide/square-check.svelte';
-	import Square from '$lucide/square.svelte';
+	import EllipsisVertical from 'lucide-svelte/icons/ellipsis-vertical';
+	import Square from 'lucide-svelte/icons/square';
+	import SquareCheck from 'lucide-svelte/icons/square-check';
 	import { getContext } from 'svelte';
 	import type { Writable } from 'svelte/store';
 	export let entry: TreeEntry;

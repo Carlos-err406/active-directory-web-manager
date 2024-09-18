@@ -6,9 +6,6 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
 	plugins: [sveltekit(), purgeCss(), hotReloadOnConfigFileChange()],
 	test: {
-		env: {
-			NODE_ENV: 'test'
-		},
 		include: ['tests/unit/**/*.{test,spec}.{js,ts}']
 	}
 });

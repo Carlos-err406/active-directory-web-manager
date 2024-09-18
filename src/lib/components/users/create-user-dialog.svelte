@@ -18,10 +18,10 @@
 		type CreateUserSchema
 	} from '$lib/schemas/user/create-user-schema';
 	import { cn } from '$lib/utils';
-	import Captions from '$lucide/captions.svelte';
-	import ChevronsDownUp from '$lucide/chevrons-down-up.svelte';
-	import ChevronsUpDown from '$lucide/chevrons-up-down.svelte';
-	import Mail from '$lucide/mail.svelte';
+	import Captions from 'lucide-svelte/icons/captions';
+	import ChevronsDownUp from 'lucide-svelte/icons/chevrons-down-up';
+	import ChevronsUpDown from 'lucide-svelte/icons/chevrons-up-down';
+	import Mail from 'lucide-svelte/icons/mail';
 	import { toast } from 'svelte-sonner';
 	import Checkbox from '../form/checkbox.svelte';
 	import ImageInput from '../form/image-input.svelte';

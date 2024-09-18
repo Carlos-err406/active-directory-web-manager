@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import ChevronDown from '$lucide/chevron-down.svelte';
+	import ChevronDown from 'lucide-svelte/icons/chevron-down';
 	import type { FlatColumn } from 'svelte-headless-table';
 	import ColumnsDropdownElement from './columns-dropdown-element.svelte';
 

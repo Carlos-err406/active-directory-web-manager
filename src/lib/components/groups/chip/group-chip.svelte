@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Group } from '$lib/types/group';
-	import X from '$lucide/x.svelte';
+	import X from 'lucide-svelte/icons/x';
 	import { createEventDispatcher } from 'svelte';
 	import { slide } from 'svelte/transition';
 

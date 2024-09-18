@@ -3,12 +3,12 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import type { TreeEntry } from '$lib/types/tree';
-	import EllipsisVertical from '$lucide/ellipsis-vertical.svelte';
-	import Eye from '$lucide/eye.svelte';
-	import PencilLine from '$lucide/pencil-line.svelte';
-	import SquareCheck from '$lucide/square-check.svelte';
-	import Square from '$lucide/square.svelte';
-	import Trash from '$lucide/trash-2.svelte';
+	import EllipsisVertical from 'lucide-svelte/icons/ellipsis-vertical';
+	import Eye from 'lucide-svelte/icons/eye';
+	import PencilLine from 'lucide-svelte/icons/pencil-line';
+	import Square from 'lucide-svelte/icons/square';
+	import SquareCheck from 'lucide-svelte/icons/square-check';
+	import Trash from 'lucide-svelte/icons/trash-2';
 	import { getContext } from 'svelte';
 	import type { Writable } from 'svelte/store';
 	import DeleteOuDialog from './delete-ou-dialog.svelte';

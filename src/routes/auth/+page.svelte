@@ -9,9 +9,9 @@
 	import * as Card from '$lib/components/ui/card';
 	import Loader from '$lib/components/ui/loader.svelte';
 	import { signInSchema, type SignInSchema } from '$lib/schemas/sign-in-schema';
-	import Bot from '$lucide/bot.svelte';
-	import Mail from '$lucide/mail.svelte';
-	import RefreshCcw from '$lucide/refresh-ccw.svelte';
+	import Bot from 'lucide-svelte/icons/bot';
+	import Mail from 'lucide-svelte/icons/mail';
+	import RefreshCcw from 'lucide-svelte/icons/refresh-ccw';
 	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import type { PageData } from './$types';

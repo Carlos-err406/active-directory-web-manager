@@ -14,12 +14,12 @@
 	import { breadcrumbs } from '$lib/stores';
 	import { UserAccountControlTypes } from '$lib/types/user';
 	import { buildBreadcrumbsFromDn, getTreeUrlFromDn } from '$lib/utils';
-	import FolderTree from '$lucide/folder-tree.svelte';
-	import LockKeyhole from '$lucide/lock-keyhole.svelte';
-	import PencilLine from '$lucide/pencil-line.svelte';
-	import Trash2 from '$lucide/trash-2.svelte';
-	import Users from '$lucide/users.svelte';
 	import dayjs from 'dayjs';
+	import FolderTree from 'lucide-svelte/icons/folder-tree';
+	import LockKeyhole from 'lucide-svelte/icons/lock-keyhole';
+	import PencilLine from 'lucide-svelte/icons/pencil-line';
+	import Trash2 from 'lucide-svelte/icons/trash-2';
+	import Users from 'lucide-svelte/icons/users';
 	import { setContext } from 'svelte';
 	import type { PageData } from './$types';
 	export let data: PageData;

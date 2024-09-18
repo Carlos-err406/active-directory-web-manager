@@ -10,11 +10,11 @@
 	import { breadcrumbs } from '$lib/stores';
 	import { UserAccountControlTypes } from '$lib/types/user';
 	import { getTreeUrlFromDn } from '$lib/utils';
-	import FolderTree from '$lucide/folder-tree.svelte';
-	import Info from '$lucide/info.svelte';
-	import LockKeyhole from '$lucide/lock-keyhole.svelte';
-	import PencilLine from '$lucide/pencil-line.svelte';
 	import dayjs from 'dayjs';
+	import FolderTree from 'lucide-svelte/icons/folder-tree';
+	import Info from 'lucide-svelte/icons/info';
+	import LockKeyhole from 'lucide-svelte/icons/lock-keyhole';
+	import PencilLine from 'lucide-svelte/icons/pencil-line';
 	import { setContext } from 'svelte';
 	import type { PageData } from './$types';
 	export let data: PageData;

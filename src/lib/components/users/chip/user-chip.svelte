@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { User } from '$lib/types/user';
+	import X from 'lucide-svelte/icons/x';
 	import { createEventDispatcher } from 'svelte';
 	import { slide } from 'svelte/transition';
-	import X from '$lucide/x.svelte';
 
 	export let user: User;
 	const dispatch = createEventDispatcher<{ x: User }>();

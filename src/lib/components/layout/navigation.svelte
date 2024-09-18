@@ -2,8 +2,8 @@
 	import { page } from '$app/stores';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import type { Session } from '$lib/types/session';
-	import Code from '$lucide/code.svelte';
-	import Settings from '$lucide/settings.svelte';
+	import Code from 'lucide-svelte/icons/code';
+	import Settings from 'lucide-svelte/icons/settings';
 	import { getNavigationItems } from '.';
 	import NavigationItem from './navigation-item.svelte';
 	$: session = $page.data.session as Session;

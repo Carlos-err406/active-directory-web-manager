@@ -5,12 +5,12 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import type { OrganizationalUnit } from '$lib/types/ou';
 	import { getTreeUrlFromDn } from '$lib/utils';
-	import EllipsisVertical from '$lucide/ellipsis-vertical.svelte';
-	import Ellipsis from '$lucide/ellipsis.svelte';
-	import Eye from '$lucide/eye.svelte';
-	import FolderTree from '$lucide/folder-tree.svelte';
-	import PencilLine from '$lucide/pencil-line.svelte';
-	import Trash from '$lucide/trash-2.svelte';
+	import Ellipsis from 'lucide-svelte/icons/ellipsis';
+	import EllipsisVertical from 'lucide-svelte/icons/ellipsis-vertical';
+	import Eye from 'lucide-svelte/icons/eye';
+	import FolderTree from 'lucide-svelte/icons/folder-tree';
+	import PencilLine from 'lucide-svelte/icons/pencil-line';
+	import Trash from 'lucide-svelte/icons/trash-2';
 	import DeleteOuDialog from './delete-ou-dialog.svelte';
 	import UpdateOuDialog from './update-ou-dialog.svelte';
 

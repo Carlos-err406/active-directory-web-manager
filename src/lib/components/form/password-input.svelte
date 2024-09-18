@@ -1,7 +1,7 @@
 <script lang="ts">
-	import EyeOff from '$lucide/eye-off.svelte';
-	import Eye from '$lucide/eye.svelte';
-	import LockKeyhole from '$lucide/lock-keyhole.svelte';
+	import Eye from 'lucide-svelte/icons/eye';
+	import EyeOff from 'lucide-svelte/icons/eye-off';
+	import LockKeyhole from 'lucide-svelte/icons/lock-keyhole';
 	import { onDestroy } from 'svelte';
 	import { Button } from '../ui/button';
 	import type { Methods } from './form.svelte';

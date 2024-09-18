@@ -5,19 +5,16 @@
 	import { toastError } from '$lib';
 	import Form, { type FormOptions } from '$lib/components/form/form.svelte';
 	import Input from '$lib/components/form/input.svelte';
-	import SelectInput from '$lib/components/form/select-input.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import {
 		createGroupSchema,
 		type CreateGroupSchema
 	} from '$lib/schemas/group/create-group-schema';
-	import { GroupTypeSelect, type Group } from '$lib/types/group';
-	import Captions from '$lucide/captions.svelte';
-	import Mail from '$lucide/mail.svelte';
+	import { type Group } from '$lib/types/group';
+	import Captions from 'lucide-svelte/icons/captions';
 	import { createEventDispatcher } from 'svelte';
 	import { toast } from 'svelte-sonner';
-	import { slide } from 'svelte/transition';
 	import AddMembersDialog from './add-members-dialog.svelte';
 	import AddMembersSurveyDialog from './add-members-survey-dialog.svelte';
 
@@ -79,7 +76,6 @@
 		<Form
 			let:methods
 			let:loading
-			let:values
 			bind:form
 			schema={createGroupSchema}
 			formProps={{ action: '/groups?/createGroup' }}
@@ -97,25 +93,6 @@
 				<Input name="sAMAccountName" inputProps={{ required: true }} {methods}>
 					<svelte:fragment slot="label">sAMAccountName</svelte:fragment>
 				</Input>
-				<SelectInput
-					name="groupType"
-					selectProps={{ required: true, placeholder: 'Select group type' }}
-					options={GroupTypeSelect}
-					{methods}
-				>
-					<svelte:fragment slot="label">groupType</svelte:fragment>
-				</SelectInput>
-				{#if values['groupType'] == 0}
-					<div transition:slide={{ axis: 'y' }}>
-						<Input name="mail" inputProps={{ required: true }} {methods}>
-							<svelte:fragment slot="label">mail</svelte:fragment>
-							<svelte:fragment slot="adornment-left">
-								<Mail />
-							</svelte:fragment>
-							<svelte:fragment slot="description">Distribution list email</svelte:fragment>
-						</Input>
-					</div>
-				{/if}
 				<Input name="description" {methods}>
 					<svelte:fragment slot="label">description</svelte:fragment>
 					<svelte:fragment slot="adornment-left">

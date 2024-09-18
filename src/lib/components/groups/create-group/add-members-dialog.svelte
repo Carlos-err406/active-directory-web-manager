@@ -1,10 +1,10 @@
 <script lang="ts">
+	import type { EntryWithObjectClass } from '$/lib/utils';
 	import { applyAction } from '$app/forms';
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { toastError } from '$lib';
 	import EntryChipList from '$lib/components/entries/entry-chip-list.svelte';
-	import type { Entry } from '$lib/components/entries/entry-select.svelte';
 	import Form, { type FormOptions } from '$lib/components/form/form.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
@@ -15,7 +15,7 @@
 	export let open = false;
 	export let dn: string;
 	const action = `/groups/${dn}?/setMembers`;
-	let members: Entry[] = [];
+	let members: EntryWithObjectClass[] = [];
 	$: {
 		open;
 		members = [];
