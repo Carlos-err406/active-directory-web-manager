@@ -1,4 +1,6 @@
 <script lang="ts">
+	import DeleteManyEntriesDialog from '$/lib/components/tree/delete-many-entries-dialog.svelte';
+	import { getDnFromUrl } from '$/lib/components/tree/utils';
 	import { Button } from '$/lib/components/ui/button';
 	import type { TreeEntry } from '$/lib/types/tree';
 	import { afterNavigate, goto, invalidateAll } from '$app/navigation';
@@ -8,11 +10,8 @@
 	import { extractBase, getCNFromDN, getRDNFromDN } from '$lib/ldap/utils';
 	import { breadcrumbs } from '$lib/stores';
 	import { getCorrectPluralization, getTreeUrlFromDn, mayHaveChildren } from '$lib/utils';
-	import Move from '$lucide/move.svelte';
-
-	import DeleteManyEntriesDialog from '$/lib/components/tree/delete-many-entries-dialog.svelte';
-	import { getDnFromUrl } from '$/lib/components/tree/utils';
 	import _ from 'lodash';
+	import Move from 'lucide-svelte/icons/move';
 	import { setContext, tick } from 'svelte';
 	import { writable } from 'svelte/store';
 	import { slide } from 'svelte/transition';

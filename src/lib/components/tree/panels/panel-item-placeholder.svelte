@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { cn } from '$lib/utils';
-	import { Loader } from '$lucide';
+	import Loader from 'lucide-svelte/icons/loader';
 </script>
 
 <div

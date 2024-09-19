@@ -2,7 +2,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { createEventDispatcher } from 'svelte';
-	import Check from '$lucide/circle-check-big.svelte';
+	import Check from 'lucide-svelte/icons/circle-check-big';
 	export let open = false;
 	const dispatch = createEventDispatcher();
 </script>

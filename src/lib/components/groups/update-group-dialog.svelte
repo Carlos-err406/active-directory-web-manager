@@ -13,8 +13,8 @@
 	} from '$lib/schemas/group/update-group-schema';
 	import type { NameChange } from '$lib/types';
 	import { GroupTypeSelect } from '$lib/types/group';
-	import Captions from '$lucide/captions.svelte';
-	import Mail from '$lucide/mail.svelte';
+	import Captions from 'lucide-svelte/icons/captions';
+	import Mail from 'lucide-svelte/icons/mail';
 	import { createEventDispatcher } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import { slide } from 'svelte/transition';

@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import ArrowUpDown from '$lucide/arrow-up-down.svelte';
-	import BookOpenText from '$lucide/book-open-text.svelte';
-	import EyeOff from '$lucide/eye-off.svelte';
-	import FilterX from '$lucide/filter-x.svelte';
-	import Search from '$lucide/search.svelte';
+	import ArrowUpDown from 'lucide-svelte/icons/arrow-up-down';
+	import BookOpenText from 'lucide-svelte/icons/book-open-text';
+	import EyeOff from 'lucide-svelte/icons/eye-off';
+	import FilterX from 'lucide-svelte/icons/filter-x';
+	import Search from 'lucide-svelte/icons/search';
 	import { derived } from 'svelte/store';
 	import { slide } from 'svelte/transition';
 	import { Button } from '../ui/button';

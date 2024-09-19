@@ -6,10 +6,10 @@
 	import { Button } from '$lib/components/ui/button';
 	import { breadcrumbs } from '$lib/stores';
 	import { buildBreadcrumbsFromDn, getTreeUrlFromDn } from '$lib/utils';
-	import FolderTree from '$lucide/folder-tree.svelte';
-	import PencilLine from '$lucide/pencil-line.svelte';
-	import Trash2 from '$lucide/trash-2.svelte';
 	import dayjs from 'dayjs';
+	import FolderTree from 'lucide-svelte/icons/folder-tree';
+	import PencilLine from 'lucide-svelte/icons/pencil-line';
+	import Trash2 from 'lucide-svelte/icons/trash-2';
 	import { setContext } from 'svelte';
 	import type { PageData } from './$types';
 	export let data: PageData;

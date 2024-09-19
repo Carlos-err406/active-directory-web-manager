@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { EntryWithObjectClass } from '$/lib/utils';
 	import { applyAction } from '$app/forms';
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
@@ -9,17 +10,16 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { getCNFromDN } from '$lib/ldap/utils';
 	import { setMembersSchema, type SetMembersSchema } from '$lib/schemas/group/set-members-schema';
-	import Loader from '$lucide/loader.svelte';
+	import Loader from 'lucide-svelte/icons/loader';
 	import { toast } from 'svelte-sonner';
 	import { slide } from 'svelte/transition';
 	import EntryChipList from '../entries/entry-chip-list.svelte';
-	import type { Entry } from '../entries/entry-select.svelte';
 	import MemberSelect from './member-select.svelte';
 	export let open: boolean;
 	export let dn: string;
 	const action = `/groups/${dn}?/setMembers`;
 	$: form = $page.data.setMembersForm;
-	let members: Entry[] = [];
+	let members: EntryWithObjectClass[] = [];
 	let initializing = false;
 	const onOpen = async () => {
 		const params = new URLSearchParams({ dn });

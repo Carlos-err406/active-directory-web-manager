@@ -2,11 +2,11 @@
 	import { page } from '$app/stores';
 	import { Button } from '$lib/components/ui/button';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import BookOpenText from '$lucide/book-open-text.svelte';
-	import Calendar from '$lucide/calendar.svelte';
-	import Captions from '$lucide/captions.svelte';
-	import FilterX from '$lucide/filter-x.svelte';
-	import Search from '$lucide/search.svelte';
+	import BookOpenText from 'lucide-svelte/icons/book-open-text';
+	import Calendar from 'lucide-svelte/icons/calendar';
+	import Captions from 'lucide-svelte/icons/captions';
+	import FilterX from 'lucide-svelte/icons/filter-x';
+	import Search from 'lucide-svelte/icons/search';
 	import { derived } from 'svelte/store';
 	import { slide } from 'svelte/transition';
 

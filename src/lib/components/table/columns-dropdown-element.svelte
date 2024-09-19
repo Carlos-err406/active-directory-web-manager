@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import Check from '$lucide/check.svelte';
+	import Check from 'lucide-svelte/icons/check';
 	import type { FlatColumn } from 'svelte-headless-table';
 	import { derived } from 'svelte/store';
 	import { DropdownMenuItem } from '$lib/components/ui/dropdown-menu';

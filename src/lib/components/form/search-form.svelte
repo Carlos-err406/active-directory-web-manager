@@ -2,7 +2,7 @@
 	import { afterNavigate, goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { cn } from '$lib/utils';
-	import Search from '$lucide/search.svelte';
+	import Search from 'lucide-svelte/icons/search';
 	import { onDestroy, tick } from 'svelte';
 	import { Input } from '../ui/input';
 	import Timer from '../ui/timer/timer.svelte';

@@ -8,9 +8,9 @@
 	import * as Form from '$lib/components/ui/form';
 	import { blobToBase64 } from '$lib/transforms';
 	import { cn } from '$lib/utils';
-	import Image from '$lucide/image.svelte';
-	import Trash from '$lucide/trash-2.svelte';
 	import type { ClassValue } from 'clsx';
+	import Image from 'lucide-svelte/icons/image';
+	import Trash from 'lucide-svelte/icons/trash-2';
 	import { onMount } from 'svelte';
 	import { slide } from 'svelte/transition';
 	import { v4 } from 'uuid';

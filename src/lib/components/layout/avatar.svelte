@@ -4,7 +4,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import type { Session } from '$lib/types/session';
-	import LogOut from '$lucide/log-out.svelte';
+	import LogOut from 'lucide-svelte/icons/log-out';
 	import { Avatar } from '../ui/avatar';
 	import AvatarFallback from '../ui/avatar/avatar-fallback.svelte';
 	import AvatarImage from '../ui/avatar/avatar-image.svelte';

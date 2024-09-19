@@ -1,9 +1,9 @@
 <script lang="ts">
+	import type { EntryWithObjectClass } from '$/lib/utils';
 	import { flip } from 'svelte/animate';
 	import EntryChip from './entry-chip.svelte';
-	import type { Entry } from './entry-select.svelte';
 
-	export let entries: Entry[] = [];
+	export let entries: EntryWithObjectClass[] = [];
 </script>
 
 <div class="mt-2 flex w-full flex-wrap items-center gap-3">

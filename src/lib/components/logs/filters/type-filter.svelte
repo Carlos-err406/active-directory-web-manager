@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import Check from 'lucide-svelte/icons/check';
 	import { derived } from 'svelte/store';
-	import Check from '$lucide/check.svelte';
 	export let filterType: string = 'all';
 
 	const filter = derived(page, ($page) => {

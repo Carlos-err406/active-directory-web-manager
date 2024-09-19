@@ -2,10 +2,10 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { cn, isGroup, type EntryWithObjectClass } from '$lib/utils';
-	import Building2 from '$lucide/building-2.svelte';
-	import Plus from '$lucide/plus.svelte';
-	import User from '$lucide/user.svelte';
-	import Users from '$lucide/users.svelte';
+	import Building2 from 'lucide-svelte/icons/building-2';
+	import Plus from 'lucide-svelte/icons/plus';
+	import User from 'lucide-svelte/icons/user';
+	import Users from 'lucide-svelte/icons/users';
 	import { createEventDispatcher } from 'svelte';
 	export let open = false;
 	export let base: EntryWithObjectClass;

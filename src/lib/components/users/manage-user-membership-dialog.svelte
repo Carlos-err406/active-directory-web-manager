@@ -12,7 +12,7 @@
 		type UpdateMembershipSchema
 	} from '$lib/schemas/user/update-membership';
 	import type { Group } from '$lib/types/group';
-	import Loader from '$lucide/loader.svelte';
+	import Loader from 'lucide-svelte/icons/loader';
 	import { toast } from 'svelte-sonner';
 	import { slide } from 'svelte/transition';
 	import GroupChipList from '../groups/chip/group-chip-list.svelte';

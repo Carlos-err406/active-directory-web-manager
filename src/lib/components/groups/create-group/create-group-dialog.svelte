@@ -5,7 +5,6 @@
 	import { toastError } from '$lib';
 	import Form, { type FormOptions } from '$lib/components/form/form.svelte';
 	import Input from '$lib/components/form/input.svelte';
-	import SelectInput from '$lib/components/form/select-input.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import {
@@ -13,11 +12,12 @@
 		type CreateGroupSchema
 	} from '$lib/schemas/group/create-group-schema';
 	import { GroupTypeSelect, type Group } from '$lib/types/group';
-	import Captions from '$lucide/captions.svelte';
-	import Mail from '$lucide/mail.svelte';
+	import Captions from 'lucide-svelte/icons/captions';
+	import Mail from 'lucide-svelte/icons/mail';
 	import { createEventDispatcher } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import { slide } from 'svelte/transition';
+	import SelectInput from '../../form/select-input.svelte';
 	import AddMembersDialog from './add-members-dialog.svelte';
 	import AddMembersSurveyDialog from './add-members-survey-dialog.svelte';
 
