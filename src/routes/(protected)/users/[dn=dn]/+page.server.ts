@@ -1,4 +1,3 @@
-import config from '$config';
 import { getEntryByDn, getMemberEntries } from '$lib/ldap';
 import { extractBase } from '$lib/ldap/utils';
 import { changePasswordSchema } from '$lib/schemas/user/change-password-schema';
@@ -24,6 +23,7 @@ export const load: PageServerLoad = async ({ params, url, locals, depends }) => 
 		dn: paramDN
 	});
 	const { ldap, session } = auth;
+	const { config } = locals;
 	if (session.dn === paramDN) throw redirect(303, '/users/me');
 	try {
 		const user = await getEntryByDn<User>(ldap, paramDN).then(jpegPhotoToB64);
@@ -54,7 +54,7 @@ export const load: PageServerLoad = async ({ params, url, locals, depends }) => 
 		};
 	} catch (e) {
 		if (isHttpError(e)) throw e;
-		const errorId = errorLog(e, { message: `Error loading user ${dn} page` });
+		const errorId = await errorLog(e, { message: `Error loading user ${dn} page` });
 		throw error(500, { message: 'Something went wrong while loading the page', errorId });
 	}
 };

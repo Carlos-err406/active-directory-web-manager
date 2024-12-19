@@ -85,7 +85,7 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 			changePasswordForm: await superValidate(zod(changePasswordSchema))
 		};
 	} catch (e) {
-		const errorId = errorLog(e, { message: 'Error loading users page' });
+		const errorId = await errorLog(e, { message: 'Error loading users page' });
 		throw error(500, {
 			message: 'Something unexpected happened while retrieving the users, try again later',
 			errorId

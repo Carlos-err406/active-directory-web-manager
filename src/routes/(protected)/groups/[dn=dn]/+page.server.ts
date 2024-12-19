@@ -1,4 +1,3 @@
-import config from '$config';
 import { getEntryByDn, getMemberEntries } from '$lib/ldap';
 import { extractBase } from '$lib/ldap/utils';
 import { deleteGroupSchema } from '$lib/schemas/group/delete-group-schema';
@@ -15,8 +14,8 @@ import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, url, params }) => {
 	const dn = decodeURIComponent(params.dn);
-
 	const { ldap } = await specificResourceAccessControl({ locals, url, dn });
+	const { config } = locals;
 	try {
 		const group = await getEntryByDn<Group>(ldap, dn);
 		if (!group) {
@@ -49,7 +48,7 @@ export const load: PageServerLoad = async ({ locals, url, params }) => {
 		};
 	} catch (e) {
 		if (isHttpError(e)) throw e;
-		const errorId = errorLog(e, { message: `Error loading group ${dn} page` });
+		const errorId = await errorLog(e, { message: `Error loading group ${dn} page` });
 		throw error(500, { message: 'Something went wrong while loading the page', errorId });
 	}
 };

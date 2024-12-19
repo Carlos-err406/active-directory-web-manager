@@ -1,5 +1,6 @@
-import config, { LOGGING_APP_BASE, LOGGING_SYSTEM_BASE } from '$config';
+import getConfig from '$config';
 import dayjs from 'dayjs';
+import path from 'path';
 import { log } from 'sveltekit-logger-hook';
 import { v4 } from 'uuid';
 
@@ -12,7 +13,8 @@ type ErrorLogOpts = {
 	errorName?: string;
 };
 
-export const errorLog = (e: unknown, extra?: ErrorLogOpts) => {
+export const errorLog = async (e: unknown, extra?: ErrorLogOpts) => {
+	const config = await getConfig();
 	const errorId = extra?.errorId ?? v4();
 	if (!config.system.logging.useLogging) return errorId;
 	const message = extra?.message ?? 'No error description';
@@ -24,16 +26,17 @@ export const errorLog = (e: unknown, extra?: ErrorLogOpts) => {
 	log(
 		{ errorId, error: `${e}`, ...extra },
 		{
-			basePath: LOGGING_SYSTEM_BASE
+			basePath: path.join(config.system.logging.basePath, 'system')
 		}
 	);
-	appLog(`(${errorName || errorId}) ` + message, 'Error');
+	await appLog(`(${errorName || errorId}) ` + message, 'Error');
 
 	return errorId;
 };
-export const appLog = (line: string, type: 'Info' | 'Warning' | 'Error' = 'Info') => {
+export const appLog = async (line: string, type: 'Info' | 'Warning' | 'Error' = 'Info') => {
+	const config = await getConfig();
 	if (!config.system.logging.useLogging) return;
 	log(`${dayjs().format('YYYY-MM-DD HH:mm:ss A')} -- [${type}]: ${line}`, {
-		basePath: LOGGING_APP_BASE
+		basePath: path.join(config.system.logging.basePath, 'app')
 	});
 };

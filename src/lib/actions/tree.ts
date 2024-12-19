@@ -1,4 +1,3 @@
-import config from '$config';
 import { PUBLIC_BASE_DN } from '$env/static/public';
 import type { Action } from '@sveltejs/kit';
 import { error, isHttpError, redirect } from '@sveltejs/kit';
@@ -23,6 +22,7 @@ export const deleteMany: Action = async (event) => {
 	const form = await superValidate(event, zod(deleteManySchema));
 	if (!form.valid) return fail(400, { form });
 	const { ldap, session } = auth;
+	const { config } = locals;
 	const { dns } = form.data;
 	const filter = new OrFilter({
 		filters: dns.map((dn) => new EqualityFilter({ attribute: 'distinguishedName', value: dn }))
@@ -37,7 +37,7 @@ export const deleteMany: Action = async (event) => {
 	const promises = entries.map(async (entry) => {
 		try {
 			if (entry.isCriticalSystemObject === 'TRUE') {
-				appLog(
+				await appLog(
 					`(CriticalSystemObject) User ${session.sAMAccountName} tried deleting ${entry.dn} but is a critical system object and can not be deleted!`,
 					'Error'
 				);
@@ -49,7 +49,7 @@ export const deleteMany: Action = async (event) => {
 			else if (e instanceof NotAllowedOnNonLeafError) {
 				const { allowNonLeafDelete } = config.directory.ous;
 				if (!allowNonLeafDelete) {
-					appLog(
+					await appLog(
 						`(NotAllowedOnNonLeafError) User ${session.sAMAccountName} tried deleting an entry (${entry.dn}) but operation is not allowed on non-leaf entries`,
 						'Error'
 					);
@@ -60,14 +60,18 @@ export const deleteMany: Action = async (event) => {
 			} else {
 				console.log(e);
 				const message = `Something unexpected happened while deleting the entry ${getCNFromDN(entry.dn)}`;
-				const errorId = errorLog(e, { message });
+				const errorId = await errorLog(e, { message });
 				throw error(500, { message, errorId });
 			}
 		}
 	});
 
 	await Promise.all(promises);
-	deletedEntries.map((dn) => appLog(`User ${session.sAMAccountName} deleted entry ${dn}`));
+	await Promise.all(
+		deletedEntries.map(
+			async (dn) => await appLog(`User ${session.sAMAccountName} deleted entry ${dn}`)
+		)
+	);
 	return { form };
 };
 
@@ -88,13 +92,13 @@ export const move: Action = async (event) => {
 			if (e instanceof UnwillingToPerformError) {
 				const { message } = e;
 				if (message.includes('to be a child of itself')) {
-					appLog(
+					await appLog(
 						`User ${session.sAMAccountName} tried moving ${dn} to be a child of itself`,
 						'Error'
 					);
 					throw error(400, { message: `Cannot move ${getCNFromDN(dn)} to be a child of itself` });
 				} else if (message.includes('DISALLOW_MOVE')) {
-					appLog(
+					await appLog(
 						`User ${session.sAMAccountName} tried moving ${dn} but is not allowed to move it`,
 						'Error'
 					);
@@ -103,7 +107,7 @@ export const move: Action = async (event) => {
 			}
 			console.log(e);
 			const message = `Something unexpected happened while moving ${dn}`;
-			const errorId = errorLog(e, { message });
+			const errorId = await errorLog(e, { message });
 			throw error(500, { message, errorId });
 		}
 	});
@@ -113,12 +117,12 @@ export const move: Action = async (event) => {
 		if (isHttpError(e)) throw e;
 		else {
 			const message = `Something unexpected happened while performing the move operation`;
-			const errorId = errorLog(e, { message });
+			const errorId = await errorLog(e, { message });
 			throw error(500, { message, errorId });
 		}
 	}
 
-	appLog(
+	await appLog(
 		`User ${session.sAMAccountName} moved ${dns.map(getRDNFromDN).join(', ')} to ${base}`,
 		'Info'
 	);

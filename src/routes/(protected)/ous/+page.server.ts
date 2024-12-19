@@ -66,7 +66,7 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 			updateOuForm: await superValidate(zod(updateOuSchema))
 		};
 	} catch (e) {
-		const errorId = errorLog(e, { message: 'Error loading Organizational Units page' });
+		const errorId = await errorLog(e, { message: 'Error loading Organizational Units page' });
 		throw error(500, {
 			message:
 				'Something unexpected happened while retrieving the Organizational Units, try again later',

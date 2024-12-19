@@ -1,4 +1,4 @@
-import config from '$config';
+import getConfig from '$config';
 import { TESTING } from '$env/static/private';
 import type { Session } from '$lib/types/session';
 import { error, redirect } from '@sveltejs/kit';
@@ -10,7 +10,7 @@ type AccessControlOpts = {
 	beforeError?: (session: Session) => void;
 	beforeLog?: (session: Session) => void;
 };
-const getNonAdminConfig = () => config.app.nonAdmin;
+const getNonAdminConfig = async () => (await getConfig()).app.nonAdmin;
 
 export const protectedAccessControl = async (accessControlOpts: AccessControlOpts) => {
 	const { locals, url, beforeError, beforeLog } = accessControlOpts;
@@ -23,27 +23,30 @@ export const protectedAccessControl = async (accessControlOpts: AccessControlOpt
 		allowAccessToOUsPage,
 		allowAccessToTreePage,
 		allowAccessToUsersPage
-	} = getNonAdminConfig();
+	} = await getNonAdminConfig();
 	const canAccessOuRoutes = () => session.isAdmin || allowAccessToOUsPage;
 	const canAccessUserRoutes = () => session.isAdmin || allowAccessToUsersPage;
 	const canAccessGroupRoutes = () => session.isAdmin || allowAccessToGroupsPage;
 	const canAccessLogRoutes = () => session.isAdmin || allowAccessToLogsPage;
 	const canAccessTreeRoutes = () => session.isAdmin || allowAccessToTreePage;
-
+	const canAccessSettingsRoute = () => session.isAdmin;
 	if (
-		(isUserRoutes(url) && !canAccessUserRoutes()) ||
 		(isGroupRoutes(url) && !canAccessGroupRoutes()) ||
 		(isLogRoutes(url) && !canAccessLogRoutes()) ||
 		(isTreeRoutes(url) && !canAccessTreeRoutes()) ||
-		(isOuRoutes(url) && !canAccessOuRoutes())
+		(isOuRoutes(url) && !canAccessOuRoutes()) ||
+		(isSettingsRoute(url) && !canAccessSettingsRoute())
 	) {
 		beforeLog?.(session);
-		appLog(
+		await appLog(
 			`User ${session.sAMAccountName} tried accessing ${url.pathname} page but Non-Admin access is disabled by configuration.`,
 			'Error'
 		);
 		beforeError?.(session);
 		throw error(403, 'Non-Admin access to this resource is disabled by configuration');
+	}
+	if (isUserRoutes(url) && !canAccessUserRoutes()) {
+		throw redirect(303, 'users/me');
 	}
 	return auth;
 };
@@ -56,6 +59,7 @@ export const specificResourceAccessControl = async (opts: HiddenResourceAccessCo
 	const { locals, url, beforeError, beforeLog, dn } = opts;
 	const auth = await protectedAccessControl({ locals, url, beforeError });
 	const { session } = auth;
+	const { config } = locals;
 	const { groups, users, ous } = config.directory;
 	if (
 		(isGroupRoutes(url) && groups.hide.includes(dn)) ||
@@ -63,7 +67,7 @@ export const specificResourceAccessControl = async (opts: HiddenResourceAccessCo
 		(isOuRoutes(url) && ous.hide.includes(dn))
 	) {
 		beforeLog?.(session);
-		appLog(
+		await appLog(
 			`User ${session.sAMAccountName} tried accessing ${url.pathname} page but resource is hidden by configuration.`,
 			'Error'
 		);
@@ -79,6 +83,7 @@ const isGroupRoutes = (url: URL) => url.pathname.startsWith('/groups');
 const isUserRoutes = (url: URL) =>
 	url.pathname.startsWith('/users') && !url.pathname.endsWith('/me');
 const isOuRoutes = (url: URL) => url.pathname.startsWith('/ous');
+const isSettingsRoute = (url: URL) => url.pathname.startsWith('/settings');
 
 export const isTestEnvironment = () => {
 	return [process.env.TESTING, TESTING].includes('1');

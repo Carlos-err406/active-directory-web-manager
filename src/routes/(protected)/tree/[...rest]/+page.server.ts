@@ -1,5 +1,4 @@
 import { UAC } from '$/lib/types/user';
-import config from '$config';
 import { PUBLIC_BASE_DN } from '$env/static/public';
 import { getBaseEntry, getGroupMembers, getHideFilters } from '$lib/ldap';
 import { deleteManySchema } from '$lib/schemas/delete-many-schema';
@@ -32,17 +31,18 @@ import {
 export const load = async ({ url, locals, params }: Parameters<PageServerLoad>[0]) => {
 	const auth = await protectedAccessControl({ locals, url });
 	const { ldap, session } = auth;
+	const { config } = locals;
 	const splittedDn = params.rest.split('/').filter(Boolean).reverse();
 	const activeDns = splittedDn
 		.map((_, index) => `${splittedDn.slice(index).join(',')},${PUBLIC_BASE_DN}`)
 		.reverse();
-	throwIfIsHiddenEntry(`${splittedDn.join(',')},${PUBLIC_BASE_DN}`, session, url);
+	await throwIfIsHiddenEntry(config, `${splittedDn.join(',')},${PUBLIC_BASE_DN}`, session, url);
 	const dns = [PUBLIC_BASE_DN, ...activeDns];
 	const q = url.searchParams.get('q');
 	return {
 		searchForm: true,
 		withoutPages: true,
-		entries: dns.map((dn) => getChildren(ldap, dn, q)),
+		entries: dns.map((dn) => getChildren(ldap, config, dn, q)),
 		activeDns,
 		deleteManyUsersForm: await superValidate(zod(deleteManySchema)),
 		deleteManyEntriesForm: await superValidate(zod(deleteManySchema)),
@@ -71,7 +71,12 @@ export const load = async ({ url, locals, params }: Parameters<PageServerLoad>[0
 	};
 };
 
-const getChildren = async (ldap: Client, base = PUBLIC_BASE_DN, query: string | null = null) => {
+const getChildren = async (
+	ldap: Client,
+	config: App.Config,
+	base = PUBLIC_BASE_DN,
+	query: string | null = null
+) => {
 	let treeEntries: Promise<TreeEntry[]> = Promise.resolve([]);
 	const mainFilter: AndFilter = new AndFilter({
 		filters: [

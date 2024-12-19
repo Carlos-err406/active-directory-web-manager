@@ -21,6 +21,7 @@ declare global {
 			 * @returns a Promise with the session object and the binded ldap client, or null if session is invalid
 			 */
 			auth: () => Promise<{ ldap: Client; session: Session } | null>;
+			config: RecursiveRequired<AppConfigType>;
 		}
 		interface PageData {
 			config: RecursiveRequired<AppConfigType>;
@@ -36,7 +37,7 @@ declare global {
 			};
 		}
 		// interface Platform {}
-		type Config = AppConfigType;
+		type Config = RecursiveRequired<AppConfigType>;
 	}
 }
 

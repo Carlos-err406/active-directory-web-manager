@@ -1,22 +1,23 @@
-import { LOGGING_APP_BASE } from '$config';
 import { getLogDate, isErrorLog, isInfoLog } from '$lib/components/logs/utils';
 import { protectedAccessControl } from '$lib/server/utils';
 import dayjs from 'dayjs';
 import fs from 'fs';
+import path from 'path';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ url, depends, locals }) => {
 	depends('protected:logs');
+	const { config } = locals;
+	const loggingAppBase = path.join(config.system.logging.basePath, 'app');
 	await protectedAccessControl({ locals, url });
 
 	const q = url.searchParams.get('q');
 	const filterType = url.searchParams.get('type') || 'all';
-
 	const fromDate = url.searchParams.get('fromDate')
 		? dayjs(url.searchParams.get('fromDate'))
 		: undefined;
 	const toDate = url.searchParams.get('toDate') ? dayjs(url.searchParams.get('toDate')) : undefined;
-	const haveLogs = fs.existsSync(LOGGING_APP_BASE);
+	const haveLogs = fs.existsSync(loggingAppBase);
 	return {
 		defaults: {
 			fromDate: fromDate?.format('YYYY-MM-DD'),
@@ -25,7 +26,7 @@ export const load: PageServerLoad = async ({ url, depends, locals }) => {
 		minDate: !haveLogs
 			? dayjs().format('YYYY-MM-DD')
 			: await new Promise<string>((resolve, reject) => {
-					fs.readdir(LOGGING_APP_BASE, (err, files) => {
+					fs.readdir(loggingAppBase, (err, files) => {
 						if (err) return reject(err);
 						const logFiles = files.filter((file) => file.endsWith('.log'));
 						const [dateString] = logFiles[0].split('.');
@@ -35,7 +36,7 @@ export const load: PageServerLoad = async ({ url, depends, locals }) => {
 		promise: {
 			logs: !haveLogs
 				? []
-				: readLogFiles()
+				: readLogFiles(loggingAppBase)
 						//filter by query string
 						.then((logs) =>
 							!q ? logs : logs.filter((log) => log.toLowerCase().includes(q.toLowerCase()))
@@ -65,14 +66,15 @@ export const load: PageServerLoad = async ({ url, depends, locals }) => {
 		searchForm: true
 	};
 };
-const readLogFiles = (): Promise<string[]> => {
+const readLogFiles = (basePath: string): Promise<string[]> => {
 	return new Promise((resolve, reject) => {
-		fs.readdir(LOGGING_APP_BASE, (err, files) => {
+		fs.readdir(basePath, (err, files) => {
 			if (err) return reject(err);
 			const logFiles = files.filter((file) => file.endsWith('.log'));
 			let logLines: string[] = [];
 			logFiles.forEach((file) => {
-				const content = fs.readFileSync(LOGGING_APP_BASE + file, 'utf-8');
+				const filePath = path.join(basePath, file);
+				const content = fs.readFileSync(filePath, 'utf-8');
 				logLines = logLines.concat(content.split('\n').filter((line) => line.trim() !== ''));
 			});
 			resolve(logLines);

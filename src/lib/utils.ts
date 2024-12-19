@@ -89,10 +89,10 @@ export const arrowNavigation: Action = (
 
 export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export type EntryWithObjectClass = Entry & {
-	[key: string]: unknown;
-	objectClass: string[];
-};
+export type EntryWithObjectClass<T = Record<string, unknown>> = Entry &
+	T & {
+		objectClass: string[];
+	};
 export const isUser = <T extends EntryWithObjectClass>(entry: T) =>
 	entry.objectClass.includes('organizationalPerson');
 export const isOu = <T extends EntryWithObjectClass>(entry: T) =>
@@ -151,3 +151,9 @@ export const getTreeUrlFromDn = (dn: string) =>
 
 export const getCorrectPluralization = (entries: unknown[], plural: string, singular: string) =>
 	entries.length === 1 ? singular : plural;
+
+export const getCaptchaCharacters = (chars: string) => {
+	const set = new Set(chars.replaceAll(' ', '').split(''));
+	const values = set.values();
+	return Array.from(values).join('');
+};

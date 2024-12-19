@@ -1,3 +1,4 @@
+import { extractBase } from '$/lib/ldap/utils';
 import type { EntryWithObjectClass } from '$/lib/utils';
 import { getEntryByDn, getMemberEntries } from '$lib/ldap';
 import { changePasswordSchema } from '$lib/schemas/user/change-password-schema';
@@ -9,12 +10,10 @@ import { error } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { PageServerLoad } from './$types';
-import { extractBase } from '$/lib/ldap/utils';
-import config from '$config';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	const { ldap, session } = await protectedAccessControl({ locals, url });
-
+	const { config } = locals;
 	const user = await getEntryByDn<User>(ldap, session.dn).then(jpegPhotoToB64);
 	if (!user) throw error(404, 'User not found');
 	const baseParent = extractBase(user.dn);

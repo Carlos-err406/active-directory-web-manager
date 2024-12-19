@@ -1,4 +1,5 @@
 import { getDirectChildren, getEntryByDn } from '$lib/ldap';
+import { extractBase } from '$lib/ldap/utils';
 import { createOuSchema } from '$lib/schemas/ou/create-ou-schema';
 import { deleteOuSchema } from '$lib/schemas/ou/delete-ou-schema';
 import { updateOuSchema } from '$lib/schemas/ou/update-ou-schema';
@@ -10,13 +11,11 @@ import { error, isHttpError } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { PageServerLoad } from './$types';
-import config from '$config';
-import { extractBase } from '$lib/ldap/utils';
 
 export const load: PageServerLoad = async ({ locals, url, params }) => {
 	const { dn } = params;
 	const { ldap } = await specificResourceAccessControl({ locals, url, dn });
-
+	const { config } = locals;
 	try {
 		const ou = await getEntryByDn<OrganizationalUnit>(ldap, dn);
 		if (!ou) {
@@ -47,7 +46,7 @@ export const load: PageServerLoad = async ({ locals, url, params }) => {
 		};
 	} catch (e) {
 		if (isHttpError(e)) throw e;
-		const errorId = errorLog(e, { message: `Error loading Organizational Unit ${dn} page` });
+		const errorId = await errorLog(e, { message: `Error loading Organizational Unit ${dn} page` });
 		throw error(500, { message: 'Something went wrong while loading the page', errorId });
 	}
 };

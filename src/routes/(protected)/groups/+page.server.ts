@@ -69,7 +69,7 @@ export const load: PageServerLoad = async ({ url, locals, depends }) => {
 			setMembersForm: await superValidate(zod(setMembersSchema))
 		};
 	} catch (e) {
-		const errorId = errorLog(e, { message: 'Error loading groups page' });
+		const errorId = await errorLog(e, { message: 'Error loading groups page' });
 		throw error(500, {
 			message: 'Something unexpected happened while retrieving the groups, try again later',
 			errorId

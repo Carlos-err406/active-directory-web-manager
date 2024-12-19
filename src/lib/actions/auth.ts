@@ -32,11 +32,11 @@ export const signIn: Action = async (event) => {
 	cookies.delete('ad-captcha', { path: '/' });
 
 	const [sAMAccountName] = email.split('@');
-	const ldap = getLDAPClient();
+	const ldap = await getLDAPClient();
 	try {
 		await ldap.bind(`${sAMAccountName}@${PUBLIC_LDAP_DOMAIN}`, password);
 	} catch (e) {
-		const errorId = errorLog(e, { message: 'Sign in attempt failed for user ' + email });
+		const errorId = await errorLog(e, { message: 'Sign in attempt failed for user ' + email });
 		if (e instanceof InvalidCredentialsError) {
 			const dataCode = e.message.split('data ')[1].split(',')[0];
 			if (dataCode === '52e') throw error(401, { message: 'Invalid Credentials', errorId });
@@ -73,10 +73,10 @@ export const signIn: Action = async (event) => {
 		setSessionCookie(cookies, session);
 		setAccessCookie(cookies, access);
 	} catch (e) {
-		const errorId = errorLog(e);
+		const errorId = await errorLog(e);
 		throw error(500, { message: 'Something unexpected happened, try again later', errorId });
 	}
-	appLog(`User ${user.sAMAccountName} signed in`, 'Info');
+	await appLog(`User ${user.sAMAccountName} signed in`, 'Info');
 	return redirect(302, '/users/me');
 };
 
@@ -85,6 +85,6 @@ export const signOut: Action = async ({ cookies, locals }) => {
 	if (!auth) return redirect(302, '/');
 	cookies.delete('ad-session', { path: '/' });
 	cookies.delete('ad-access', { path: '/' });
-	appLog(`User ${auth.session.sAMAccountName} signed out`, 'Info');
+	await appLog(`User ${auth.session.sAMAccountName} signed out`, 'Info');
 	return redirect(302, '/');
 };

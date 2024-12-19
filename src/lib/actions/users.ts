@@ -1,4 +1,3 @@
-import config from '$config';
 import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
 import {
 	encodePassword,
@@ -56,7 +55,7 @@ export const createUser: Action = async (event) => {
 
 	const canCreate = await validateUserAmount(ldap);
 	if (!canCreate) {
-		appLog(
+		await appLog(
 			`(ReachedUserLimit) User ${session.sAMAccountName} tried creating a user but can not create more users in this directory. Maximum amount reached.`,
 			'Error'
 		);
@@ -124,17 +123,17 @@ export const createUser: Action = async (event) => {
 		if (e instanceof AlreadyExistsError) {
 			return setError(form, 'sAMAccountName', 'sAMAccountName already in use!');
 		} else if (e instanceof InsufficientAccessError) {
-			appLog(
+			await appLog(
 				`(InsufficientAccessError) User ${session.sAMAccountName} tried creating a user without having enough access`,
 				'Error'
 			);
 			throw error(403, "You don't have permission to create users!");
 		}
 		const message = 'Something unexpected happened while creating the user';
-		const errorId = errorLog(e, { message });
+		const errorId = await errorLog(e, { message });
 		throw error(500, { message, errorId });
 	}
-	appLog(`${session.sAMAccountName} created user: ${dn}`);
+	await appLog(`${session.sAMAccountName} created user: ${dn}`);
 
 	//add to group
 	if (baseIsGroup) {
@@ -148,7 +147,7 @@ export const createUser: Action = async (event) => {
 			await ldap.modify(baseEntry.distinguishedName, change!);
 		} catch (e) {
 			const message = `Something went wrong adding the user to ${group.sAMAccountName}'s members`;
-			const errorId = errorLog(e, { message });
+			const errorId = await errorLog(e, { message });
 			throw error(500, { message, errorId });
 		}
 	}
@@ -167,7 +166,7 @@ export const deleteUser: Action = async (event) => {
 	const user = await getEntryByDn<User>(ldap, dn);
 	if (!user) throw error(404, 'User not found!');
 	else if (user.isCriticalSystemObject === 'TRUE') {
-		appLog(
+		await appLog(
 			`(CriticalSystemObject) User ${auth.session.sAMAccountName} tried deleting ${dn} but is a critical system object and can not be deleted!`,
 			'Error'
 		);
@@ -178,17 +177,17 @@ export const deleteUser: Action = async (event) => {
 	} catch (e) {
 		console.log(e);
 		if (e instanceof InsufficientAccessError) {
-			appLog(
+			await appLog(
 				`(InsufficientAccessError) User ${auth.session.sAMAccountName} tried deleting a user (${dn}) but does not have enough access`,
 				'Error'
 			);
 			throw error(403, "You don't have permission to delete users!");
 		}
 		const message = `Something unexpected happened while trying to delete ${user.sAMAccountName}`;
-		const errorId = errorLog(e, { message });
+		const errorId = await errorLog(e, { message });
 		throw error(500, { message, errorId });
 	}
-	appLog(`User ${auth.session.sAMAccountName} deleted user ${dn}`);
+	await appLog(`User ${auth.session.sAMAccountName} deleted user ${dn}`);
 	return { form };
 };
 
@@ -208,23 +207,23 @@ export const deleteManyUsers: Action = async (event) => {
 	const { searchEntries } = await ldap.search(PUBLIC_BASE_DN, { filter });
 	const promises = searchEntries.map(async (entry) => {
 		if (entry['isCriticalSystemObject'] === 'TRUE') {
-			appLog(
+			await appLog(
 				`(CriticalSystemObject) User ${auth.session.sAMAccountName} tried deleting ${entry.dn} but is a critical system object and can not be deleted!`,
 				'Error'
 			);
 			throw error(403, `Entry ${entry.sAMAccountName} can not be deleted!`);
 		}
-		return ldap.del(entry.dn).catch((e) => {
+		return ldap.del(entry.dn).catch(async (e) => {
 			const message = `Something unexpected happened while deleting the user ${entry.sAMAccountName}`;
-			const errorId = errorLog(e, { message });
+			const errorId = await errorLog(e, { message });
 			throw error(500, { message, errorId });
 		});
 	});
 
 	await Promise.all(promises);
-	if (dns.length === 1) appLog(`User ${auth.session.sAMAccountName} deleted user ${dns[0]}`);
+	if (dns.length === 1) await appLog(`User ${auth.session.sAMAccountName} deleted user ${dns[0]}`);
 	else
-		appLog(
+		await appLog(
 			`User ${auth.session.sAMAccountName} deleted several users: ${dns.map(getCNFromDN).join(', ')}`
 		);
 	return { form };
@@ -248,18 +247,18 @@ export const changeUserPassword: Action = async (event) => {
 	if (!session.isAdmin) {
 		try {
 			const { sAMAccountName } = user;
-			const testPasswordLdap = getLDAPClient();
+			const testPasswordLdap = await getLDAPClient();
 			await testPasswordLdap.bind(`${sAMAccountName}@${PUBLIC_LDAP_DOMAIN}`, oldPassword);
 			await testPasswordLdap.unbind();
 		} catch (e) {
 			if (e instanceof InvalidCredentialsError) {
 				if (isUpdatingSelfPassword)
-					appLog(
+					await appLog(
 						`(InvalidCredentialsError) User ${auth.session.sAMAccountName} tried changing its own password but old password was incorrect`,
 						'Error'
 					);
 				else
-					appLog(
+					await appLog(
 						`(InvalidCredentialsError) User ${auth.session.sAMAccountName} tried changing ${user.sAMAccountName}'s password but old password was incorrect`,
 						'Error'
 					);
@@ -267,7 +266,7 @@ export const changeUserPassword: Action = async (event) => {
 				return setError(form, 'oldPassword', 'Incorrect password');
 			} else {
 				const message = `Something unexpected happened while validating the password`;
-				const errorId = errorLog(e, { message });
+				const errorId = await errorLog(e, { message });
 				throw error(500, { message, errorId });
 			}
 		}
@@ -282,17 +281,17 @@ export const changeUserPassword: Action = async (event) => {
 		await ldap.modify(dn, passwordChange);
 	} catch (e) {
 		const message = `Something unexpected happened while changing ${user.sAMAccountName}'s password`;
-		const errorId = errorLog(e, { message });
+		const errorId = await errorLog(e, { message });
 		throw error(500, { message, errorId });
 	}
 	if (isUpdatingSelfPassword) {
-		appLog(`User ${auth.session.sAMAccountName} changed its own password`);
+		await appLog(`User ${auth.session.sAMAccountName} changed its own password`);
 		//update access token
 		const { email } = verifyAccessToken(access);
 		const newAccess = generateAccessToken({ email, password });
 		setAccessCookie(cookies, newAccess);
 	} else {
-		appLog(`User ${auth.session.sAMAccountName} changed ${user.sAMAccountName}'s password`);
+		await appLog(`User ${auth.session.sAMAccountName} changed ${user.sAMAccountName}'s password`);
 	}
 	return { form };
 };
@@ -307,11 +306,11 @@ export const updateUser: Action = async (event) => {
 	if (!dn) throw error(400, 'No user DN provided');
 
 	const { ldap, session } = auth;
-
+	const { config } = locals;
 	const isSelfUpdating = dn === session.dn;
 
 	if (isSelfUpdating && !session.isAdmin && !config.app.nonAdmin.allowSelfEdit) {
-		appLog(
+		await appLog(
 			`User ${session.sAMAccountName} tried updating its own profile but non-admin self-update is disabled by configuration`,
 			'Error'
 		);
@@ -329,7 +328,8 @@ export const updateUser: Action = async (event) => {
 	const uac = Object.entries(uacFlags).reduce((acc, [key, value]) => {
 		if (!key.startsWith('uac.') || !value) return acc;
 		const flag = Number(key.slice(4));
-		return (acc += flag);
+		acc += flag;
+		return acc;
 	}, 0);
 	const displayName = `${givenName}` + (sn ? ` ${sn}` : '');
 	const [, content] = jpegPhotoBase64?.split('base64,') || [];
@@ -359,14 +359,14 @@ export const updateUser: Action = async (event) => {
 		if (e instanceof AlreadyExistsError) {
 			return setError(form, 'sAMAccountName', 'sAMAccountName already in use!');
 		} else if (e instanceof InsufficientAccessError) {
-			appLog(
+			await appLog(
 				`(InsufficientAccessError) User ${session.sAMAccountName} tried updating user ${dn} but does not have enough access`,
 				'Error'
 			);
 			throw error(403, { message: "You don't have permission to edit this user!" });
 		} else if (e instanceof UnknownStatusCodeError) {
 			const { message } = e;
-			appLog(
+			await appLog(
 				`(UnknownStatusCodeError) User ${session.sAMAccountName} tried updating user ${dn} but ldap server returned: ${message}`,
 				'Error'
 			);
@@ -374,7 +374,7 @@ export const updateUser: Action = async (event) => {
 			throw error(400, parsedMessage);
 		}
 		const message = `Something unexpected happened while updating ${user.sAMAccountName}`;
-		const errorId = errorLog(e, { message });
+		const errorId = await errorLog(e, { message });
 		throw error(500, { message, errorId });
 	}
 	if (sAMAccountNameChange) {
@@ -388,7 +388,7 @@ export const updateUser: Action = async (event) => {
 			}
 		} catch (e) {
 			const message = `Something unexpected happened while updating ${user.sAMAccountName}'s distinguishedName`;
-			const errorId = errorLog(e, { message });
+			const errorId = await errorLog(e, { message });
 			throw error(500, { message, errorId });
 		}
 	}
@@ -396,7 +396,7 @@ export const updateUser: Action = async (event) => {
 		searchOpts: { attributes: SESSION_ENTRY_ATTRIBUTES }
 	});
 	if (isSelfUpdating) {
-		appLog(`User ${session.sAMAccountName} updated its own profile`);
+		await appLog(`User ${session.sAMAccountName} updated its own profile`);
 
 		const newSession = await generateSessionToken(ldap, updatedUser);
 		setSessionCookie(cookies, newSession);
@@ -407,7 +407,7 @@ export const updateUser: Action = async (event) => {
 		});
 		setAccessCookie(cookies, newAccess);
 	} else {
-		appLog(`User ${session.sAMAccountName} updated ${updatedUser.sAMAccountName}'s profile`);
+		await appLog(`User ${session.sAMAccountName} updated ${updatedUser.sAMAccountName}'s profile`);
 	}
 	return withFiles({
 		form,
@@ -453,10 +453,10 @@ export const updateMembership: Action = async (event) => {
 		await Promise.all(promises);
 	} catch (e) {
 		const message = `Something went wrong updating ${user.sAMAccountName}'s groups`;
-		const errorId = errorLog(e, { message });
+		const errorId = await errorLog(e, { message });
 		throw error(500, { message, errorId });
 	}
-	appLog(
+	await appLog(
 		`User ${auth.session.sAMAccountName} set ${user.sAMAccountName}'s group membership to: ${dns.map(getCNFromDN).join(', ')}`
 	);
 	return { form };

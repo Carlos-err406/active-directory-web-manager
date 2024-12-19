@@ -1,8 +1,8 @@
-import config from '$config';
 import { generateCaptchaToken, setCaptchaCookie } from '$lib/server';
 import type { RequestHandler } from '@sveltejs/kit';
 import svgCaptcha from 'svg-captcha';
-export const GET: RequestHandler = async ({ cookies }) => {
+export const GET: RequestHandler = async ({ cookies, locals }) => {
+	const { config } = locals;
 	const { charPreset, ...options } = config.app.captcha;
 	const chars = charPreset;
 	const { text, data } = svgCaptcha.create({ ...options, charPreset: chars });

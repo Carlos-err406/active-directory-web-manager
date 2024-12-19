@@ -1,4 +1,3 @@
-import config from '$config';
 import { PUBLIC_BASE_DN } from '$env/static/public';
 import { getHideFilters } from '$lib/ldap';
 import { urlFilterToLdapFilter } from '$lib/ldap/filter';
@@ -9,6 +8,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 	const auth = await locals.auth();
 	if (!auth) throw redirect(302, '/auth');
 	const { ldap } = auth;
+	const { config } = locals;
 	const urlFilter = url.searchParams.get('filter');
 	if (!urlFilter) throw error(400, 'No filter provided');
 	const { groups, users } = config.directory;

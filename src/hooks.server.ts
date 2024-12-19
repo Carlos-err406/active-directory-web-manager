@@ -1,4 +1,4 @@
-import config, { LOGGING_SYSTEM_BASE } from '$config';
+import getConfig from '$config';
 import { PUBLIC_API_KEY, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
 import { getLDAPClient } from '$lib/ldap/client';
 import {
@@ -11,6 +11,12 @@ import { errorLog } from '$lib/server/logs';
 import { error, type Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 import { getLoggerHook } from 'sveltekit-logger-hook';
+
+const appConfigSetHandler: Handle = async ({ event, resolve }) => {
+	const config = await getConfig();
+	event.locals.config = config;
+	return resolve(event);
+};
 
 const apiProtectionHandler: Handle = ({ event, resolve }) => {
 	const { url, request } = event;
@@ -32,7 +38,7 @@ const authenticationSetHandler: Handle = async ({ event, resolve }) => {
 		const session = getSessionToken(cookies);
 		if (!session) return null;
 		try {
-			const ldap = getLDAPClient();
+			const ldap = await getLDAPClient();
 			const { email, password } = verifyAccessToken(access);
 			const [sAMAccountName] = email.split('@');
 			await ldap.bind(`${sAMAccountName}@${PUBLIC_LDAP_DOMAIN}`, password);
@@ -68,34 +74,43 @@ const ldapUnbindHandler: Handle = async ({ event, resolve }) => {
 	return response;
 };
 
-const { decodeSearchParams, logDateTemplate, logTemplate, useLogging, decodePathname } =
-	config.system.logging;
 /** handler hook for logging all requests
  *
  * if LOGGER environment variable is 1 the `logHandler` hook is included on the sequence
  * else `logHandler` is not included
  */
-const logHandler = getLoggerHook({
-	template: logTemplate,
-	dateTemplate: logDateTemplate,
-	fileOptions: { basePath: LOGGING_SYSTEM_BASE },
-	decodeSearchParams,
-	decodePathname,
-	colorOptions: {
-		date: ({ status }) => (status >= 400 ? 'redBold' : 'yellow'),
-		method: ({ status }) => (status >= 400 ? 'redBold' : 'green'),
-		status: ({ status }) => (status >= 400 ? 'redBold' : 'green'),
-		url: ({ status }) => (status >= 400 ? 'redBold' : 'cyanBold'),
-		urlSearchParams: ({ status }) => (status >= 400 ? 'redBold' : 'default')
+
+const loggingHandler: Handle = async ({ event, resolve }) => {
+	const { basePath, decodePathname, logTemplate, decodeSearchParams, logDateTemplate, useLogging } =
+		event.locals.config.system.logging;
+	if (!useLogging) return resolve(event);
+	else {
+		const loggerHook = getLoggerHook({
+			template: logTemplate,
+			dateTemplate: logDateTemplate,
+			fileOptions: { basePath: basePath + '/system/' },
+			decodeSearchParams,
+			decodePathname,
+			colorOptions: {
+				date: ({ status }) => (status >= 400 ? 'redBold' : 'yellow'),
+				method: ({ status }) => (status >= 400 ? 'redBold' : 'green'),
+				status: ({ status }) => (status >= 400 ? 'redBold' : 'green'),
+				url: ({ status }) => (status >= 400 ? 'redBold' : 'cyanBold'),
+				urlSearchParams: ({ status }) => (status >= 400 ? 'redBold' : 'default')
+			}
+		});
+		return loggerHook({ event, resolve });
 	}
-});
+};
 
 const getSequence = () => {
-	const sequence: Handle[] = [apiProtectionHandler, authenticationSetHandler, ldapUnbindHandler];
-	if (useLogging) {
-		sequence.unshift(logHandler);
-		console.log('Logging is enabled');
-	} else console.log('Logging is disabled');
+	const sequence: Handle[] = [
+		appConfigSetHandler,
+		loggingHandler,
+		apiProtectionHandler,
+		authenticationSetHandler,
+		ldapUnbindHandler
+	];
 	return sequence;
 };
 

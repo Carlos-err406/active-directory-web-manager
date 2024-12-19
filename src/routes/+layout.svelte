@@ -1,12 +1,12 @@
 <script>
-	import { afterNavigate } from '$app/navigation';
-	import { navigating, page } from '$app/stores';
+	import { afterNavigate, beforeNavigate } from '$app/navigation';
+	import { page } from '$app/stores';
 	import Loader from '$lib/components/ui/loader.svelte';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { globalLoader } from '$lib/stores';
 	import { ModeWatcher, setMode } from 'mode-watcher';
-	import { toast } from 'svelte-sonner';
 	import NProgress from 'nprogress';
+	import { toast } from 'svelte-sonner';
 	import '../app.pcss';
 	import '../nprogress.pcss';
 
@@ -17,21 +17,17 @@
 		trickleSpeed: 100
 	});
 
+	beforeNavigate(() => {
+		NProgress.start();
+	});
 	afterNavigate(() => {
+		NProgress.done();
 		const toastState = $page.state.toast;
 		if (toastState) {
 			toast[toastState.type](toastState.message, toastState.data);
 		}
 	});
 
-	$: {
-		if ($navigating) {
-			NProgress.start();
-		}
-		if (!$navigating) {
-			NProgress.done();
-		}
-	}
 	setMode('light');
 </script>
 

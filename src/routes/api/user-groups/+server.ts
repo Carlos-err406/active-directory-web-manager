@@ -1,4 +1,3 @@
-import config from '$config';
 import { PUBLIC_BASE_DN } from '$env/static/public';
 import { getHideFilters, getUserGroups } from '$lib/ldap';
 import { json, redirect, type RequestHandler } from '@sveltejs/kit';
@@ -10,6 +9,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 	const dn = url.searchParams.get('dn');
 	if (!dn) return json([]);
 	const { ldap } = auth;
+	const { config } = locals;
 	const { directory } = config;
 	const groups = await getUserGroups(ldap, dn);
 	if (!groups.length) return json([]);

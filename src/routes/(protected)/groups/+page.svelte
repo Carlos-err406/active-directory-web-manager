@@ -143,7 +143,9 @@
 	<div class="my-2 flex w-full justify-end gap-4">
 		<ResetFiltersDropdown />
 		<ColumnsDropdown {hidableCols} {flatColumns} />
-		<Button on:click={() => (groupCreateDialogOpen = true)}>Create Group</Button>
+		{#if data.session.isAdmin}
+			<Button on:click={() => (groupCreateDialogOpen = true)}>Create Group</Button>
+		{/if}
 	</div>
 	<DataTable viewModel={{ ...viewModel, flatColumns, rows, pluginStates }}>
 		<svelte:fragment slot="selected-row-actions">

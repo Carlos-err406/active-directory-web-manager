@@ -1,4 +1,3 @@
-import config from '$config';
 import { PUBLIC_BASE_DN } from '$env/static/public';
 import {
 	getBaseEntry,
@@ -37,7 +36,7 @@ export const createOu: Action = async (event) => {
 
 	const canCreate = await validateOuAmount(ldap);
 	if (!canCreate) {
-		appLog(
+		await appLog(
 			`(ReachedOULimit) User ${session.sAMAccountName} tried creating an Organizational Unit but can not create more Organizational Units in this directory. Maximum amount reached.`,
 			'Error'
 		);
@@ -66,17 +65,17 @@ export const createOu: Action = async (event) => {
 		if (e instanceof AlreadyExistsError) {
 			return setError(form, 'name', 'name already in use!');
 		} else if (e instanceof InsufficientAccessError) {
-			appLog(
+			await appLog(
 				`(InsufficientAccessError) User ${session.sAMAccountName} tried creating an Organizational Unit without having enough access`,
 				'Error'
 			);
 			throw error(403, "You don't have permission to create Organizational Units");
 		}
 		const message = 'Something unexpected happened while creating the Organizational Unit';
-		const errorId = errorLog(e, { message });
+		const errorId = await errorLog(e, { message });
 		throw error(500, { message, errorId });
 	}
-	appLog(`${auth.session.sAMAccountName} created Organizational Unit: ${dn}`);
+	await appLog(`${auth.session.sAMAccountName} created Organizational Unit: ${dn}`);
 
 	return { form };
 };
@@ -88,12 +87,13 @@ export const deleteOu: Action = async (event) => {
 	const form = await superValidate(event, zod(deleteOuSchema));
 	if (!form.valid) return fail(400, { form });
 	const { ldap, session } = auth;
+	const { config } = locals;
 	const { dn } = form.data;
 
 	const ou = await getEntryByDn<OrganizationalUnit>(ldap, dn);
 	if (!ou) throw error(404, 'Organizational Unit not found!');
 	else if (ou.isCriticalSystemObject === 'TRUE') {
-		appLog(
+		await appLog(
 			`(CriticalSystemObject) User ${session.sAMAccountName} tried deleting ${dn} but is a critical system object and can not be deleted!`,
 			'Error'
 		);
@@ -104,15 +104,15 @@ export const deleteOu: Action = async (event) => {
 		await ldap.del(dn);
 	} catch (e) {
 		if (e instanceof InsufficientAccessError) {
-			appLog(
+			await appLog(
 				`(InsufficientAccessError) User ${session.sAMAccountName} tried deleting an Organizational Unit (${dn}) but does not have enough access`,
 				'Error'
 			);
 			throw error(403, "You don't have permission to delete Organizational Units!");
 		} else if (e instanceof NotAllowedOnNonLeafError) {
-			const { allowNonLeafDelete } = config.directory.ous;
+			const { allowNonLeafDelete } = config;
 			if (!allowNonLeafDelete) {
-				appLog(
+				await appLog(
 					`(NotAllowedOnNonLeafError) User ${session.sAMAccountName} tried deleting an Organizational Unit (${dn}) but operation is not allowed on non-leaf entries`,
 					'Error'
 				);
@@ -122,12 +122,15 @@ export const deleteOu: Action = async (event) => {
 			}
 		} else {
 			const message = `Something unexpected happened while trying to delete ${ou.name}`;
-			const errorId = errorLog(e, { message });
+			const errorId = await errorLog(e, { message });
 			throw error(500, { message, errorId });
 		}
 	}
-	deletedEntries.map((dn) => appLog(`User ${session.sAMAccountName} deleted entry: ${dn}`));
-
+	await Promise.all(
+		deletedEntries.map(
+			async (dn) => await appLog(`User ${session.sAMAccountName} deleted entry: ${dn}`)
+		)
+	);
 	return { form };
 };
 
@@ -146,24 +149,24 @@ export const deleteManyOus: Action = async (event) => {
 	const { searchEntries } = await ldap.search(PUBLIC_BASE_DN, { filter });
 	const promises = searchEntries.map(async (entry) => {
 		if (entry['isCriticalSystemObject'] === 'TRUE') {
-			appLog(
+			await appLog(
 				`(CriticalSystemObject) User ${session.sAMAccountName} tried deleting ${entry.dn} but is a critical system object and can not be deleted!`,
 				'Error'
 			);
 			throw error(403, `Entry ${entry.sAMAccountName || entry.name} can not be deleted!`);
 		}
-		return ldap.del(entry.dn).catch((e) => {
+		return ldap.del(entry.dn).catch(async (e) => {
 			const message = `Something unexpected happened while deleting the Organizational Unit ${entry.name}`;
-			const errorId = errorLog(e, { message });
+			const errorId = await errorLog(e, { message });
 			throw error(500, { message, errorId });
 		});
 	});
 
 	await Promise.all(promises);
 	if (dns.length === 1)
-		appLog(`User ${session.sAMAccountName} deleted Organizational Unit ${dns[0]}`);
+		await appLog(`User ${session.sAMAccountName} deleted Organizational Unit ${dns[0]}`);
 	else
-		appLog(
+		await appLog(
 			`User ${session.sAMAccountName} deleted several Organizational Units: ${dns.map(getCNFromDN).join(', ')}`
 		);
 	return { form };
@@ -200,14 +203,14 @@ export const updateOu: Action = async (event) => {
 		if (e instanceof AlreadyExistsError) {
 			return setError(form, 'name', 'name already in use!');
 		} else if (e instanceof InsufficientAccessError) {
-			appLog(
+			await appLog(
 				`(InsufficientAccessError) User ${session.sAMAccountName} tried updating Organizational Unit ${dn} but does not have enough access`,
 				'Error'
 			);
 			throw error(403, { message: "You don't have permission to edit Organizational Units!" });
 		}
 		const message = `Something unexpected happened while updating ${ou.name}`;
-		const errorId = errorLog(e, { message });
+		const errorId = await errorLog(e, { message });
 		throw error(500, { message, errorId });
 	}
 };

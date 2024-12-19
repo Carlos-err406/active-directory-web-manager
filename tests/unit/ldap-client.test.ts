@@ -7,8 +7,8 @@ import { afterAll, afterEach, assert, beforeAll, beforeEach, describe, expect, i
 import { addTestUser, delTestUser, getTestUser, safe } from './fixtures';
 import { dn, password, sAMAccountName } from './mock-data';
 
-describe('ldap-ts auth test', () => {
-	const ldap = getLDAPClient();
+describe('ldap-ts auth test', async () => {
+	const ldap = await getLDAPClient();
 	afterEach(async () => await ldap.unbind());
 	beforeAll(async () => {
 		await safe(() => sudo(addTestUser));

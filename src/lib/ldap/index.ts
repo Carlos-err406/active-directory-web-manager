@@ -1,4 +1,4 @@
-import config from '$config';
+import getConfig from '$config';
 import { ADMIN_PASSWD } from '$env/static/private';
 import { PUBLIC_BASE_DN, PUBLIC_LDAP_DOMAIN } from '$env/static/public';
 import type { Group } from '$lib/types/group';
@@ -131,11 +131,13 @@ export const inferChange = <T>(entry: T, attribute: keyof T, value?: string | st
 	}
 };
 
-export const isAdmin = (ldap: Client, dn: string) =>
-	entryBelongsToGroup(ldap, dn, config.directory.adminGroup);
+export const isAdmin = async (ldap: Client, dn: string) => {
+	const config = await getConfig();
+	return entryBelongsToGroup(ldap, dn, config.directory.adminGroup);
+};
 
 export const sudo = async (sudoOperation: (ldap: Client) => Promise<void>) => {
-	const ldap = getLDAPClient();
+	const ldap = await getLDAPClient();
 	await ldap.bind(`administrator@${PUBLIC_LDAP_DOMAIN}`, ADMIN_PASSWD);
 	await sudoOperation(ldap);
 	await ldap.unbind();
@@ -183,6 +185,7 @@ export const getAllOrganizationalUnits = (
 		.then(({ searchEntries }) => searchEntries as Group[]);
 
 export const validateUserAmount = async (ldap: Client) => {
+	const config = await getConfig();
 	const { limit } = config.directory.users;
 	if (!limit) return true;
 	const users = await getAllUsers(ldap);
@@ -190,6 +193,7 @@ export const validateUserAmount = async (ldap: Client) => {
 };
 
 export const validateGroupAmount = async (ldap: Client) => {
+	const config = await getConfig();
 	const { limit } = config.directory.groups;
 	if (!limit) return true;
 	const groups = await getAllGroups(ldap);
@@ -197,21 +201,28 @@ export const validateGroupAmount = async (ldap: Client) => {
 };
 
 export const validateOuAmount = async (ldap: Client) => {
+	const config = await getConfig();
 	const { limit } = config.directory.ous;
 	if (!limit) return true;
 	const ous = await getAllOrganizationalUnits(ldap);
 	return ous.length < limit;
 };
 
-export const getFilteredUsers = (ldap: Client, extraFilters: Filter[] = []) =>
-	getAllUsers(ldap, [...getHideFilters(config.directory.users.hide), ...extraFilters]);
-
-export const getFilteredGroups = (ldap: Client, extraFilters: Filter[] = []) =>
-	getAllGroups(ldap, [...getHideFilters(config.directory.groups.hide), ...extraFilters]);
-
-export const getFilteredOrganizationalUnits = (ldap: Client, extraFilters: Filter[] = []) =>
-	getAllOrganizationalUnits(ldap, [...getHideFilters(config.directory.ous.hide), ...extraFilters]);
-
+export const getFilteredUsers = async (ldap: Client, extraFilters: Filter[] = []) => {
+	const config = await getConfig();
+	return getAllUsers(ldap, [...getHideFilters(config.directory.users.hide), ...extraFilters]);
+};
+export const getFilteredGroups = async (ldap: Client, extraFilters: Filter[] = []) => {
+	const config = await getConfig();
+	return getAllGroups(ldap, [...getHideFilters(config.directory.groups.hide), ...extraFilters]);
+};
+export const getFilteredOrganizationalUnits = async (ldap: Client, extraFilters: Filter[] = []) => {
+	const config = await getConfig();
+	return getAllOrganizationalUnits(ldap, [
+		...getHideFilters(config.directory.ous.hide),
+		...extraFilters
+	]);
+};
 export const getHideFilters = (hide: string[] = []) =>
 	hide.map(
 		(q) =>

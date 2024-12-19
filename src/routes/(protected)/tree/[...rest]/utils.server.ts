@@ -1,4 +1,3 @@
-import config from '$config';
 import { appLog } from '$lib/server/logs';
 import { jpegPhotoToB64 } from '$lib/transforms';
 import type { Session } from '$lib/types/session';
@@ -70,11 +69,16 @@ export const treeSearch = (
 		})
 		.then(({ searchEntries }) => searchEntries.map(jpegPhotoToB64) as TreeEntry[]);
 
-export const throwIfIsHiddenEntry = (dn: string, session: Session, url: URL) => {
+export const throwIfIsHiddenEntry = async (
+	config: App.Config,
+	dn: string,
+	session: Session,
+	url: URL
+) => {
 	const { users, ous, groups, tree } = config.directory;
 	const hiddenEntries = tree.hide.concat(groups.hide, ous.hide, users.hide);
 	if (hiddenEntries.some((hidden) => dn.endsWith(hidden))) {
-		appLog(
+		await appLog(
 			`User ${session.sAMAccountName} tried accessing ${decodeURIComponent(url.pathname)} but resource is hidden by configuration.`,
 			'Error'
 		);
