@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { EntryWithObjectClass } from '$/lib/utils';
 	import { goto, invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { PUBLIC_API_KEY } from '$env/static/public';
@@ -21,7 +22,7 @@
 	export let dn: string;
 	const action = `/users/${dn}?/updateMembership`;
 	$: form = $page.data.updateUserForm;
-	let groups: Group[] = [];
+	let groups: EntryWithObjectClass<Group>[] = [];
 	let initializing = false;
 
 	const onOpen = async () => {

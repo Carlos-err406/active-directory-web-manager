@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { EntryWithObjectClass } from '$/lib/utils';
 	import {
 		AndFilter,
 		EqualityFilter,
@@ -9,7 +10,7 @@
 	import type { User } from '$lib/types/user';
 	import { createEventDispatcher } from 'svelte';
 	import EntrySelect from '../entries/entry-select.svelte';
-	export let selected: User[] = [];
+	export let selected: EntryWithObjectClass<User>[] = [];
 	const dispatch = createEventDispatcher<{ select: User }>();
 	const onSelect = ({ detail }: CustomEvent) => dispatch('select', detail);
 </script>
