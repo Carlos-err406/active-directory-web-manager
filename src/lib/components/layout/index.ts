@@ -17,26 +17,40 @@ export const getNavigationItems = (
 	config: RecursiveRequired<App.Config>,
 	isAdmin = false
 ): NavigationItemType[] => {
+	const {
+		allowAccessToGroupsPage,
+		allowAccessToLogsPage,
+		allowAccessToOUsPage,
+		allowAccessToTreePage,
+		allowAccessToUsersPage
+	} = config.app.nonAdmin;
+
 	const filterLogsPageIfDisabled = (item: NavigationItemType) => {
-		const canAccess = config.app.nonAdmin.allowAccessToLogsPage || isAdmin;
+		const canAccess = allowAccessToLogsPage || isAdmin;
 		if (!item.href.startsWith('/logs')) return true;
 		else return config.app.views.logsPage.show && canAccess;
 	};
+	const filterUsersPageIfDisabled = (item: NavigationItemType) => {
+		const canAccess = allowAccessToUsersPage || isAdmin;
+		if (!item.href.startsWith('/users')) return true;
+		else return canAccess;
+	};
 	const filterTreePageIfDisabled = (item: NavigationItemType) => {
-		const canAccess = config.app.nonAdmin.allowAccessToGroupsPage || isAdmin;
+		const canAccess = allowAccessToTreePage || isAdmin;
 		if (!item.href.startsWith('/tree')) return true;
 		else return config.app.views.treePage.show && canAccess;
 	};
 	const filterOusPageIfDisabled = (item: NavigationItemType) => {
-		const canAccess = config.app.nonAdmin.allowAccessToOUsPage || isAdmin;
+		const canAccess = allowAccessToOUsPage || isAdmin;
 		if (!item.href.startsWith('/ous')) return true;
 		else return config.app.views.ousPage.show && canAccess;
 	};
 	const filterGroupsPageIfDisabled = (item: NavigationItemType) => {
-		const canAccess = config.app.nonAdmin.allowAccessToGroupsPage || isAdmin;
+		const canAccess = allowAccessToGroupsPage || isAdmin;
 		if (!item.href.startsWith('/groups')) return true;
 		else return config.app.views.groupsPage.show && canAccess;
 	};
+
 	return [
 		{ href: '/users', name: 'Users', icon: User },
 		{ href: '/groups', name: 'Groups', icon: Users },
@@ -52,6 +66,7 @@ export const getNavigationItems = (
 			icon: FileTextIcon
 		}
 	]
+		.filter(filterUsersPageIfDisabled)
 		.filter(filterLogsPageIfDisabled)
 		.filter(filterTreePageIfDisabled)
 		.filter(filterOusPageIfDisabled)
