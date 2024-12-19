@@ -19,21 +19,23 @@
 
 <Form.Field form={methods} {name}>
 	<Form.Control let:attrs>
-		<div class="flex items-center gap-2">
-			<Checkbox
-				{...attrs}
-				{...inputProps}
-				bind:checked
-				on:click
-				on:keydown
-				aria-labelledby="label-for-{name}"
-				class="transition-all [&_svg]:transition-all"
-			/>
-			<input name={attrs.name} value={$form[name]} hidden />
-			<div class="space-y-1 leading-none">
-				<Form.Label id="label-for-{name}" class={cn(inputProps.required && 'required')}>
-					<slot name="label" />
-				</Form.Label>
+		<div class="flex flex-col gap-1">
+			<div class="flex items-center gap-2">
+				<Checkbox
+					{...attrs}
+					{...inputProps}
+					bind:checked
+					on:click
+					on:keydown
+					aria-labelledby="label-for-{name}"
+					class="transition-all [&_svg]:transition-all"
+				/>
+				<input name={attrs.name} value={$form[name]} hidden />
+				<div class="space-y-1 leading-none">
+					<Form.Label id="label-for-{name}" class={cn(inputProps.required && 'required')}>
+						<slot name="label" />
+					</Form.Label>
+				</div>
 			</div>
 			<Form.Description><slot name="description" /></Form.Description>
 		</div>
